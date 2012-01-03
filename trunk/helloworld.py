@@ -66,7 +66,14 @@ class Guestbook(webapp2.RequestHandler):
     greeting.put()
     self.redirect('/?' + urllib.urlencode({'guestbook_name': guestbook_name}))
 
+class GoogleWebmasterVerify(webapp2.RequestHandler):
+  def get(self):
+      template = jinja_environment.get_template('google910e6da758dc80f1.html')
+      self.response.out.write(template.render())
 
+# TODO(mcupino): Maybe find out how to have the GoogleWebmasterVerify
+# automatically route to the html page?
 app = webapp2.WSGIApplication([('/', MainPage),
-                               ('/sign', Guestbook)],
-                              debug=True)
+    ('/sign', Guestbook),
+    ('/google910e6da758dc80f1.html', GoogleWebmasterVerify)],
+    debug=True)
