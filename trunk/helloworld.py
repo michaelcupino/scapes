@@ -4,6 +4,8 @@ import urllib
 import webapp2
 import jinja2
 import os
+import gdata.docs.data
+import gdata.docs.client
 
 jinja_environment = jinja2.Environment(
     loader=jinja2.FileSystemLoader(os.path.dirname(__file__)))
