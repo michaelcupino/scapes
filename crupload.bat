@@ -1,0 +1,2 @@
+set /p reviewer=Who would you like to review your code?
+"D:\Program Files\CodeReview\upload.py" --cc sucy-uci-code-reviews@googlegroups.com --reviewers %reviewer% --send_mail --server codereview.appspot.com
