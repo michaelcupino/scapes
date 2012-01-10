@@ -7,6 +7,8 @@ import os
 import gdata.gauth
 import gdata.docs.client
 import ConfigParser
+import difflib
+import string
 
 jinja_environment = jinja2.Environment(
     loader=jinja2.FileSystemLoader(os.path.dirname(__file__)))
@@ -47,7 +49,7 @@ class Fetcher(webapp2.RequestHandler):
         approval_page_url = request_token.generate_authorization_url()
 
         message = """<a href="%s">
-        Request token for the Google Documents Scope</a>"""
+        For the 4th document on the Google Docs list, show revision 1 and revision 2</a>"""
         self.response.out.write(message % approval_page_url)
 
 
@@ -57,6 +59,7 @@ class RequestTokenCallback(webapp2.RequestHandler):
     def get(self):
         current_user = users.get_current_user()
 
+        # TODO(someone?): Is it possible to keep the auth longer?
         request_token_key = 'request_token_%s' % current_user.user_id()
         request_token = gdata.gauth.ae_load(request_token_key)
         gdata.gauth.authorize_request_token(request_token, self.request.uri)
@@ -67,10 +70,35 @@ class RequestTokenCallback(webapp2.RequestHandler):
         gdata.gauth.ae_save(request_token, access_token_key)
 
         # gdocs.GetDocList() is deprecated; gdocs.GetResources() is the new way
+        # TODO(someone?): Find a way to make the user easily choose a doc to analyze
         feed = gdocs.GetResources()
-        for entry in feed.entry:
-            template = '<div>%s</div>'
-            self.response.out.write(template % entry.title.text)
+        doc = feed.entry[3]
+        revisions = gdocs.GetRevisions(doc)
+
+        revision1 = revisions.entry[0]
+        revision1Text = gdocs.DownloadRevisionToMemory(
+            revision1, {'exportFormat': 'txt'})
+        revision1TextList = string.split(revision1Text, '\n')
+
+        revision2 = revisions.entry[1]
+        revision2Text = gdocs.DownloadRevisionToMemory(
+            revision2, {'exportFormat': 'txt'})
+        revision2TextList = string.split(revision2Text, '\n')
+
+        template = """<div>%s</div>"""
+
+        # TODO(someone?): Make these things into templates
+        self.response.out.write("<h2>Revision 1</h2>")
+        self.response.out.write("<pre>")
+        for line in difflib.context_diff([], revision1TextList):
+            self.response.out.write(line)
+        self.response.out.write("</pre>")
+
+        self.response.out.write("<h2>Revision 2</h2>")
+        self.response.out.write("<pre>")
+        for line in difflib.context_diff(revision1TextList, revision2TextList):
+            self.response.out.write(line)
+        self.response.out.write("</pre>")
 
 class Greeting(db.Model):
   """Models an individual Guestbook entry with an author, content, and date."""
