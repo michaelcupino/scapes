@@ -74,31 +74,29 @@ class RequestTokenCallback(webapp2.RequestHandler):
         feed = gdocs.GetResources()
         doc = feed.entry[3]
         revisions = gdocs.GetRevisions(doc)
-
-        revision1 = revisions.entry[0]
-        revision1Text = gdocs.DownloadRevisionToMemory(
-            revision1, {'exportFormat': 'txt'})
-        revision1TextList = string.split(revision1Text, '\n')
-
-        revision2 = revisions.entry[1]
-        revision2Text = gdocs.DownloadRevisionToMemory(
-            revision2, {'exportFormat': 'txt'})
-        revision2TextList = string.split(revision2Text, '\n')
+        
+        revisionTextList = [];
+        for revision in revisions.entry:
+            revisionText = gdocs.DownloadRevisionToMemory(
+                revision, {'exportFormat': 'txt'})
+            revisionTextList.append(string.split(revisionText, '\n'))
 
         template = """<div>%s</div>"""
 
         # TODO(someone?): Make these things into templates
-        self.response.out.write("<h2>Revision 1</h2>")
-        self.response.out.write("<pre>")
-        for line in difflib.context_diff([], revision1TextList):
-            self.response.out.write(line)
-        self.response.out.write("</pre>")
-
-        self.response.out.write("<h2>Revision 2</h2>")
-        self.response.out.write("<pre>")
-        for line in difflib.context_diff(revision1TextList, revision2TextList):
-            self.response.out.write(line)
-        self.response.out.write("</pre>")
+        
+        count = 1;
+        previousText = [];
+        
+        for revisionText in revisionTextList:
+            revisionString = "<h2>Revision %s</h2>" % (count)
+            count += 1
+            self.response.out.write(revisionString)
+            self.response.out.write("<pre>")
+            for line in difflib.context_diff(previousText, revisionText):
+                self.response.out.write(line)
+            self.response.out.write("</pre>")
+            previousText = revisionText
 
 class Greeting(db.Model):
   """Models an individual Guestbook entry with an author, content, and date."""
