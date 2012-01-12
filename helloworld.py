@@ -9,6 +9,8 @@ import gdata.docs.client
 import ConfigParser
 import difflib
 import string
+import Crypto
+import random
 
 jinja_environment = jinja2.Environment(
     loader=jinja2.FileSystemLoader(os.path.dirname(__file__)))
@@ -18,6 +20,8 @@ from google.appengine.api import users
 
 from google.appengine.ext.webapp.util import run_wsgi_app, login_required
 
+from Crypto.Cipher import AES
+
 # Configure gdata
 config = ConfigParser.RawConfigParser()
 config.read('config.cfg')
@@ -25,7 +29,8 @@ SETTINGS = {
     'APP_NAME': config.get('gdata_settings', 'APP_NAME'),
     'CONSUMER_KEY': config.get('gdata_settings', 'CONSUMER_KEY'),
     'CONSUMER_SECRET': config.get('gdata_settings', 'CONSUMER_SECRET'),
-    'SCOPES': [config.get('gdata_settings', 'SCOPES')]
+    'SCOPES': [config.get('gdata_settings', 'SCOPES')],
+    'Key': config.get('encryption_settings', 'KEY')
     }
 
 gdocs = gdata.docs.client.DocsClient(source = SETTINGS['APP_NAME'])
@@ -57,6 +62,7 @@ class RequestTokenCallback(webapp2.RequestHandler):
 
     @login_required
     def get(self):
+        self.response.out.write("<a href='/step1'>Step 1</a> <br \>")
         current_user = users.get_current_user()
 
         # TODO(someone?): Is it possible to keep the auth longer?
@@ -68,6 +74,17 @@ class RequestTokenCallback(webapp2.RequestHandler):
 
         access_token_key = 'access_token_%s' % current_user.user_id()
         gdata.gauth.ae_save(request_token, access_token_key)
+        
+        aesEncrypter = AES.new(SETTINGS['Key'], AES.MODE_ECB)
+        
+        remainder = len(access_token_key) % 16
+        neededChars = 16 - remainder
+        join_token = ''.join(random.choice(string.ascii_uppercase + string.digits) for x in range(neededChars))
+        access_token_key += join_token
+        
+        encryption = aesEncrypter.encrypt(access_token_key)
+        
+        decrypted = aesEncrypter.decrypt(access_token_key)
 
         # gdocs.GetDocList() is deprecated; gdocs.GetResources() is the new way
         # TODO(someone?): Find a way to make the user easily choose a doc to analyze
