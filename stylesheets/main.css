@@ -1,4 +1,19 @@
 body {
-  font-family: Verdana, Helvetica, sans-serif;
+  font-family: 'Helvetica Neue',helvetica,arial,sans-serif;
   background-color: #DDDDDD;
+}
+
+input {
+  background-color: #4D90FE;
+  border: 1px solid transparent;
+  color: white;
+  padding: 0;
+  border-radius: 2px;
+  border-top-left-radius: 2px;
+  border-top-right-radius: 2px;
+  border-bottom-right-radius: 2px;
+  border-bottom-left-radius: 2px;
+  min-width: 75px;
+  font: inherit;
+  line-height: 25px;
 }
