@@ -9,8 +9,6 @@ import gdata.docs.client
 import ConfigParser
 import difflib
 import string
-import Crypto
-import random
 
 jinja_environment = jinja2.Environment(
     loader=jinja2.FileSystemLoader(os.path.dirname(__file__)))
@@ -20,8 +18,6 @@ from google.appengine.api import users
 
 from google.appengine.ext.webapp.util import run_wsgi_app, login_required
 
-from Crypto.Cipher import AES
-
 # Configure gdata
 config = ConfigParser.RawConfigParser()
 config.read('config.cfg')
@@ -29,8 +25,7 @@ SETTINGS = {
     'APP_NAME': config.get('gdata_settings', 'APP_NAME'),
     'CONSUMER_KEY': config.get('gdata_settings', 'CONSUMER_KEY'),
     'CONSUMER_SECRET': config.get('gdata_settings', 'CONSUMER_SECRET'),
-    'SCOPES': [config.get('gdata_settings', 'SCOPES')],
-    'Key': config.get('encryption_settings', 'KEY')
+    'SCOPES': [config.get('gdata_settings', 'SCOPES')]
     }
 
 gdocs = gdata.docs.client.DocsClient(source = SETTINGS['APP_NAME'])
@@ -57,6 +52,44 @@ class Fetcher(webapp2.RequestHandler):
         For the 4th document on the Google Docs list, show revision 1 and revision 2</a>"""
         self.response.out.write(message % approval_page_url)
 
+        
+class RequestRevision(webapp2.RequestHandler):    
+    @login_required
+    def get(self):
+        access_token_key = 'access_token_%s' % users.get_current_user().user_id()
+        access_token = gdata.gauth.AeLoad(access_token_key)
+        gdocs.auth_token = access_token
+        
+        self.response.out.write("<a href='/step1'>Step 1</a> <br \>")
+        
+        feed = gdocs.GetResources()
+        doc = feed.entry[0]
+        revisions = gdocs.GetRevisions(doc)
+                
+        # TODO(jordan): Don't store all revision in a list
+        revisionTextList = [];
+        for revision in revisions.entry:
+            revisionText = gdocs.DownloadRevisionToMemory(
+                revision, {'exportFormat': 'txt'})
+            revisionTextList.append(string.split(revisionText, '\n'))
+
+        template = """<div>%s</div>"""
+
+        # TODO(someone?): Make these things into templates
+        
+        count = 1;
+        previousText = [];
+        
+        for revisionText in revisionTextList:
+            revisionString = "<h2>Revision %s</h2>" % (count)
+            count += 1
+            self.response.out.write(revisionString)
+            self.response.out.write("<pre>")
+            for line in difflib.context_diff(previousText, revisionText):
+                self.response.out.write(line)
+            self.response.out.write("</pre>")
+            previousText = revisionText
+
 
 class RequestTokenCallback(webapp2.RequestHandler):
 
@@ -65,31 +98,23 @@ class RequestTokenCallback(webapp2.RequestHandler):
         self.response.out.write("<a href='/step1'>Step 1</a> <br \>")
         current_user = users.get_current_user()
 
-        # TODO(someone?): Is it possible to keep the auth longer?
+        # Authorize the request token to be an access token
         request_token_key = 'request_token_%s' % current_user.user_id()
-        request_token = gdata.gauth.ae_load(request_token_key)
+        request_token = gdata.gauth.AeLoad(request_token_key)
         gdata.gauth.authorize_request_token(request_token, self.request.uri)
 
+        # Create the long lived access token from the request token
         gdocs.auth_token = gdocs.get_access_token(request_token)
+        access_token = request_token
 
+        # Store the access token
         access_token_key = 'access_token_%s' % current_user.user_id()
-        gdata.gauth.ae_save(request_token, access_token_key)
-        
-        aesEncrypter = AES.new(SETTINGS['Key'], AES.MODE_ECB)
-        
-        remainder = len(access_token_key) % 16
-        neededChars = 16 - remainder
-        join_token = ''.join(random.choice(string.ascii_uppercase + string.digits) for x in range(neededChars))
-        access_token_key += join_token
-        
-        encryption = aesEncrypter.encrypt(access_token_key)
-        
-        decrypted = aesEncrypter.decrypt(access_token_key)
+        gdata.gauth.ae_save(access_token, access_token_key)
 
         # gdocs.GetDocList() is deprecated; gdocs.GetResources() is the new way
         # TODO(someone?): Find a way to make the user easily choose a doc to analyze
         feed = gdocs.GetResources()
-        doc = feed.entry[3]
+        doc = feed.entry[0]
         revisions = gdocs.GetRevisions(doc)
         
         revisionTextList = [];
@@ -178,5 +203,6 @@ app = webapp2.WSGIApplication([('/', MainPage),
     ('/sign', Guestbook),
     ('/google910e6da758dc80f1.html', GoogleWebmasterVerify),
     ('/step1', Fetcher),
-    ('/step2', RequestTokenCallback)],
+    ('/step2', RequestTokenCallback),
+    ('/step3', RequestRevision)],
     debug=True)
