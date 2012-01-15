@@ -79,7 +79,7 @@ class RequestRevision(webapp2.RequestHandler):
         self.response.out.write("<a href='/step1'>Step 1</a> <br \>")
         
         feed = gdocs.GetResources()
-        doc = feed.entry[id]
+        doc = feed.entry[int(id)]
         revisions = gdocs.GetRevisions(doc)
                  
         count = 1;
