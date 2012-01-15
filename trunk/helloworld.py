@@ -52,13 +52,29 @@ class Fetcher(webapp2.RequestHandler):
         For the 4th document on the Google Docs list, show revision 1 and revision 2</a>"""
         self.response.out.write(message % approval_page_url)
     
-    
+class FetchRevision(webapp2.RequestHandler):
+    @login_required
+    def get(self):
+        access_token_key = 'access_token_%s' % users.get_current_user().user_id()
+        access_token = gdata.gauth.AeLoad(access_token_key)
+        gdocs.auth_token = access_token
+        
+        feed = gdocs.GetResources()
+        count = 0;
+        template = '<div><a href=%s>%s</a></div>'
+        for entry in feed.entry:
+            link = "/step4?id=%d" % count
+            self.response.out.write(template % (link, entry.title.text))
+            count += 1
+            
+            
 class RequestRevision(webapp2.RequestHandler):    
     @login_required
     def get(self):
         access_token_key = 'access_token_%s' % users.get_current_user().user_id()
         access_token = gdata.gauth.AeLoad(access_token_key)
         gdocs.auth_token = access_token
+        id = self.request.get('id')
         
         self.response.out.write("<a href='/step1'>Step 1</a> <br \>")
         
@@ -81,9 +97,9 @@ class RequestRevision(webapp2.RequestHandler):
             self.response.out.write("</pre>")
             previousText = revisionText
 
-        template = """<div>%s</div>"""
-
         # TODO(someone?): Make these things into templates
+        
+        template = """<div>%s</div>"""
 
         
 class RequestTokenCallback(webapp2.RequestHandler):
@@ -194,5 +210,6 @@ app = webapp2.WSGIApplication([('/', MainPage),
     ('/google910e6da758dc80f1.html', GoogleWebmasterVerify),
     ('/step1', Fetcher),
     ('/step2', RequestTokenCallback),
-    ('/step3', RequestRevision)],
+    ('/step3', FetchRevision),
+    ('/step4', RequestRevision)],
     debug=True)
