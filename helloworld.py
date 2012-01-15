@@ -51,8 +51,8 @@ class Fetcher(webapp2.RequestHandler):
         message = """<a href="%s">
         For the 4th document on the Google Docs list, show revision 1 and revision 2</a>"""
         self.response.out.write(message % approval_page_url)
-
-        
+    
+    
 class RequestRevision(webapp2.RequestHandler):    
     @login_required
     def get(self):
@@ -65,32 +65,27 @@ class RequestRevision(webapp2.RequestHandler):
         feed = gdocs.GetResources()
         doc = feed.entry[0]
         revisions = gdocs.GetRevisions(doc)
-                
-        # TODO(jordan): Don't store all revision in a list
-        revisionTextList = [];
+                 
+        count = 1;
+        previousText = "";
         for revision in revisions.entry:
             revisionText = gdocs.DownloadRevisionToMemory(
                 revision, {'exportFormat': 'txt'})
-            revisionTextList.append(string.split(revisionText, '\n'))
-
-        template = """<div>%s</div>"""
-
-        # TODO(someone?): Make these things into templates
-        
-        count = 1;
-        previousText = [];
-        
-        for revisionText in revisionTextList:
             revisionString = "<h2>Revision %s</h2>" % (count)
             count += 1
             self.response.out.write(revisionString)
             self.response.out.write("<pre>")
+            revisionText = string.split(revisionText, '\n')
             for line in difflib.context_diff(previousText, revisionText):
                 self.response.out.write(line)
             self.response.out.write("</pre>")
             previousText = revisionText
 
+        template = """<div>%s</div>"""
 
+        # TODO(someone?): Make these things into templates
+
+        
 class RequestTokenCallback(webapp2.RequestHandler):
 
     @login_required
@@ -117,28 +112,23 @@ class RequestTokenCallback(webapp2.RequestHandler):
         doc = feed.entry[0]
         revisions = gdocs.GetRevisions(doc)
         
-        revisionTextList = [];
+        count = 1;
+        previousText = "";
         for revision in revisions.entry:
             revisionText = gdocs.DownloadRevisionToMemory(
                 revision, {'exportFormat': 'txt'})
-            revisionTextList.append(string.split(revisionText, '\n'))
-
-        template = """<div>%s</div>"""
-
-        # TODO(someone?): Make these things into templates
-        
-        count = 1;
-        previousText = [];
-        
-        for revisionText in revisionTextList:
             revisionString = "<h2>Revision %s</h2>" % (count)
             count += 1
             self.response.out.write(revisionString)
             self.response.out.write("<pre>")
+            revisionText = string.split(revisionText, '\n')
             for line in difflib.context_diff(previousText, revisionText):
                 self.response.out.write(line)
             self.response.out.write("</pre>")
             previousText = revisionText
+
+        template = """<div>%s</div>"""
+
 
 class Greeting(db.Model):
   """Models an individual Guestbook entry with an author, content, and date."""
