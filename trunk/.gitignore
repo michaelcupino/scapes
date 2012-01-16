@@ -1,5 +1,5 @@
 *.swp
 *.pyc
-config.cfg
-crupload.py
-crupdate.py
+/config.cfg
+/crupload.py
+/crupdate.py
