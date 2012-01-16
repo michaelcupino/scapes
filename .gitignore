@@ -3,4 +3,3 @@
 config.cfg
 crupload.py
 crupdate.py
-templates/*.yaml
