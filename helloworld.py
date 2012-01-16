@@ -198,6 +198,11 @@ class Guestbook(webapp2.RequestHandler):
     greeting.put()
     self.redirect('/?' + urllib.urlencode({'guestbook_name': guestbook_name}))
 
+class CanvasPlayground(webapp2.RequestHandler):
+    def get(self):
+        template = jinja_environment.get_template('templates/canvas.html')
+        self.response.out.write(template.render())
+
 class GoogleWebmasterVerify(webapp2.RequestHandler):
   def get(self):
       template = jinja_environment.get_template('google910e6da758dc80f1.html')
@@ -207,6 +212,7 @@ class GoogleWebmasterVerify(webapp2.RequestHandler):
 # automatically route to the html page?
 app = webapp2.WSGIApplication([('/', MainPage),
     ('/sign', Guestbook),
+    ('/canvas', CanvasPlayground),
     ('/google910e6da758dc80f1.html', GoogleWebmasterVerify),
     ('/step1', Fetcher),
     ('/step2', RequestTokenCallback),
