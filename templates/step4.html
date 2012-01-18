@@ -1,0 +1,12 @@
+{% extends "templates/defaultLayout.html" %}
+{% block content %}
+  {% for diff in diffs %}
+    <div class="diff">
+      <h2>Revision {{ loop.index }}</h2>
+      <pre>
+        {# TODO(someone?) Figure out why you have to decode #}
+        {{ diff.decode("utf-8") }}
+      </pre>
+    </div>
+  {% endfor %}
+{% endblock %}

@@ -46,67 +46,67 @@ class Fetcher(webapp2.RequestHandler):
         request_token_key = 'request_token_%s' % current_user.user_id()
         gdata.gauth.ae_save(request_token, request_token_key)
 
-        approval_page_url = request_token.generate_authorization_url()
+        approvalPageUrl = request_token.generate_authorization_url()
 
-        message = """<a href="%s">
-        For the 4th document on the Google Docs list, show revision 1 and revision 2</a>"""
-        self.response.out.write(message % approval_page_url)
-    
+        templateValues = {
+            'approvalPageUrl': approvalPageUrl,
+        }
+        template = jinja_environment.get_template('templates/step1.html')
+        self.response.out.write(template.render(templateValues))
+
 class FetchRevision(webapp2.RequestHandler):
     @login_required
     def get(self):
         access_token_key = 'access_token_%s' % users.get_current_user().user_id()
         access_token = gdata.gauth.AeLoad(access_token_key)
         gdocs.auth_token = access_token
-        
+
         feed = gdocs.GetResources()
-        count = 0;
-        template = '<div><a href=%s>%s</a></div>'
-        for entry in feed.entry:
-            link = "/step4?id=%d" % count
-            self.response.out.write(template % (link, entry.title.text))
-            count += 1
-            
-            
-class RequestRevision(webapp2.RequestHandler):    
+
+        templateValues = {
+            'entries': feed.entry,
+        }
+        template = jinja_environment.get_template('templates/step3.html')
+        self.response.out.write(template.render(templateValues))
+
+
+class RequestRevision(webapp2.RequestHandler):
     @login_required
     def get(self):
         access_token_key = 'access_token_%s' % users.get_current_user().user_id()
         access_token = gdata.gauth.AeLoad(access_token_key)
         gdocs.auth_token = access_token
         id = self.request.get('id')
-        
-        self.response.out.write("<a href='/step1'>Step 1</a> <br \>")
-        
+
         feed = gdocs.GetResources()
         doc = feed.entry[int(id)]
         revisions = gdocs.GetRevisions(doc)
-                 
-        count = 1;
+
         previousText = "";
+        diffs = []
         for revision in revisions.entry:
+            # TODO(someone?): Maybe make this download into a separate function
+            # because the client's browser timesout if this takes too long
             revisionText = gdocs.DownloadRevisionToMemory(
                 revision, {'exportFormat': 'txt'})
-            revisionString = "<h2>Revision %s</h2>" % (count)
-            count += 1
-            self.response.out.write(revisionString)
-            self.response.out.write("<pre>")
             revisionText = string.split(revisionText, '\n')
+            currentDiff = ""
             for line in difflib.context_diff(previousText, revisionText):
-                self.response.out.write(line)
-            self.response.out.write("</pre>")
+                currentDiff += line
+            diffs.append(currentDiff)
             previousText = revisionText
 
-        # TODO(someone?): Make these things into templates
-        
-        template = """<div>%s</div>"""
+        templateValues = {
+            'diffs': diffs,
+        }
+        template = jinja_environment.get_template('templates/step4.html')
+        self.response.out.write(template.render(templateValues))
 
-        
+
 class RequestTokenCallback(webapp2.RequestHandler):
 
     @login_required
     def get(self):
-        self.response.out.write("<a href='/step1'>Step 1</a> <br \>")
         current_user = users.get_current_user()
 
         # Authorize the request token to be an access token
@@ -122,28 +122,10 @@ class RequestTokenCallback(webapp2.RequestHandler):
         access_token_key = 'access_token_%s' % current_user.user_id()
         gdata.gauth.ae_save(access_token, access_token_key)
 
-        # gdocs.GetDocList() is deprecated; gdocs.GetResources() is the new way
-        # TODO(someone?): Find a way to make the user easily choose a doc to analyze
-        feed = gdocs.GetResources()
-        doc = feed.entry[0]
-        revisions = gdocs.GetRevisions(doc)
-        
-        count = 1;
-        previousText = "";
-        for revision in revisions.entry:
-            revisionText = gdocs.DownloadRevisionToMemory(
-                revision, {'exportFormat': 'txt'})
-            revisionString = "<h2>Revision %s</h2>" % (count)
-            count += 1
-            self.response.out.write(revisionString)
-            self.response.out.write("<pre>")
-            revisionText = string.split(revisionText, '\n')
-            for line in difflib.context_diff(previousText, revisionText):
-                self.response.out.write(line)
-            self.response.out.write("</pre>")
-            previousText = revisionText
-
-        template = """<div>%s</div>"""
+        # TODO(someone?): Find out what webap2.redirect does
+        webapp2.redirect('step3')
+        template = jinja_environment.get_template('templates/step2.html')
+        self.response.out.write(template.render())
 
 
 class Greeting(db.Model):
@@ -172,14 +154,13 @@ class MainPage(webapp2.RequestHandler):
             url = users.create_login_url(self.request.uri)
             url_linktext = 'Login'
 
-        template_values = {
+        templateValues = {
             'greetings': greetings,
             'url': url,
             'url_linktext': url_linktext,
         }
-
         template = jinja_environment.get_template('templates/index.html')
-        self.response.out.write(template.render(template_values))
+        self.response.out.write(template.render(templateValues))
 
 
 class Guestbook(webapp2.RequestHandler):
