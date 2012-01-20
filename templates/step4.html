@@ -1,5 +1,21 @@
 {% extends "templates/defaultLayout.html" %}
+{% block head %}
+  <script src="/js/processing-1.3.6.min.js"></script>
+{% endblock %}
 {% block content %}
+  <script type="text/javascript">
+    setRevisionCount({{ revisionCount }});
+  </script>
+  <h1>Analysis of Document</h2>
+  <h2>Mocked Revision History Visualilzation</h2>
+  <div class="visualization">
+    <div class="visualization-info">
+      <p class="user1">Michael</p>
+      <p class="user2">Grace</p>
+      <p class="user3">Danielle</p>
+    </div>
+    <canvas data-processing-sources="/pde/docsRevision.pde"></canvas>
+  </div>
   {% for diff in diffs %}
     <div class="diff">
       <h2>Revision {{ loop.index }}</h2>

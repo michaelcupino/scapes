@@ -7,7 +7,10 @@ threadsafe: true
 handlers:
 - url: /stylesheets
   static_dir: stylesheets
-
+- url: /js
+  static_dir: js
+- url: /pde
+  static_dir: pde
 - url: /.*
   script: main.app
 
