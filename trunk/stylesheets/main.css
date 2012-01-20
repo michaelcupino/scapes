@@ -17,3 +17,26 @@ input {
   font: inherit;
   line-height: 25px;
 }
+
+.visualization-info {
+  display: inline-block;
+  vertical-align: top;
+  margin-right: 80px;
+}
+
+.visualization canvas {
+  display: inline-block;
+  border: 1px;
+}
+
+.user1 {
+  color: rgb(255, 255, 255);
+}
+
+.user2 {
+  color: rgb(150, 150, 150);
+}
+
+.user3 {
+  color: rgb(50, 50, 50);
+}

@@ -98,6 +98,7 @@ class RequestRevision(webapp2.RequestHandler):
 
         templateValues = {
             'diffs': diffs,
+            'revisionCount': len(revisions.entry),
         }
         template = jinja_environment.get_template('templates/step4.html')
         self.response.out.write(template.render(templateValues))
