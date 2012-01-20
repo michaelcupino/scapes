@@ -103,6 +103,26 @@ class RequestRevision(webapp2.RequestHandler):
         self.response.out.write(template.render(templateValues))
 
 
+class RequestRawRevision(webapp2.RequestHandler):
+    @login_required
+    def get(self):
+        access_token_key = 'access_token_%s' % users.get_current_user().user_id()
+        access_token = gdata.gauth.AeLoad(access_token_key)
+        gdocs.auth_token = access_token
+        id = self.request.get('id')
+
+        feed = gdocs.GetResources()
+        doc = feed.entry[int(id)]
+        revisions = gdocs.GetRevisions(doc)
+
+        for revision in revisions.entry:
+            # TODO(someone?): Maybe make this download into a separate function
+            # because the client's browser timesout if this takes too long
+            revisionText = gdocs.DownloadRevisionToMemory(revision)
+            self.response.out.write(revisionText)
+            self.response.out.write("\n\n\n")
+
+
 class RequestTokenCallback(webapp2.RequestHandler):
 
     @login_required
@@ -198,5 +218,6 @@ app = webapp2.WSGIApplication([('/', MainPage),
     ('/step1', Fetcher),
     ('/step2', RequestTokenCallback),
     ('/step3', FetchRevision),
-    ('/step4', RequestRevision)],
+    ('/step4', RequestRevision),
+    ('/raw', RequestRawRevision)],
     debug=True)
