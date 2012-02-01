@@ -7,6 +7,7 @@
     setRevisionCount({{ revisionCount }});
   </script>
   <h1>Analysis of Document</h2>
+
   <h2>Mocked Revision History Visualilzation</h2>
   <div class="visualization">
     <div class="visualization-info">
@@ -16,13 +17,28 @@
     </div>
     <canvas data-processing-sources="/pde/docsRevision.pde"></canvas>
   </div>
-  {% for diff in diffs %}
-    <div class="diff">
-      <h2>Revision {{ loop.index }}</h2>
-      <pre>
-        {# TODO(someone?) Figure out why you have to decode #}
-        {{ diff.decode("utf-8") }}
-      </pre>
+
+  <h2>Document Tags</h2>
+  {% for documentTag in documentTags %}
+    <div class="document-tag">
+      {{ documentTag.content|escape }}
     </div>
   {% endfor %}
+  <form action="/tagDocument" method="post">
+    <div><textarea name="content" rows="3" cols="60"></textarea></div>
+    <div><input type="submit" value="Add Tag"></div>
+  </form>
+
+  <h2>Raw Diffs</h2>
+  <div class="raw-diffs">
+    {% for diff in diffs %}
+      <div class="diff">
+        <h3>Revision {{ loop.index }}</h3>
+        <pre>
+          {# TODO(someone?) Figure out why you have to decode #}
+          {{ diff.decode("utf-8") }}
+        </pre>
+      </div>
+    {% endfor %}
+  </div>
 {% endblock %}
