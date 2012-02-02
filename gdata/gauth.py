@@ -104,10 +104,10 @@ AUTH_SCOPES = {
     'lh2': ( # Picasa Web Albums API
         'http://picasaweb.google.com/data/',),
     'apps': ( # Google Apps Provisioning API
-        'http://www.google.com/a/feeds/',
-        'https://www.google.com/a/feeds/',
-        'http://apps-apis.google.com/a/feeds/',
-        'https://apps-apis.google.com/a/feeds/'),
+        'https://apps-apis.google.com/a/feeds/user/',
+        'https://apps-apis.google.com/a/feeds/policies/',
+        'https://apps-apis.google.com/a/feeds/alias/',
+        'https://apps-apis.google.com/a/feeds/groups/'),
     'weaver': ( # Health H9 Sandbox
         'https://www.google.com/h9/feeds/',),
     'wise': ( # Spreadsheets Data API
@@ -467,7 +467,11 @@ def generate_signature(data, rsa_key):
   try:
     from tlslite.utils import keyfactory
   except ImportError:
-    from gdata.tlslite.utils import keyfactory
+    try:
+      from gdata.tlslite.utils import keyfactory
+    except ImportError:
+      from tlslite.tlslite.utils import keyfactory
+
   private_key = keyfactory.parsePrivateKey(rsa_key)
   signed = private_key.hashAndSign(data)
   # Python2.3 and lower does not have the base64.b64encode function.
@@ -653,7 +657,10 @@ def generate_rsa_signature(http_request, consumer_key, rsa_key,
   try:
     from tlslite.utils import keyfactory
   except ImportError:
-    from gdata.tlslite.utils import keyfactory
+    try:
+      from gdata.tlslite.utils import keyfactory
+    except ImportError:
+      from tlslite.tlslite.utils import keyfactory
   base_string = build_oauth_base_string(
       http_request, consumer_key, nonce, RSA_SHA1, timestamp, version,
       next, token, verifier=verifier)
@@ -1170,7 +1177,6 @@ class OAuth2Token(object):
         'user-agent': self.user_agent,
     }
 
-    print 'REFRESHING!'
     http_request = atom.http_core.HttpRequest(uri=self.token_uri, method='POST', headers=headers)
     http_request.add_body_part(body, mime_type='application/x-www-form-urlencoded')
     response = request(http_request)

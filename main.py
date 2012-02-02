@@ -102,10 +102,10 @@ class RequestRevision(webapp2.RequestHandler):
     access_token = gdata.gauth.AeLoad(access_token_key)
     gdocs.auth_token = access_token
     id = self.request.get('id')
-
-    feed = gdocs.GetResources()
-    doc = feed.entry[int(id)]
-    revisions = gdocs.GetRevisions(doc)
+    
+    # TODO(jordan): Figure out how to catch exception with invalid resource
+    resource = gdocs.GetResourceById(id)
+    revisions = gdocs.GetRevisions(resource)
 
     previousText = "";
     diffs = []
@@ -144,9 +144,9 @@ class RequestRawRevision(webapp2.RequestHandler):
     gdocs.auth_token = access_token
     id = self.request.get('id')
 
-    feed = gdocs.GetResources()
-    doc = feed.entry[int(id)]
-    revisions = gdocs.GetRevisions(doc)
+    # TODO(jordan): Figure out how to catch exception with invalid resource
+    resource = gdocs.GetResourceById(id)
+    revisions = gdocs.GetRevisions(resource)
 
     for revision in revisions.entry:
       # TODO(someone?): Maybe make this download into a separate function
