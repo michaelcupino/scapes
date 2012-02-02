@@ -32,9 +32,8 @@ import gdata.gauth
 # Feed URIs that are given by the API, but cannot be obtained without
 # making a mostly unnecessary HTTP request.
 RESOURCE_FEED_URI = '/feeds/default/private/full'
+RESOURCE_SELF_LINK_TEMPLATE = RESOURCE_FEED_URI + '/%s'
 RESOURCE_UPLOAD_URI = '/feeds/upload/create-session/default/private/full'
-COLLECTION_UPLOAD_URI_TEMPLATE = \
-    '/feeds/upload/create-session/feeds/default/private/full/%s/contents'
 ARCHIVE_FEED_URI = '/feeds/default/private/archive'
 METADATA_URI = '/feeds/metadata/default'
 CHANGE_FEED_URI = '/feeds/default/private/changes'
@@ -208,6 +207,20 @@ class DocsClient(gdata.client.GDClient):
 
   GetResource = get_resource
 
+  def get_resource_by_id(self, resource_id, **kwargs):
+    """Retrieves a resource again given its resource ID.
+
+    Args:
+      resource_id: Typed or untyped resource ID of a resource.
+      kwargs: Other args to pass to GetResourceBySelfLink().
+    Returns:
+      gdata.docs.data.Resource representing retrieved resource.
+    """
+    return self.GetResourceBySelfLink(
+        RESOURCE_SELF_LINK_TEMPLATE % resource_id, **kwargs)
+
+  GetResourceById = get_resource_by_id
+
   def get_resource_by_self_link(self, uri, etag=None, show_root=None,
                                 **kwargs):
     """Retrieves a particular resource by its self link.
@@ -269,7 +282,7 @@ class DocsClient(gdata.client.GDClient):
           gdata.docs.client.RESOURCE_FEED_URI.  If collection and create_uri are
           None, use gdata.docs.client.RESOURCE_UPLOAD_URI.  If collection and
           media are not None,
-          gdata.docs.client.COLLECTION_UPLOAD_URI_TEMPLATE is used,
+          collection.GetResumableCreateMediaLink() is used,
           with the collection's resource ID substituted in.
       kwargs: Other parameters to pass to self.post() and self.update().
 
@@ -278,8 +291,7 @@ class DocsClient(gdata.client.GDClient):
     """
     if media is not None:
       if create_uri is None and collection is not None:
-        create_uri = COLLECTION_UPLOAD_URI_TEMPLATE % \
-            collection.resource_id.text
+        create_uri = collection.GetResumableCreateMediaLink().href
       elif create_uri is None:
         create_uri = RESOURCE_UPLOAD_URI
       uploader = gdata.client.ResumableUploader(
@@ -571,11 +583,27 @@ class DocsClient(gdata.client.GDClient):
       raise ValueError(
           '%s is a collection, which is not valid in this method' % str(entry))
 
+  def get_acl(self, entry, **kwargs):
+    """Retrieves an AclFeed for the given resource.
+
+    Args:
+      entry: gdata.docs.data.Resource to fetch AclFeed for.
+      kwargs: Other args to pass to GetFeed().
+    Returns:
+      gdata.docs.data.AclFeed representing retrieved entries.
+    """
+    self._check_entry_is_resource(entry)
+    return self.get_feed(
+        entry.GetAclFeedLink().href,
+        desired_class=gdata.docs.data.AclFeed, **kwargs)
+
+  GetAcl = get_acl
+
   def get_acl_entry(self, entry, **kwargs):
     """Retrieves an AclEntry again.
-    
+
     This is useful if you need to poll for an ACL changing.
-    
+
     Args:
       entry: gdata.docs.data.AclEntry to fetch and return.
       kwargs: Other args to pass to GetAclEntryBySelfLink().
@@ -627,8 +655,8 @@ class DocsClient(gdata.client.GDClient):
       raise ValueError(('Given resource has no ACL link.  Did you fetch this'
                         'resource from the API?'))
     if send_notifications is not None:
-      if send_notifications:
-        uri += '?send-notification-emails=true'
+      if not send_notifications:
+        uri += '?send-notification-emails=false'
 
     return self.post(acl_entry, uri, desired_class=gdata.docs.data.AclEntry,
                      **kwargs)
@@ -648,9 +676,9 @@ class DocsClient(gdata.client.GDClient):
       gdata.docs.data.AclEntry representing the updated ACL entry.
     """
     uri = entry.GetEditLink().href
-    if send_notifications:
-      uri += '?send-notification-emails=true'
-    return super(DocsClient, self).update(entry, uri=uri, force=True, **kwargs)
+    if not send_notifications:
+      uri += '?send-notification-emails=false'
+    return super(DocsClient, self).update(entry, uri=uri, **kwargs)
 
   UpdateAclEntry = update_acl_entry
 
@@ -664,7 +692,7 @@ class DocsClient(gdata.client.GDClient):
     Returns:
       Result of delete request.
     """
-    return super(DocsClient, self).delete(entry.GetEditLink().href, force=True,
+    return super(DocsClient, self).delete(entry.GetEditLink().href,
                                           **kwargs)
 
   DeleteAclEntry = delete_acl_entry
@@ -690,7 +718,7 @@ class DocsClient(gdata.client.GDClient):
     feed = gdata.docs.data.AclFeed()
     feed.entry = entries
     return super(DocsClient, self).post(
-        feed, uri=resource.GetAclLink().href + '/acl', force=True, **kwargs)
+        feed, uri=resource.GetAclLink().href + '/acl/batch', **kwargs)
 
   BatchProcessAclEntries = batch_process_acl_entries
 

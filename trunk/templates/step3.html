@@ -4,8 +4,8 @@
     <div class="document-item">
       {# TODO(someone?): Make the id into the doc id instead of the
         order in which it appears in the list #}
-      <a href="raw?id={{ loop.index0 }}">raw</a>
-      <a href="step4?id={{ loop.index0 }}">{{ entry.title.text }}</a>
+      <a href="raw?id={{ entry.resource_id.text }}">raw</a>
+      <a href="step4?id={{ entry.resource_id.text }}">{{ entry.title.text }}</a>
     </div>
   {% endfor %}
 {% endblock %}
