@@ -3,6 +3,7 @@
   <script src="/js/processing-1.3.6.min.js"></script>
 {% endblock %}
 {% block content %}
+
   <script type="text/javascript">
     setRevisionCount({{ revisionCount }});
   </script>
@@ -33,10 +34,11 @@
   <div class="raw-diffs">
     {% for diff in diffs %}
       <div class="diff">
-        <h3>Revision {{ loop.index }}</h3>
+        <h3>Revision {{ loop.index }}, Last Edited: {{ diff[1] }}</h3>
+        <p>Words Added: , Words Deleted: </p>
         <pre>
           {# TODO(someone?) Figure out why you have to decode #}
-          {{ diff.decode("utf-8") }}
+          {{ diff[0].decode("utf-8") }}
         </pre>
       </div>
     {% endfor %}

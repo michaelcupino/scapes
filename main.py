@@ -98,6 +98,8 @@ class FetchRevision(webapp2.RequestHandler):
 class RequestRevision(webapp2.RequestHandler):
   @login_required
   def get(self):
+    # TODO(dani): Statistics Summary
+    
     access_token_key = 'access_token_%s' % users.get_current_user().user_id()
     access_token = gdata.gauth.AeLoad(access_token_key)
     gdocs.auth_token = access_token
@@ -106,6 +108,8 @@ class RequestRevision(webapp2.RequestHandler):
     # TODO(jordan): Figure out how to catch exception with invalid resource
     resource = gdocs.GetResourceById(id)
     revisions = gdocs.GetRevisions(resource)
+    
+    acl = gdocs.GetResourceAcl(resource)
 
     previousText = "";
     diffs = []
@@ -116,9 +120,11 @@ class RequestRevision(webapp2.RequestHandler):
           revision, {'exportFormat': 'txt'})
       revisionText = string.split(revisionText, '\n')
       currentDiff = ""
+      # TODO(dani): Playing with Google API Last Edit
+      lastEdit = revision.updated
       for line in difflib.context_diff(previousText, revisionText):
         currentDiff += line
-      diffs.append(currentDiff)
+      diffs.append(tuple([currentDiff, lastEdit]))
       previousText = revisionText
 
     # Document Tags
@@ -128,6 +134,7 @@ class RequestRevision(webapp2.RequestHandler):
     documentTags = documentTagQuery.fetch(10)
 
     templateValues = {
+      'acl': acl,
       'documentTags': documentTags,
       'diffs': diffs,
       'revisionCount': len(revisions.entry),
