@@ -32,13 +32,13 @@
 
   <h2>Raw Diffs</h2>
   <div class="raw-diffs">
-    {% for diff in diffs %}
+    {% for revisionValues in valuesOfRevisions %}
       <div class="diff">
-        <h3>Revision {{ loop.index }}, Author: {{diff[1] }}, Last Edited: {{ diff[2] }}</h3>
+        <h3>{{ revisionValues['revisionTitle'] }}, Author: {{ revisionValues['author'] }}, Last Edited: {{ revisionValues['lastEdit'] }}</h3>
         <p>Words Added: , Words Deleted: </p>
         <pre>
           {# TODO(someone?) Figure out why you have to decode #}
-          {{ diff[0].decode("utf-8") }}
+          {{ revisionValues['currentDiff'].decode("utf-8") }}
         </pre>
       </div>
     {% endfor %}
