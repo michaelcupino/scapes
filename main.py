@@ -113,6 +113,8 @@ class RequestRevision(webapp2.RequestHandler):
 
     previousText = "";
     diffs = []
+    originalAuthor = None
+    differentAuthor = False
     for revision in revisions.entry:
       # TODO(someone?): Maybe make this download into a separate function
       # because the client's browser timesout if this takes too long
@@ -124,7 +126,15 @@ class RequestRevision(webapp2.RequestHandler):
       lastEdit = revision.updated
       for line in difflib.context_diff(previousText, revisionText):
         currentDiff += line
-      diffs.append(tuple([currentDiff, lastEdit]))
+      author = revision.author[0].email.text
+      if originalAuthor is None:
+        originalAuthor = author
+      elif author != originalAuthor:
+        differentAuthor = True
+      elif differentAuthor and originalAuthor == author:
+        #TODO: Move to template values eventually
+        self.response.out.write("Flag as author other author <br />")
+      diffs.append(tuple([currentDiff,author, lastEdit]))
       previousText = revisionText
 
     # Document Tags
