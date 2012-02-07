@@ -112,7 +112,7 @@ class RequestRevision(webapp2.RequestHandler):
     acl = gdocs.GetResourceAcl(resource)
 
     previousText = "";
-    diffs = []
+    valuesOfRevisions = []
     originalAuthor = None
     differentAuthor = False
     for revision in revisions.entry:
@@ -124,6 +124,7 @@ class RequestRevision(webapp2.RequestHandler):
       currentDiff = ""
       # TODO(dani): Playing with Google API Last Edit
       lastEdit = revision.updated
+      revisionTitle = revision.title.text
       for line in difflib.context_diff(previousText, revisionText):
         currentDiff += line
       author = revision.author[0].email.text
@@ -134,7 +135,13 @@ class RequestRevision(webapp2.RequestHandler):
       elif differentAuthor and originalAuthor == author:
         #TODO: Move to template values eventually
         self.response.out.write("Flag as author other author <br />")
-      diffs.append(tuple([currentDiff,author, lastEdit]))
+      revisionValues = {
+        'currentDiff': currentDiff,
+        'author': author,
+        'lastEdit': lastEdit,
+        'revisionTitle': revisionTitle,
+      }  
+      valuesOfRevisions.append(revisionValues)
       previousText = revisionText
 
     # Document Tags
@@ -146,7 +153,7 @@ class RequestRevision(webapp2.RequestHandler):
     templateValues = {
       'acl': acl,
       'documentTags': documentTags,
-      'diffs': diffs,
+      'valuesOfRevisions': valuesOfRevisions,
       'revisionCount': len(revisions.entry),
     }
     template = jinja_environment.get_template('templates/step4.html')
