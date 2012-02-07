@@ -18,6 +18,26 @@ input {
   line-height: 25px;
 }
 
+table {
+  border-collapse: collapse;
+}
+
+table, th, td {
+  border: 1px solid black;
+}
+
+th, td {
+  padding: 10px;
+}
+
+td {
+  text-align: right;
+}
+
+td:nth-child(-n+3) {
+  text-align: center;
+}
+
 .visualization-info {
   display: inline-block;
   vertical-align: top;
