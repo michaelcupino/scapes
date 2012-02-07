@@ -34,7 +34,7 @@
   <div class="raw-diffs">
     {% for diff in diffs %}
       <div class="diff">
-        <h3>Revision {{ loop.index }}, Last Edited: {{ diff[1] }}</h3>
+        <h3>Revision {{ loop.index }}, Author: {{diff[1] }}, Last Edited: {{ diff[2] }}</h3>
         <p>Words Added: , Words Deleted: </p>
         <pre>
           {# TODO(someone?) Figure out why you have to decode #}
