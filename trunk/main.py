@@ -107,6 +107,7 @@ class RequestRevision(webapp2.RequestHandler):
     
     # TODO(jordan): Figure out how to catch exception with invalid resource
     resource = gdocs.GetResourceById(id)
+    resourceTitle = resource.title.text
     revisions = gdocs.GetRevisions(resource)
     
     acl = gdocs.GetResourceAcl(resource)
@@ -163,6 +164,7 @@ class RequestRevision(webapp2.RequestHandler):
       'documentTags': documentTags,
       'valuesOfRevisions': valuesOfRevisions,
       'revisionCount': len(revisions.entry),
+      'resourceTitle': resourceTitle,
     }
     template = jinja_environment.get_template('templates/step4.html')
     self.response.out.write(template.render(templateValues))
