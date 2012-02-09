@@ -86,7 +86,7 @@ class FetchRevision(webapp2.RequestHandler):
     access_token = gdata.gauth.AeLoad(access_token_key)
     gdocs.auth_token = access_token
 
-    feed = gdocs.GetResources()
+    feed = gdocs.GetResources(uri='/feeds/default/private/full/-/document')
 
     templateValues = {
       'entries': feed.entry,
