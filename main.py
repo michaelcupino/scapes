@@ -115,16 +115,23 @@ class RequestRevision(webapp2.RequestHandler):
     valuesOfRevisions = []
     originalAuthor = None
     differentAuthor = False
+    
     for revision in revisions.entry:
       # TODO(someone?): Maybe make this download into a separate function
       # because the client's browser timesout if this takes too long
       revisionText = gdocs.DownloadRevisionToMemory(
           revision, {'exportFormat': 'txt'})
       revisionText = string.split(revisionText, '\n')
+      revisionWordCount = 0
+      revisionTitle = revision.title.text
+      
+      for line in revisionText:
+        line = line.split()
+        revisionWordCount = revisionWordCount + len(line)
+      
       currentDiff = ""
       # TODO(dani): Playing with Google API Last Edit
       lastEdit = revision.updated
-      revisionTitle = revision.title.text
       for line in difflib.context_diff(previousText, revisionText):
         currentDiff += line
       author = revision.author[0].email.text
@@ -140,6 +147,7 @@ class RequestRevision(webapp2.RequestHandler):
         'author': author,
         'lastEdit': lastEdit,
         'revisionTitle': revisionTitle,
+        'revisionWordCount' : revisionWordCount,
       }  
       valuesOfRevisions.append(revisionValues)
       previousText = revisionText

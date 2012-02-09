@@ -81,7 +81,7 @@
     {% for revisionValues in valuesOfRevisions %}
       <div class="diff">
         <h3>{{ revisionValues['revisionTitle'] }}, Author: {{ revisionValues['author'] }}, Last Edited: {{ revisionValues['lastEdit'] }}</h3>
-        <p>Words Added: , Words Deleted: </p>
+        <p>Total word count: {{ revisionValues['revisionWordCount'] }}, Words Added: , Words Deleted: </p>
         <pre>
           {# TODO(someone?) Figure out why you have to decode #}
           {{ revisionValues['currentDiff'].decode("utf-8") }}
