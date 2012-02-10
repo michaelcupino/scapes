@@ -85,6 +85,7 @@ class FetchRevision(webapp2.RequestHandler):
     access_token_key = 'access_token_%s' % users.get_current_user().user_id()
     access_token = gdata.gauth.AeLoad(access_token_key)
     gdocs.auth_token = access_token
+    flag = self.request.get('flag')
 
     feed = gdocs.GetResources(uri='/feeds/default/private/full/-/document')
     
@@ -99,24 +100,25 @@ class FetchRevision(webapp2.RequestHandler):
         'flag': "",
       }
       
-      originalAuthor = None
-      differentAuthor = False
-      flagged = False
-      
-      for revision in revisions.entry:
-        author = revision.author[0].email.text
-        if originalAuthor is None:
-          originalAuthor = author
-        elif author != originalAuthor:
-          differentAuthor = True
-        elif differentAuthor and originalAuthor == author:
-          #TODO: Move to template values eventually
-          documentTuple = {
-            'entry': entry,
-            'flag': "Interesting",
-          }
-          flagged = True
-          break
+      if flag != "false":
+        originalAuthor = None
+        differentAuthor = False
+        flagged = False
+        
+        for revision in revisions.entry:
+          author = revision.author[0].email.text
+          if originalAuthor is None:
+            originalAuthor = author
+          elif author != originalAuthor:
+            differentAuthor = True
+          elif differentAuthor and originalAuthor == author:
+            #TODO: Move to template values eventually
+            documentTuple = {
+              'entry': entry,
+              'flag': "Interesting",
+            }
+            flagged = True
+            break
       
       documents.append(documentTuple)
 
