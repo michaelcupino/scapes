@@ -130,7 +130,6 @@ class FetchRevision(webapp2.RequestHandler):
 class RequestRevision(webapp2.RequestHandler):
   @login_required
   def get(self):
-    # TODO(dani): Statistics Summary
     
     access_token_key = 'access_token_%s' % users.get_current_user().user_id()
     access_token = gdata.gauth.AeLoad(access_token_key)
@@ -166,8 +165,17 @@ class RequestRevision(webapp2.RequestHandler):
       currentDiff = ""
       # TODO(dani): Playing with Google API Last Edit
       lastEdit = revision.updated
+      linesAdded = 0
+      linesDeleted = 0
+      linesChanged = 0
       for line in difflib.context_diff(previousText, revisionText):
         currentDiff += line
+        if line.startswith('+ '):
+          linesAdded += 1
+        elif line.startswith('- '):
+          linesDeleted += 1
+        elif line.startswith('! '):
+          linesChanged += 1
       author = revision.author[0].email.text
       if not flagged:
         if originalAuthor is None:
@@ -183,10 +191,17 @@ class RequestRevision(webapp2.RequestHandler):
         'author': author,
         'lastEdit': lastEdit,
         'revisionTitle': revisionTitle,
-        'revisionWordCount' : revisionWordCount,
+        'revisionWordCount': revisionWordCount,
+        'linesAdded': linesAdded,
+        'linesDeleted': linesDeleted,
+        'linesChanged': linesChanged
       }  
       valuesOfRevisions.append(revisionValues)
+      
       previousText = revisionText
+      # TODO(dani): Statistics Summary
+      # Lines Added
+      
 
     # Document Tags
     # TODO(someone?): Look into parents/ancestors. Maybe we can use this
@@ -198,6 +213,7 @@ class RequestRevision(webapp2.RequestHandler):
       'acl': acl,
       'documentTags': documentTags,
       'valuesOfRevisions': valuesOfRevisions,
+      'linesAdded': linesAdded,
       'revisionCount': len(revisions.entry),
       'resourceTitle': resourceTitle,
     }
