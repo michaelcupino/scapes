@@ -91,16 +91,16 @@ class FetchRevision(webapp2.RequestHandler):
     
     documents = []
     
-    for entry in feed.entry:
-      resource_id = entry.resource_id.text
-      resource = gdocs.GetResourceById(resource_id)
-      revisions = gdocs.GetRevisions(resource)
-      documentTuple = {
-        'entry': entry,
-        'flag': "",
-      }
-      
-      if flag != "false":
+    if flag != "false":
+      for entry in feed.entry:
+        resource_id = entry.resource_id.text
+        resource = gdocs.GetResourceById(resource_id)
+        revisions = gdocs.GetRevisions(resource)
+        documentTuple = {
+          'entry': entry,
+          'flag': "",
+        }
+        
         originalAuthor = None
         differentAuthor = False
         flagged = False
@@ -119,8 +119,15 @@ class FetchRevision(webapp2.RequestHandler):
             }
             flagged = True
             break
-      
-      documents.append(documentTuple)
+        
+        documents.append(documentTuple) 
+    else:
+      for entry in feed.entry:
+        documentTuple = {
+          'entry': entry,
+          'flag': "",
+        }
+        documents.append(documentTuple)
 
     templateValues = {
       'entries': documents,
