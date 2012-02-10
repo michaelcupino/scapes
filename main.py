@@ -87,9 +87,41 @@ class FetchRevision(webapp2.RequestHandler):
     gdocs.auth_token = access_token
 
     feed = gdocs.GetResources(uri='/feeds/default/private/full/-/document')
+    
+    documents = []
+    
+    for entry in feed.entry:
+      resource_id = entry.resource_id.text
+      resource = gdocs.GetResourceById(resource_id)
+      revisions = gdocs.GetRevisions(resource)
+      documentTuple = {
+        'entry': entry,
+        'flag': "",
+      }
+      
+      originalAuthor = None
+      differentAuthor = False
+      flagged = False
+      
+      for revision in revisions.entry:
+        author = revision.author[0].email.text
+        if originalAuthor is None:
+          originalAuthor = author
+        elif author != originalAuthor:
+          differentAuthor = True
+        elif differentAuthor and originalAuthor == author:
+          #TODO: Move to template values eventually
+          documentTuple = {
+            'entry': entry,
+            'flag': "Interesting",
+          }
+          flagged = True
+          break
+      
+      documents.append(documentTuple)
 
     templateValues = {
-      'entries': feed.entry,
+      'entries': documents,
     }
     template = jinja_environment.get_template('templates/step3.html')
     self.response.out.write(template.render(templateValues))
@@ -116,6 +148,7 @@ class RequestRevision(webapp2.RequestHandler):
     valuesOfRevisions = []
     originalAuthor = None
     differentAuthor = False
+    flagged = False
     
     for revision in revisions.entry:
       # TODO(someone?): Maybe make this download into a separate function
@@ -136,13 +169,15 @@ class RequestRevision(webapp2.RequestHandler):
       for line in difflib.context_diff(previousText, revisionText):
         currentDiff += line
       author = revision.author[0].email.text
-      if originalAuthor is None:
-        originalAuthor = author
-      elif author != originalAuthor:
-        differentAuthor = True
-      elif differentAuthor and originalAuthor == author:
-        #TODO: Move to template values eventually
-        self.response.out.write("Flag as author other author <br />")
+      if not flagged:
+        if originalAuthor is None:
+          originalAuthor = author
+        elif author != originalAuthor:
+          differentAuthor = True
+        elif differentAuthor and originalAuthor == author:
+          #TODO: Move to template values eventually
+          self.response.out.write("Flag as author other author <br />")
+          flagged = True
       revisionValues = {
         'currentDiff': currentDiff,
         'author': author,
