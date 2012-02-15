@@ -13,6 +13,7 @@ import string
 jinja_environment = jinja2.Environment(
     loader=jinja2.FileSystemLoader(os.path.dirname(__file__)))
 
+from django.utils import simplejson
 from google.appengine.ext import db
 from google.appengine.api import users
 
@@ -292,6 +293,50 @@ class GoogleWebmasterVerify(webapp2.RequestHandler):
     template = jinja_environment.get_template('google910e6da758dc80f1.html')
     self.response.out.write(template.render())
 
+class RPCHandler(webapp2.RequestHandler):
+  """ Handles RPC calls and calls methods inside the RPCMethods class
+  """
+  def __init__(self, *args, **kwargs):
+    webapp2.RequestHandler.__init__(self, *args, **kwargs)
+    self.methods = RPCMethods()
+
+  def get(self):
+    func = None
+
+    action = self.request.get('action')
+    if action:
+      # Deny access if asking to access private/protected methods
+      if action[0] == '_':
+        self.error(403)
+        return
+      else:
+        func = getattr(self.methods, action, None)
+
+    # Return a "Not Found" if the function/method can't be found
+    if not func:
+      self.error(404)
+      return
+
+    args = ()
+    while True:
+      key = 'arg%d' % len(args)
+      val = self.request.get(key)
+      if val:
+        args += (simplejson.loads(val),)
+      else:
+        break
+    result = func(*args)
+    self.response.out.write(simplejson.dumps(result))
+
+
+class RPCMethods:
+  """ Defines the methodsthat can be RPCed.
+  NOTE: Do not allow remote callers to acces to private/protected "_*" methods.
+  """
+  def Add(self, *args):
+    ints = [int(arg) for arg in args]
+    return sum(ints)
+
 # TODO(mcupino): Maybe find out how to have the GoogleWebmasterVerify
 # automatically route to the html page?
 app = webapp2.WSGIApplication([('/', MainPage),
@@ -302,5 +347,6 @@ app = webapp2.WSGIApplication([('/', MainPage),
     ('/step3', FetchRevision),
     ('/step4', RequestRevision),
     ('/tagDocument', DocumentTagger),
-    ('/raw', RequestRawRevision)],
+    ('/raw', RequestRawRevision),
+    ('/rpc', RPCHandler)],
     debug=True)
