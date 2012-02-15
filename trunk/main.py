@@ -1,23 +1,22 @@
+import ConfigParser
 import cgi
 import datetime
-import urllib
-import webapp2
+import difflib
+import gdata.docs.client
+import gdata.gauth
 import jinja2
 import os
-import gdata.gauth
-import gdata.docs.client
-import ConfigParser
-import difflib
 import string
+import urllib
+import webapp2
+
+from django.utils import simplejson
+from google.appengine.api import users
+from google.appengine.ext import db
+from google.appengine.ext.webapp.util import run_wsgi_app, login_required
 
 jinja_environment = jinja2.Environment(
     loader=jinja2.FileSystemLoader(os.path.dirname(__file__)))
-
-from django.utils import simplejson
-from google.appengine.ext import db
-from google.appengine.api import users
-
-from google.appengine.ext.webapp.util import run_wsgi_app, login_required
 
 # Configure gdata
 config = ConfigParser.RawConfigParser()
@@ -301,18 +300,15 @@ class RPCHandler(webapp2.RequestHandler):
     self.methods = RPCMethods()
 
   def get(self):
-    func = None
-
+    # Deny access if asking to access private/protected methods
     action = self.request.get('action')
     if action:
-      # Deny access if asking to access private/protected methods
       if action[0] == '_':
         self.error(403)
         return
-      else:
-        func = getattr(self.methods, action, None)
 
     # Return a "Not Found" if the function/method can't be found
+    func = getattr(self.methods, action, None)
     if not func:
       self.error(404)
       return
@@ -325,8 +321,35 @@ class RPCHandler(webapp2.RequestHandler):
         args += (simplejson.loads(val),)
       else:
         break
+
     result = func(*args)
     self.response.out.write(simplejson.dumps(result))
+
+  def post(self):
+    # Deny access if asking to access private/protected methods
+    action = self.request.get('action')
+    if action == '_':
+      self.error(403)
+      return
+
+    # Return a "Not Found" if the function/method can't be found
+    func = getattr(self.methods, action, None)
+    if not func:
+      self.error(404)
+      return
+
+    args = ()
+    while True:
+      key = 'arg%d' % len(args)
+      val = self.request.get(key)
+      if val:
+        args += (simplejson.loads(val),)
+      else:
+        break
+
+    result = func(*args)
+    self.response.out.write(simplejson.dumps(result))
+
 
 
 class RPCMethods:
