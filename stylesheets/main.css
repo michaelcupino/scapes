@@ -53,6 +53,18 @@ body {
   font-family: 'Helvetica Neue',helvetica,arial,sans-serif;
   background-color: #DDDDDD;
 }
+h1 {
+  font-size: 300%;
+}
+h2 {
+  font-size: 200%;
+}
+h3 {
+  font-size: 150%;
+}
+h4 {
+  font-size: 125%;
+}
 
 input[type=submit] {
   background-color: #4D90FE;
