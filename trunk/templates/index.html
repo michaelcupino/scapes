@@ -1,5 +1,13 @@
 {% extends "templates/defaultLayout.html" %}
+{% block head %}
+{% endblock %}
 {% block content %}
    <h1>SCAPES</h1>
+   <div class="tutorial">
+    Number 1: <input id="num1" type="text" value="1" />
+    Number 2: <input id="num2" type="text" value="1" />
+    <input type="button" value="Add" onclick="doAdd()" />
+    Result: <input id="result" type="text" value="" readonly="true" disabled="true" />
+   </div>
 {% endblock %}
 
