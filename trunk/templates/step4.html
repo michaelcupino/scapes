@@ -76,6 +76,26 @@
     </tfoot>
   </table>
 
+  <h2>Ajax Revisions</h2>
+  <script>
+    function addRevisionToDom(content) {
+      $(".ajax-revisions").append(
+          "<div class='ajax-revision'>" + content + "</div>"
+      );
+    }
+    {% for revisionLink in revisionLinks %}
+      $.ajax({
+        type: "GET",
+        url: "/requestARevision",
+        data: {
+          revisionLink: '{{ revisionLink }}'
+        },
+        success: addRevisionToDom
+      });
+    {% endfor %}
+  </script>
+  <div class="ajax-revisions"></div>
+
   <h2>Raw Diffs</h2>
   <div class="raw-diffs">
     {% for revisionValues in valuesOfRevisions %}

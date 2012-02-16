@@ -87,13 +87,16 @@ class FetchRevision(webapp2.RequestHandler):
     gdocs.auth_token = access_token
     flag = self.request.get('flag')
 
+    # TODO(mcupino): AJAXify this
     feed = gdocs.GetResources(uri='/feeds/default/private/full/-/document')
     
     documents = []
     
     if flag != "false":
+      resourceLinks = [] #TODO(mcupino): Rmove later
       for entry in feed.entry:
         resource_id = entry.resource_id.text
+        # TODO(mcupino): AJAXify this
         resource = gdocs.GetResourceById(resource_id)
         revisions = gdocs.GetRevisions(resource)
         documentTuple = {
@@ -122,7 +125,10 @@ class FetchRevision(webapp2.RequestHandler):
         
         documents.append(documentTuple) 
     else:
+      resourceLinks = []
       for entry in feed.entry:
+        resourceLink = entry.GetSelfLink().href
+        resourceLinks.append(resourceLink)
         documentTuple = {
           'entry': entry,
           'flag': "",
@@ -131,8 +137,42 @@ class FetchRevision(webapp2.RequestHandler):
 
     templateValues = {
       'entries': documents,
+      'resourceLinks': resourceLinks
     }
     template = jinja_environment.get_template('templates/step3.html')
+    self.response.out.write(template.render(templateValues))
+
+
+class RequestAResource(webapp2.RequestHandler):
+  @login_required
+  def get(self):
+    #revision = gdocs.GetRevisionBySelfLink(self.request.get('revisionLink'))
+    #revisionLink = gdocs.DownloadRevisionToMemory(revision)
+    resource = gdocs.GetResourceBySelfLink(self.request.get('resourceLink'))
+    revisions = gdocs.GetRevisions(resource)
+    
+    originalAuthor = None
+    differentAuthor = False
+    flagged = False
+    flag = ""
+    
+    for revision in revisions.entry:
+      author = revision.author[0].email.text
+      if originalAuthor is None:
+        originalAuthor = author
+      elif author != originalAuthor:
+        differentAuthor = True
+      elif differentAuthor and originalAuthor == author:
+        #TODO: Move to template values eventually
+        flag = "Interesting"
+        flagged = True
+        break
+    templateValues = {
+      'resourceLink': self.request.get('resourceLink'),
+      'resource': resource,
+      'flag': flag
+    }
+    template = jinja_environment.get_template('templates/requestAResource.html')
     self.response.out.write(template.render(templateValues))
 
 
@@ -155,11 +195,14 @@ class RequestRevision(webapp2.RequestHandler):
 
     previousText = "";
     valuesOfRevisions = []
+    revisionLinks = []
     originalAuthor = None
     differentAuthor = False
     flagged = False
     
     for revision in revisions.entry:
+      revisionLink = revision.GetSelfLink().href
+      revisionLinks.append(revisionLink)
       # TODO(someone?): Maybe make this download into a separate function
       # because the client's browser timesout if this takes too long
       revisionText = gdocs.DownloadRevisionToMemory(
@@ -227,8 +270,71 @@ class RequestRevision(webapp2.RequestHandler):
       'revisionCount': len(revisions.entry),
       'resourceTitle': resourceTitle,
       'untypedResourceId': untypedResourceId,
+      'revisionLinks': revisionLinks
     }
     template = jinja_environment.get_template('templates/step4.html')
+    self.response.out.write(template.render(templateValues))
+
+class RequestARevision(webapp2.RequestHandler):
+  @login_required
+  def get(self):
+    revision = gdocs.GetRevisionBySelfLink(self.request.get('revisionLink'))
+    revisionText = gdocs.DownloadRevisionToMemory(
+        revision, {'exportFormat': 'txt'})
+    revisionText = string.split(revisionText, '\n')
+    revisionWordCount = 0
+    revisionTitle = revision.title.text
+    
+    for line in revisionText:
+      line = line.split()
+      revisionWordCount = revisionWordCount + len(line)
+    
+    currentDiff = ""
+    # TODO(dani): Playing with Google API Last Edit
+    lastEdit = revision.updated
+    linesAdded = 0
+    linesDeleted = 0
+    linesChanged = 0
+
+    # TODO(mcupino): Find out how to pass on a previous text from each ajax call
+    ##for line in difflib.context_diff(previousText, revisionText):
+    ##  currentDiff += line
+    ##  if line.startswith('+ '):
+    ##    linesAdded += 1
+    ##  elif line.startswith('- '):
+    ##    linesDeleted += 1
+    ##  elif line.startswith('! '):
+    ##    linesChanged += 1
+
+    author = revision.author[0].email.text
+    # TODO(mcupino): Find out how to pass on flaged value from each ajax call
+    ##if not flagged:
+    ##  if originalAuthor is None:
+    ##    originalAuthor = author
+    ##  elif author != originalAuthor:
+    ##    differentAuthor = True
+    ##  elif differentAuthor and originalAuthor == author:
+    ##    #TODO: Move to template values eventually
+    ##    self.response.out.write("Flag as author other author <br />")
+    ##    flagged = True
+
+    # TODO(mcupino): Find out how to pass on a previous text from each ajax call
+    # previousText = revisionText
+
+    # TODO(dani): Statistics Summary
+    # Lines Added
+
+    templateValues = {
+      'revisionLink': self.request.get('revisionLink'),
+      'author': author,
+      'lastEdit': lastEdit,
+      'revisionTitle': revisionTitle,
+      'revisionWordCount': revisionWordCount,
+      'linesAdded': linesAdded,
+      'linesDeleted': linesDeleted,
+      'linesChanged': linesChanged
+    }
+    template = jinja_environment.get_template('templates/requestARevision.html')
     self.response.out.write(template.render(templateValues))
 
 
@@ -244,12 +350,24 @@ class RequestRawRevision(webapp2.RequestHandler):
     resource = gdocs.GetResourceById(id)
     revisions = gdocs.GetRevisions(resource)
 
+    revisionLinks = []
     for revision in revisions.entry:
-      # TODO(someone?): Maybe make this download into a separate function
-      # because the client's browser timesout if this takes too long
-      revisionText = gdocs.DownloadRevisionToMemory(revision)
-      self.response.out.write(revisionText)
-      self.response.out.write("\n\n\n")
+      revisionLink = revision.GetSelfLink().href
+      revisionLinks.append(revisionLink)
+
+    templateValues = {
+      'revisionLinks': revisionLinks,
+    }
+    template = jinja_environment.get_template('templates/raw.html')
+    self.response.out.write(template.render(templateValues))
+
+
+class RequestARawRevision(webapp2.RequestHandler):
+  @login_required
+  def get(self):
+    revision = gdocs.GetRevisionBySelfLink(self.request.get('revisionLink'))
+    revisionLink = gdocs.DownloadRevisionToMemory(revision)
+    self.response.out.write(revisionLink)
 
 
 class RequestTokenCallback(webapp2.RequestHandler):
@@ -371,5 +489,8 @@ app = webapp2.WSGIApplication([('/', MainPage),
     ('/step4', RequestRevision),
     ('/tagDocument', DocumentTagger),
     ('/raw', RequestRawRevision),
+    ('/requestAResource', RequestAResource),
+    ('/requestARawRevision', RequestARawRevision),
+    ('/requestARevision', RequestARevision),
     ('/rpc', RPCHandler)],
     debug=True)
