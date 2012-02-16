@@ -1,0 +1,24 @@
+{% extends "templates/defaultLayout.html" %}
+{% block head %}
+  <script>
+    function addRevisionToDom(content) {
+      $(".revisions").append(
+          "<div class='revision'>" + content + "</div>"
+      );
+    }
+    {% for revisionLink in revisionLinks %}
+      $.ajax({
+        type: "GET",
+        url: "/requestARawRevision",
+        data: {
+          revisionLink: '{{ revisionLink }}'
+        },
+        success: addRevisionToDom
+      });
+    {% endfor %}
+  </script>
+{% endblock %}
+{% block content %}
+  <div class="revisions"></div>
+{% endblock %}
+

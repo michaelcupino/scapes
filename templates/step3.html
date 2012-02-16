@@ -1,5 +1,26 @@
 {% extends "templates/defaultLayout.html" %}
 {% block content %}
+  <h1>Document List</h1>
+  <h2>Ajaxed List</h2>
+  <script>
+    function addResourceToDom(content) {
+      $(".resources").append(
+          "<div class='resource'>" + content + "</div>"
+      );
+    }
+    {% for resourceLink in resourceLinks %}
+      $.ajax({
+        type: "GET",
+        url: "/requestAResource",
+        data: {
+          resourceLink: '{{ resourceLink }}'
+        },
+        success: addResourceToDom
+      });
+    {% endfor %}
+  </script>
+  <div class="resources"></div>
+  <h2>Slow List</h2>
   {% for entry in entries %}
     <div class="document-item">
       {# TODO(someone?): Make the id into the doc id instead of the
