@@ -9,6 +9,7 @@ import os
 import string
 import urllib
 import webapp2
+import diff_match_patch.diff_match_patch
 
 from datetime import datetime
 from django.utils import simplejson
@@ -30,6 +31,7 @@ SETTINGS = {
     }
 
 gdocs = gdata.docs.client.DocsClient(source = SETTINGS['APP_NAME'])
+gdiff = diff_match_patch.diff_match_patch()
 
 
 class DocumentTag(db.Model):
@@ -54,6 +56,53 @@ class DocumentTagger(webapp2.RequestHandler):
 
     url = self.request.headers.get('Referer')
     self.redirect(url)
+
+
+class GDiffPlayground(webapp2.RequestHandler):
+  def get(self):
+    a = "Hi my name is Michael Cupino.\nI'm coding python."
+    b = "Hi my name is not Gabriel Apostol Cupino.\nI am coding python. This is 4 words."
+    self.response.out.write(a)
+    self.response.out.write("\n")
+
+    self.response.out.write(b)
+    self.response.out.write("\n")
+
+    diffs = gdiff.diff_main(a, b, False)
+
+    gdiff.diff_cleanupSemantic(diffs)
+
+    def isRemoveOrAdd(x):
+      return x[0] != gdiff.DIFF_EQUAL
+    diffs = filter(isRemoveOrAdd, diffs)
+    self.response.out.write(diffs)
+    self.response.out.write("\n")
+
+    def countWords(x):
+      splitedString = x[1].split()
+      wordCount = len(splitedString)
+      return (x[0], wordCount)
+    diffWordCount = map(countWords, diffs)
+    self.response.out.write(diffWordCount)
+    self.response.out.write("\n")
+
+    def addWordCount(x, y):
+      if type(x) == type(1):
+        return x + y[1]
+      else:
+        return x[1] + y[1]
+
+    def isAdd(x):
+      return x[0] == gdiff.DIFF_INSERT
+    addedWordCount = reduce(addWordCount, filter(isAdd, diffWordCount))
+    self.response.out.write("adedWordCount: " + str(addedWordCount))
+    self.response.out.write("\n")
+
+    def isRemove(x):
+      return x[0] == gdiff.DIFF_DELETE
+    deletedWordCount = reduce(addWordCount, (filter(isRemove, diffWordCount)))
+    self.response.out.write("deletedWordCount: " + str(deletedWordCount))
+    self.response.out.write("\n")
 
 
 class Fetcher(webapp2.RequestHandler):
@@ -500,5 +549,6 @@ app = webapp2.WSGIApplication([('/', MainPage),
     ('/requestAResource', RequestAResource),
     ('/requestARawRevision', RequestARawRevision),
     ('/requestARevision', RequestARevision),
+    ('/gdiff', GDiffPlayground),
     ('/rpc', RPCHandler)],
     debug=True)
