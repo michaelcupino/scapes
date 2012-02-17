@@ -10,6 +10,7 @@ import string
 import urllib
 import webapp2
 
+from datetime import datetime
 from django.utils import simplejson
 from google.appengine.api import users
 from google.appengine.ext import db
@@ -218,6 +219,11 @@ class RequestRevision(webapp2.RequestHandler):
       currentDiff = ""
       # TODO(dani): Playing with Google API Last Edit
       lastEdit = revision.updated
+      #TODO: find out what the Z at the end of the revision.updated means
+      lastEditedDateTime = datetime.strptime(revision.updated.text,
+          "%Y-%m-%dT%H:%M:%S.%fZ")
+      lastEditedDate = lastEditedDateTime.strftime("%a, %m/%d/%y")
+      lastEditedTime = lastEditedDateTime.strftime("%I:%M%p")
       linesAdded = 0
       linesDeleted = 0
       linesChanged = 0
@@ -243,6 +249,8 @@ class RequestRevision(webapp2.RequestHandler):
         'currentDiff': currentDiff,
         'author': author,
         'lastEdit': lastEdit,
+        'lastEditedDate': lastEditedDate,
+        'lastEditedTime': lastEditedTime,
         'revisionTitle': revisionTitle,
         'revisionWordCount': revisionWordCount,
         'linesAdded': linesAdded,
