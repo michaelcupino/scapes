@@ -7,8 +7,12 @@
   <script type="text/javascript">
     setRevisionCount({{ revisionCount }});
   </script>
-  <h1>Analysis of Document: {{ resourceTitle }}</h1>
-  <a href="https://docs.google.com/document/d/{{ untypedResourceId }}/edit">Original document link</a>
+  <h1>
+    {# TODO: Find out how to get non-hard coded URL. It's .href of an a link object #}
+    <a href= "https://docs.google.com/document/d/{{ untypedResourceId }}/edit">
+      {{ resourceTitle }}</a>
+    Document Analysis
+  </h1>
   <h2>Mocked Revision History Visualilzation</h2>
   <div class="visualization">
     <div class="visualization-info">
@@ -30,47 +34,39 @@
     <div><input type="submit" value="Add Tag"></div>
   </form>
   
-  <h2>Mock Data Table </h2>
+  <h2>Document Statistics</h2>
   <table>
     <thead>
       <tr>
         <th>Date</th>
         <th>Time</th>
         <th>Who in doc</th>
+        <th>Word count</th>
         <th>Words added</th>
         <th>Words deleted</th>
         <th>Punct. cap</th>
         <th>Words moved</th>
+        <th>Lines added</th>
+        <th>Lines deleted</th>
+        <th>Lines changed</th>
       </tr>
     </thead>
     <tbody>
-      <tr>
-        <td>18-Sep</td>
-        <td>3:05PM</td>
-        <td>ME(red)</td>
-        <td>1358</td>
-        <td></td>
-        <td></td>
-        <td></td>
-      </tr>
-      <tr>
-        <td>19-Sep</td>
-        <td>4:53PM</td>
-        <td>ME(red)</td>
-        <td>2</td>
-        <td>3</td>
-        <td>1</td>
-        <td></td>
-      </tr>
-      <tr>
-        <td>19-Sep</td>
-        <td>7:02AM</td>
-        <td>ME(red)</td>
-        <td>313</td>
-        <td>20</td>
-        <td>2</td>
-        <td></td>
-      </tr>
+      {% for revisionValues in valuesOfRevisions %}
+        <tr>
+          <td>{{ revisionValues['lastEditedDate'] }}</td>
+          <td>{{ revisionValues['lastEditedTime'] }}</td>
+          <td>{{ revisionValues['author'] }}</td>
+          <td>{{ revisionValues['revisionWordCount'] }}</td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td>{{ revisionValues['linesAdded'] }}</td>
+          <td>{{ revisionValues['linesDeleted'] }}</td>
+          <td>{{ revisionValues['linesChanged'] }}</td>
+        </tr>
+      {% endfor %}
     </tbody>
     <tfoot>
     </tfoot>
