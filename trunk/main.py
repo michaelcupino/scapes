@@ -244,6 +244,7 @@ class RequestRevision(webapp2.RequestHandler):
     acl = gdocs.GetResourceAcl(resource)
 
     previousText = "";
+    previousTextUnsplitted = "";
     valuesOfRevisions = []
     revisionLinks = []
     originalAuthor = None
@@ -257,6 +258,7 @@ class RequestRevision(webapp2.RequestHandler):
       # because the client's browser timesout if this takes too long
       revisionText = gdocs.DownloadRevisionToMemory(
           revision, {'exportFormat': 'txt'})
+      revisionTextUnsplitted = revisionText # TODO(mcupino): I'm hoping a copy of it
       revisionText = string.split(revisionText, '\n')
       revisionWordCount = 0
       revisionTitle = revision.title.text
@@ -284,6 +286,50 @@ class RequestRevision(webapp2.RequestHandler):
           linesDeleted += 1
         elif line.startswith('! '):
           linesChanged += 1
+
+
+      # TODO(mcupino): Maybe make word acount into a separate function
+      newDiffs = gdiff.diff_main(previousTextUnsplitted, revisionTextUnsplitted, False)
+      gdiff.diff_cleanupSemantic(newDiffs)
+
+      def isRemoveOrAdd(x):
+        return x[0] != gdiff.DIFF_EQUAL
+      newDiffs = filter(isRemoveOrAdd, newDiffs)
+
+      def countWords(x):
+        splitedString = x[1].split()
+        wordCount = len(splitedString)
+        return (x[0], wordCount)
+      diffWordCount = map(countWords, newDiffs)
+
+      # TODO(mcupino): Make this into a separate higher level function, so
+      # we don't have to do if elses for every time we reduce
+      def addWordCount(x, y):
+        if type(x) == type(1):
+          return x + y[1]
+        else:
+          return x[1] + y[1]
+
+      def isAdd(x):
+        return x[0] == gdiff.DIFF_INSERT
+      newDiffsAdded = filter(isAdd, diffWordCount)
+      if newDiffsAdded == []:
+        addedWordCount = 0
+      elif len(newDiffsAdded) == 1:
+        addedWordCount = newDiffsAdded[0][1]
+      else:
+        addedWordCount = reduce(addWordCount, newDiffsAdded)
+
+      def isRemove(x):
+        return x[0] == gdiff.DIFF_DELETE
+      newDiffsRemoved = filter(isRemove, diffWordCount)
+      if newDiffsRemoved == []:
+        deletedWordCount = 0
+      elif len(newDiffsRemoved) == 1:
+        deletedWordCount = newDiffsRemoved[0][1]
+      else:
+        deletedWordCount = reduce(addWordCount, newDiffsRemoved)
+
       author = revision.author[0].email.text
       if not flagged:
         if originalAuthor is None:
@@ -304,11 +350,14 @@ class RequestRevision(webapp2.RequestHandler):
         'revisionWordCount': revisionWordCount,
         'linesAdded': linesAdded,
         'linesDeleted': linesDeleted,
-        'linesChanged': linesChanged
+        'linesChanged': linesChanged,
+        'addedWordCount': addedWordCount,
+        'deletedWordCount': deletedWordCount
       }  
       valuesOfRevisions.append(revisionValues)
       
       previousText = revisionText
+      previousTextUnsplitted = revisionTextUnsplitted
       # TODO(dani): Statistics Summary
       # Lines Added
       
