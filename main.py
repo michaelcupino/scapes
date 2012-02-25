@@ -142,7 +142,7 @@ class FetchRevision(webapp2.RequestHandler):
     
     documents = []
     
-    if flag != "false":
+    if flag == "true":
       resourceLinks = [] #TODO(mcupino): Rmove later
       for entry in feed.entry:
         resource_id = entry.resource_id.text
