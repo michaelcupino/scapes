@@ -506,7 +506,7 @@ class MainPage(webapp2.RequestHandler):
     if user:
       template = jinja_environment.get_template('templates/indexUser.html')
       templateValues = {
-        'nickname': user.nickname(),
+      # 'username': user.nickname(),
         'logoutLink': users.create_logout_url(self.request.uri),
       }
     else:
