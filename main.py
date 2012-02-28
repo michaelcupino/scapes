@@ -502,8 +502,19 @@ class RequestTokenCallback(webapp2.RequestHandler):
 
 class MainPage(webapp2.RequestHandler):
   def get(self):
-    template = jinja_environment.get_template('templates/index.html')
-    self.response.out.write(template.render())
+    user = users.get_current_user()
+    if user:
+      template = jinja_environment.get_template('templates/indexUser.html')
+      templateValues = {
+        # 'nickname': user.nickname(),
+        'logoutLink': users.create_logout_url(self.request.uri),
+      }
+    else:
+      template = jinja_environment.get_template('templates/indexNoUser.html')
+      templateValues = {
+        'loginLink': users.create_login_url(self.request.uri),
+      }
+    self.response.out.write(template.render(templateValues))
 
 
 class CanvasPlayground(webapp2.RequestHandler):

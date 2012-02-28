@@ -48,10 +48,12 @@ table {
   border-spacing: 0;
 }
 
-/* SCAPES Styles */
+/**
+ * @section General Styles
+ */
 body {
   font-family: 'Helvetica Neue',helvetica,arial,sans-serif;
-  background-color: #DDDDDD;
+  background-color: #eeeeee;
 }
 h1 {
   font-size: 300%;
@@ -122,4 +124,71 @@ td:nth-child(-n+3) {
 
 .user3 {
   color: rgb(50, 50, 50);
+}
+
+/**
+ * @section Default Layout
+ */
+.content {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+}
+
+/**
+ * @section Index
+ */
+.index-container {
+  font-size: 125%;
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: -webkit-box;
+  -webkit-box-orient: horizontal;
+  -webkit-box-pack: center;
+  -webkit-box-align: center;
+}
+
+.index-main {
+  position: relative;
+  padding: 3em;
+  border: 1px solid #AAA;
+  border-radius: 5px;
+  background-color: #ffffff;
+  -webkit-box-shadow: 0 0 65px 15px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 0 65px 15px rgba(0, 0, 0, 0.2);
+}
+
+.index-header  {
+  margin-bottom: 2em;
+}
+
+.index-user {
+  position: absolute;
+  top: 1em;
+  right: 1em;
+  text-align: right;
+}
+
+.index-controls {
+}
+
+.index-control {
+  border: 1px solid #AAA;
+  padding: 1em;
+  margin: 1em 0;
+  border-radius: 5px;
+}
+
+
+.index-control:hover {
+  background-color: yellow;
+}
+
+.index-control:active {
+  background-color: blue;
 }

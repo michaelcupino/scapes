@@ -1,0 +1,24 @@
+{% extends "templates/index.html" %}
+{% block index %}
+  <div class="index-user">
+    <p>Logged in <!--as {{ nickname }}--></p>
+    <p><a href={{ logoutLink }}>Log out</a></p>
+  </div>
+  <div class="index-controls">
+    <div class="index-control">
+      <a href="/step1">Authorize the SCAPES app to Google Docs</a>
+    </div>
+    <div class="index-control">
+      <a href="/step3">
+        See a list of interesting docs (original author - different author - original author)
+      </a>
+    </div>
+    <div class="index-control">
+      See a list of latest 100 docs
+    </div>
+    <div class="index-control">
+      Search by tag
+    </div>
+  </div>
+{% endblock %}
+
