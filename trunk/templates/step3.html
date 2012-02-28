@@ -2,12 +2,8 @@
 {% block content %}
   <h1>Document List</h1>
   <h2>Ajaxed List</h2>
+  <div class="resources"></div>
   <script>
-    function addResourceToDom(content) {
-      $(".resources").append(
-          "<div class='resource'>" + content + "</div>"
-      );
-    }
     {% for resourceLink in resourceLinks %}
       $.ajax({
         type: "GET",
@@ -15,11 +11,11 @@
         data: {
           resourceLink: '{{ resourceLink }}'
         },
-        success: addResourceToDom
+        beforeSend: createLoadResourceToDomFunction({{loop.index}}),
+        success: createAddResourceToDomFunction(".resource-{{ loop.index }}")
       });
     {% endfor %}
   </script>
-  <div class="resources"></div>
   <h2>Slow List</h2>
   {% for entry in entries %}
     <div class="document-item">

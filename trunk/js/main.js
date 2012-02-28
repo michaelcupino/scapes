@@ -26,3 +26,31 @@ function doAdd() {
     success: onAddSuccess
   });
 }
+
+function createLoadResourceToDomFunction(index) {
+  return function loadResourceToDom(jqxHR) {
+    content = "Loading " + index;
+    $(".resources").append(
+        "<div class='resource-" + index + "'>" + content + "</div>"
+    );
+  }
+}
+
+function loadResourceToDom(jqxHR) {
+  content = "Loading 0";
+  $(".resources").append(
+      "<div class='resource-0'>" + content + "</div>"
+  );
+}
+
+function createAddResourceToDomFunction(selector) {
+  return function addResourceToDom(content) {
+    $(selector).html(content);
+  }
+}
+
+function addResourceToDom(content) {
+  $(".resources").append(
+      "<div class='resource'>" + content + "</div>"
+  );
+}
