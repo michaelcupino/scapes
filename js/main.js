@@ -31,7 +31,7 @@ function createLoadResourceToDomFunction(index) {
   return function loadResourceToDom(jqxHR) {
     content = "Loading " + index;
     $(".resources").append(
-        "<div class='resource-" + index + "'>" + content + "</div>"
+        "<div class='loading resource-" + index + "'>" + content + "</div>"
     );
   }
 }

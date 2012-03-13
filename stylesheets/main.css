@@ -56,16 +56,25 @@ body {
   background-color: #eeeeee;
 }
 h1 {
-  font-size: 300%;
+  font-size: 175%;
+  font-weight: bold;
 }
 h2 {
-  font-size: 200%;
+  font-size: 125%;
+  font-weight: bold;
 }
 h3 {
-  font-size: 150%;
 }
 h4 {
   font-size: 125%;
+}
+
+a {
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
 }
 
 input[type=submit] {
@@ -88,7 +97,7 @@ table {
 }
 
 table, th, td {
-  border: 1px solid black;
+  border: 1px solid #aaaaaa;
 }
 
 th, td {
@@ -115,15 +124,15 @@ td:nth-child(-n+3) {
 }
 
 .user1 {
-  color: rgb(255, 255, 255);
+  color: rgb(200, 200, 200);
 }
 
 .user2 {
-  color: rgb(150, 150, 150);
+  color: rgb(100, 100, 100);
 }
 
 .user3 {
-  color: rgb(50, 50, 50);
+  color: rgb(0, 0, 0);
 }
 
 /**
@@ -148,6 +157,19 @@ td:nth-child(-n+3) {
   bottom: 0;
   left: 0;
   display: -webkit-box;
+  -webkit-box-orient: horizontal;
+  -webkit-box-pack: center;
+  -webkit-box-align: center;
+}
+
+.index-container2 {
+  font-size: 125%;
+  position: absolute;
+  display: inline;
+  top: 2em;
+  left: 2em;
+  right: 2em;
+  bottom: 2em;
   -webkit-box-orient: horizontal;
   -webkit-box-pack: center;
   -webkit-box-align: center;
@@ -186,9 +208,31 @@ td:nth-child(-n+3) {
 
 
 .index-control:hover {
-  background-color: yellow;
+  background-color: #cccccc;
 }
 
 .index-control:active {
-  background-color: blue;
+  background-color: #999999;
+}
+
+/* Convenience */
+.hidden {
+  display: none;
+}
+
+.general-doc-info, .visualization, .stats-table {
+  margin-bottom: 2em;
+}
+
+.list-header {
+  margin-bottom: 1em;
+}
+
+.list-header span {
+  font-size: 0.8em;
+  color: #555555;
+}
+
+.loading {
+  color: #999999;
 }

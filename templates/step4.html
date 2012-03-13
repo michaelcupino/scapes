@@ -3,107 +3,107 @@
   <script src="/js/processing-1.3.6.min.js"></script>
 {% endblock %}
 {% block content %}
-
-  <script type="text/javascript">
-    setRevisionCount({{ revisionCount }});
-  </script>
-  <h1>
-    {# TODO: Find out how to get non-hard coded URL. It's .href of an a link object #}
-    <a href= "https://docs.google.com/document/d/{{ untypedResourceId }}/edit">
-      {{ resourceTitle }}</a>
-    Document Analysis
-  </h1>
-  <h3>Document ID: {{ untypedResourceId }}</h3>
-  <h2>Mocked Revision History Visualilzation</h2>
-  <div class="visualization">
-    <div class="visualization-info">
-      <p class="user1">Michael</p>
-      <p class="user2">Grace</p>
-      <p class="user3">Danielle</p>
-    </div>
-    <canvas data-processing-sources="/pde/docsRevision.pde"></canvas>
-  </div>
-
-  <h2>Document Tags</h2>
-  {% for documentTag in documentTags %}
-    <div class="document-tag">
-      {{ documentTag.content|escape }}
-    </div>
-  {% endfor %}
-  <form action="/tagDocument" method="post">
-    <div><textarea name="content" rows="3" cols="60"></textarea></div>
-    <div><input type="submit" value="Add Tag"></div>
-  </form>
-  
-  <h2>Document Statistics</h2>
-  <table>
-    <thead>
-      <tr>
-        <th>Date</th>
-        <th>Time</th>
-        <th>Who in doc</th>
-        <th>Word count</th>
-        <th>Words added</th>
-        <th>Words deleted</th>
-        <th>Punct. cap</th>
-        <th>Words moved</th>
-        <th>Lines added</th>
-        <th>Lines deleted</th>
-        <th>Lines changed</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for revisionValues in valuesOfRevisions %}
-        <tr>
-          <td>{{ revisionValues['lastEditedDate'] }}</td>
-          <td>{{ revisionValues['lastEditedTime'] }}</td>
-          <td>{{ revisionValues['author'] }}</td>
-          <td>{{ revisionValues['revisionWordCount'] }}</td>
-          <td>{{ revisionValues['addedWordCount'] }}</td>
-          <td>{{ revisionValues['deletedWordCount'] }}</td>
-          <td></td>
-          <td></td>
-          <td>{{ revisionValues['linesAdded'] }}</td>
-          <td>{{ revisionValues['linesDeleted'] }}</td>
-          <td>{{ revisionValues['linesChanged'] }}</td>
-        </tr>
-      {% endfor %}
-    </tbody>
-    <tfoot>
-    </tfoot>
-  </table>
-
-  <h2>Ajax Revisions</h2>
-  <script>
-    function addRevisionToDom(content) {
-      $(".ajax-revisions").append(
-          "<div class='ajax-revision'>" + content + "</div>"
-      );
-    }
-    {% for revisionLink in revisionLinks %}
-      $.ajax({
-        type: "GET",
-        url: "/requestARevision",
-        data: {
-          revisionLink: '{{ revisionLink }}'
-        },
-        success: addRevisionToDom
-      });
-    {% endfor %}
-  </script>
-  <div class="ajax-revisions"></div>
-
-  <h2>Raw Diffs</h2>
-  <div class="raw-diffs">
-    {% for revisionValues in valuesOfRevisions %}
-      <div class="diff">
-        <h3>{{ revisionValues['revisionTitle'] }}, Author: {{ revisionValues['author'] }}, Last Edited: {{ revisionValues['lastEdit'] }}</h3>
-        <p>Total word count: {{ revisionValues['revisionWordCount'] }}, Lines Added: {{ revisionValues['linesAdded'] }}, Lines Deleted: {{ revisionValues['linesDeleted'] }}, Lines Changed: {{ revisionValues['linesChanged'] }}</p>
-        <pre>
-          {# TODO(someone?) Figure out why you have to decode #}
-          {{ revisionValues['currentDiff'].decode("utf-8") }}
-        </pre>
+  <div class="index-container">
+    <div class="index-main">
+      <script type="text/javascript">
+        setRevisionCount({{ revisionCount }});
+      </script>
+      <div class="general-doc-info">
+        <h1>
+          {# TODO: Find out how to get non-hard coded URL. It's .href of an a link object #}
+          <a href= "https://docs.google.com/document/d/{{ untypedResourceId }}/edit">
+            {{ resourceTitle }}</a>
+        </h1>
+        <h3>ID: {{ untypedResourceId }}</h3>
       </div>
-    {% endfor %}
+
+      <!--
+      <h2>Document Tags</h2>
+      {% for documentTag in documentTags %}
+        <div class="document-tag">
+          {{ documentTag.content|escape }}
+        </div>
+      {% endfor %}
+      <form action="/tagDocument" method="post">
+        <div><textarea name="content" rows="3" cols="60"></textarea></div>
+        <div><input type="submit" value="Add Tag"></div>
+      </form>
+      -->
+      <h2 class="hidden">Document Statistics</h2>
+      <table class="stats-table" cellspacing="0">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Time</th>
+            <th>Who in doc</th>
+            <th>Word count</th>
+            <th>Words added</th>
+            <th>Words deleted</th>
+            <th>Punct. cap</th>
+            <th>Words moved</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for revisionValues in valuesOfRevisions %}
+            <tr>
+              <td>{{ revisionValues['lastEditedDate'] }}</td>
+              <td>{{ revisionValues['lastEditedTime'] }}</td>
+              <td>{{ revisionValues['author'] }}</td>
+              <td>{{ revisionValues['revisionWordCount'] }}</td>
+              <td>{{ revisionValues['addedWordCount'] }}</td>
+              <td>{{ revisionValues['deletedWordCount'] }}</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+        <tfoot>
+        </tfoot>
+      </table>
+      <!--
+      <h2>Ajax Revisions</h2>
+      <script>
+        function addRevisionToDom(content) {
+          $(".ajax-revisions").append(
+              "<div class='ajax-revision'>" + content + "</div>"
+          );
+        }
+        {% for revisionLink in revisionLinks %}
+          $.ajax({
+            type: "GET",
+            url: "/requestARevision",
+            data: {
+              revisionLink: '{{ revisionLink }}'
+            },
+            success: addRevisionToDom
+          });
+        {% endfor %}
+      </script>
+      <div class="ajax-revisions"></div>
+
+      <h2>Raw Diffs</h2>
+      <div class="raw-diffs">
+        {% for revisionValues in valuesOfRevisions %}
+          <div class="diff">
+            <h3>{{ revisionValues['revisionTitle'] }}, Author: {{ revisionValues['author'] }}, Last Edited: {{ revisionValues['lastEdit'] }}</h3>
+            <p>Total word count: {{ revisionValues['revisionWordCount'] }}, Lines Added: {{ revisionValues['linesAdded'] }}, Lines Deleted: {{ revisionValues['linesDeleted'] }}, Lines Changed: {{ revisionValues['linesChanged'] }}</p>
+            <pre>
+              {# TODO(someone?) Figure out why you have to decode #}
+              {{ revisionValues['currentDiff'].decode("utf-8") }}
+            </pre>
+          </div>
+        {% endfor %}
+      </div>
+      -->
+      <h2 class="hidden">Revision History Visualilzation*</h2>
+      <div class="visualization">
+        <div class="visualization-info">
+          <p class="user1">Michael</p>
+          <p class="user2">Grace</p>
+          <p class="user3">Danielle</p>
+        </div>
+        <canvas data-processing-sources="/pde/docsRevision.pde"></canvas>
+      </div>
+    </div>
   </div>
 {% endblock %}
