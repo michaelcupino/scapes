@@ -44,11 +44,11 @@ void randomlyCreateRevision(int versionNumber, int rectangleWidth,
 
 int getUserColor(int userId) {
   if (userId == 0) {
-    return 255;
+    return 200;
   } else if (userId == 1) {
-    return 150;
+    return 100;
   } else {
-    return 50;
+    return 0;
   }
 }
 

@@ -136,9 +136,14 @@ class FetchRevision(webapp2.RequestHandler):
     access_token = gdata.gauth.AeLoad(access_token_key)
     gdocs.auth_token = access_token
     flag = self.request.get('flag')
+    uri = self.request.get('uri')
 
     # TODO(mcupino): AJAXify this
-    feed = gdocs.GetResources(uri='/feeds/default/private/full/-/document')
+    if uri:
+      feed = gdocs.GetResources(uri=uri)
+    else:
+      feed = gdocs.GetResources(uri='/feeds/default/private/full/-/document')
+
     
     documents = []
     
@@ -192,6 +197,30 @@ class FetchRevision(webapp2.RequestHandler):
     template = jinja_environment.get_template('templates/step3.html')
     self.response.out.write(template.render(templateValues))
 
+
+class FetchCollection(webapp2.RequestHandler):
+  @login_required
+  def get(self):
+    access_token_key = 'access_token_%s' % users.get_current_user().user_id()
+    access_token = gdata.gauth.AeLoad(access_token_key)
+    gdocs.auth_token = access_token
+
+    feed = gdocs.GetResources(uri='/feeds/default/private/full/-/folder')
+
+    folders = []
+    for entry in feed.entry:
+      folder = {
+        'title': entry.title.text,
+        'id': entry.id.text
+      }
+      folders.append(folder)
+
+    templateValues = {
+      'entries': "",
+      'folders': folders
+    }
+    template = jinja_environment.get_template('templates/collections.html')
+    self.response.out.write(template.render(templateValues))
 
 class RequestAResource(webapp2.RequestHandler):
   @login_required
@@ -604,6 +633,7 @@ app = webapp2.WSGIApplication([('/', MainPage),
     ('/step2', RequestTokenCallback),
     ('/step3', FetchRevision),
     ('/step4', RequestRevision),
+    ('/collections', FetchCollection),
     ('/tagDocument', DocumentTagger),
     ('/raw', RequestRawRevision),
     ('/requestAResource', RequestAResource),

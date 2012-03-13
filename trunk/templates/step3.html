@@ -1,28 +1,25 @@
 {% extends "templates/defaultLayout.html" %}
 {% block content %}
-  <h1>Document List</h1>
-  <h2>Ajaxed List</h2>
-  <div class="resources"></div>
-  <script>
-    {% for resourceLink in resourceLinks %}
-      $.ajax({
-        type: "GET",
-        url: "/requestAResource",
-        data: {
-          resourceLink: '{{ resourceLink }}'
-        },
-        beforeSend: createLoadResourceToDomFunction({{loop.index}}),
-        success: createAddResourceToDomFunction(".resource-{{ loop.index }}")
-      });
-    {% endfor %}
-  </script>
-  <h2>Slow List</h2>
-  {% for entry in entries %}
-    <div class="document-item">
-      {# TODO(someone?): Make the id into the doc id instead of the
-        order in which it appears in the list #}
-      <a href="raw?id={{ entry['entry'].resource_id.text }}">raw</a>
-      <a href="step4?id={{ entry['entry'].resource_id.text }}">{{ entry['entry'].title.text }}</a> {{ entry['flag'] }}
+  <div class="index-container2">
+    <div class="index-main">
+      <div class="list-header">
+        <h1>Document List</h1>
+        <span>Choose a document to analyze</span>
+      </div>
+      <div class="resources"></div>
+      <script>
+        {% for resourceLink in resourceLinks %}
+          $.ajax({
+            type: "GET",
+            url: "/requestAResource",
+            data: {
+              resourceLink: '{{ resourceLink }}'
+            },
+            beforeSend: createLoadResourceToDomFunction({{loop.index}}),
+            success: createAddResourceToDomFunction(".resource-{{ loop.index }}")
+          });
+        {% endfor %}
+      </script>
     </div>
-  {% endfor %}
+  </div>
 {% endblock %}
