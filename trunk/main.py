@@ -240,12 +240,23 @@ class RequestAResource(webapp2.RequestHandler):
     
     for revision in revisions.entry:
       revisionLink = revision.GetSelfLink().href
+      resourceSelfLink = self.request.get('resourceLink')
       author = revision.author[0].email.text
-      revisionText = gdocs.DownloadRevisionToMemory(
-          revision, {'exportFormat': 'txt'})
-      revisionStore = Revision(resourceLink=self.request.get('resourceLink'),
+      q = Revision.all()
+      #TODO: Make this query more efficient, don't use *
+      q = db.GqlQuery("SELECT * FROM Revision " +
+          "WHERE resourceLink = :1 AND revisionNumber = :2",
+          resourceSelfLink, revisionLink)
+      results = q.get()
+      revisionText = None
+      if (results == None):
+        revisionText = gdocs.DownloadRevisionToMemory(
+            revision, {'exportFormat': 'txt'})
+        revisionStore = Revision(resourceLink=resourceSelfLink, 
           revisionNumber=revisionLink, revisionDownloadedText=revisionText)
-      revisionStore.put()
+        revisionStore.put()
+      else:
+        revisionText = results.revisionDownloadedText
       if originalAuthor is None:
         originalAuthor = author
       elif author != originalAuthor:
@@ -296,6 +307,7 @@ class RequestRevision(webapp2.RequestHandler):
       # TODO(someone?): Maybe make this download into a separate function
       # because the client's browser timesout if this takes too long
       q = Revision.all()
+      #TODO: Make this query more efficient, don't use *
       q = db.GqlQuery("SELECT * FROM Revision " +
           "WHERE resourceLink = :1 AND revisionNumber = :2",
           resourceSelfLink, revisionLink)
