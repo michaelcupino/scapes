@@ -5,6 +5,8 @@ api_version: 1
 threadsafe: true
 
 handlers:
+- url: /test.*
+  script: gaeunit.application
 - url: /stylesheets
   static_dir: stylesheets
 - url: /js
