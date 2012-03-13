@@ -40,6 +40,10 @@ class DocumentTag(db.Model):
   content = db.StringProperty()
   date = db.DateTimeProperty(auto_now_add=True)
 
+class Revision(db.Model):
+  resourceLink = db.StringProperty()
+  revisionNumber = db.StringProperty()
+  revisionDownloadedText = db.BlobProperty()
 
 class DocumentTagger(webapp2.RequestHandler):
   def post(self):
@@ -128,7 +132,6 @@ class Fetcher(webapp2.RequestHandler):
     template = jinja_environment.get_template('templates/step1.html')
     self.response.out.write(template.render(templateValues))
 
-
 class FetchRevision(webapp2.RequestHandler):
   @login_required
   def get(self):
@@ -148,7 +151,6 @@ class FetchRevision(webapp2.RequestHandler):
     documents = []
     
     if flag == "true":
-      resourceLinks = [] #TODO(mcupino): Rmove later
       for entry in feed.entry:
         resource_id = entry.resource_id.text
         # TODO(mcupino): AJAXify this
@@ -162,6 +164,7 @@ class FetchRevision(webapp2.RequestHandler):
         originalAuthor = None
         differentAuthor = False
         flagged = False
+        
         
         for revision in revisions.entry:
           author = revision.author[0].email.text
@@ -236,7 +239,13 @@ class RequestAResource(webapp2.RequestHandler):
     flag = ""
     
     for revision in revisions.entry:
+      revisionLink = revision.GetSelfLink().href
       author = revision.author[0].email.text
+      revisionText = gdocs.DownloadRevisionToMemory(
+          revision, {'exportFormat': 'txt'})
+      revisionStore = Revision(resourceLink=self.request.get('resourceLink'),
+          revisionNumber=revisionLink, revisionDownloadedText=revisionText)
+      revisionStore.put()
       if originalAuthor is None:
         originalAuthor = author
       elif author != originalAuthor:
@@ -262,12 +271,13 @@ class RequestRevision(webapp2.RequestHandler):
     access_token_key = 'access_token_%s' % users.get_current_user().user_id()
     access_token = gdata.gauth.AeLoad(access_token_key)
     gdocs.auth_token = access_token
-    id = self.request.get('id')
+    resourceId = self.request.get('id')
     
     # TODO(jordan): Figure out how to catch exception with invalid resource
-    resource = gdocs.GetResourceById(id)
+    resource = gdocs.GetResourceById(resourceId)
+    resourceSelfLink = resource.GetSelfLink().href
     resourceTitle = resource.title.text
-    untypedResourceId = string.lstrip(id, 'document:')
+    untypedResourceId = string.lstrip(resourceId, 'document:')
     revisions = gdocs.GetRevisions(resource)
     
     acl = gdocs.GetResourceAcl(resource)
@@ -285,8 +295,21 @@ class RequestRevision(webapp2.RequestHandler):
       revisionLinks.append(revisionLink)
       # TODO(someone?): Maybe make this download into a separate function
       # because the client's browser timesout if this takes too long
-      revisionText = gdocs.DownloadRevisionToMemory(
-          revision, {'exportFormat': 'txt'})
+      q = Revision.all()
+      q = db.GqlQuery("SELECT * FROM Revision " +
+          "WHERE resourceLink = :1 AND revisionNumber = :2",
+          resourceSelfLink, revisionLink)
+      results = q.get()
+      revisionText = None
+      if (results == None):
+        revisionText = gdocs.DownloadRevisionToMemory(
+            revision, {'exportFormat': 'txt'})
+        revisionStore = Revision(resourceLink=resourceSelfLink, 
+          revisionNumber=revisionLink, revisionDownloadedText=revisionText)
+        revisionStore.put()
+      else:
+        revisionText = results.revisionDownloadedText
+      
       revisionTextUnsplitted = revisionText # TODO(mcupino): I'm hoping a copy of it
       revisionText = string.split(revisionText, '\n')
       revisionWordCount = 0
