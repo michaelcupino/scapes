@@ -15,20 +15,12 @@
             {{ resourceTitle }}</a>
         </h1>
         <h3>ID: {{ untypedResourceId }}</h3>
+        <p>
+          <a href="/csv-example.csv?resourceSelfLink={{ resourceSelfLink }}">
+            Download table</a>
+        </p>
       </div>
 
-      <!--
-      <h2>Document Tags</h2>
-      {% for documentTag in documentTags %}
-        <div class="document-tag">
-          {{ documentTag.content|escape }}
-        </div>
-      {% endfor %}
-      <form action="/tagDocument" method="post">
-        <div><textarea name="content" rows="3" cols="60"></textarea></div>
-        <div><input type="submit" value="Add Tag"></div>
-      </form>
-      -->
       <h2 class="hidden">Document Statistics</h2>
       <table class="stats-table" cellspacing="0">
         <thead>
@@ -60,41 +52,6 @@
         <tfoot>
         </tfoot>
       </table>
-      <!--
-      <h2>Ajax Revisions</h2>
-      <script>
-        function addRevisionToDom(content) {
-          $(".ajax-revisions").append(
-              "<div class='ajax-revision'>" + content + "</div>"
-          );
-        }
-        {% for revisionLink in revisionLinks %}
-          $.ajax({
-            type: "GET",
-            url: "/requestARevision",
-            data: {
-              revisionLink: '{{ revisionLink }}'
-            },
-            success: addRevisionToDom
-          });
-        {% endfor %}
-      </script>
-      <div class="ajax-revisions"></div>
-
-      <h2>Raw Diffs</h2>
-      <div class="raw-diffs">
-        {% for revisionValues in valuesOfRevisions %}
-          <div class="diff">
-            <h3>{{ revisionValues['revisionTitle'] }}, Author: {{ revisionValues['author'] }}, Last Edited: {{ revisionValues['lastEdit'] }}</h3>
-            <p>Total word count: {{ revisionValues['revisionWordCount'] }}, Lines Added: {{ revisionValues['linesAdded'] }}, Lines Deleted: {{ revisionValues['linesDeleted'] }}, Lines Changed: {{ revisionValues['linesChanged'] }}</p>
-            <pre>
-              {# TODO(someone?) Figure out why you have to decode #}
-              {{ revisionValues['currentDiff'].decode("utf-8") }}
-            </pre>
-          </div>
-        {% endfor %}
-      </div>
-      -->
       <h2 class="hidden">Revision History Visualilzation*</h2>
       <div class="visualization">
         <div class="visualization-info">

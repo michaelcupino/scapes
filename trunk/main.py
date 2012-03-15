@@ -1,5 +1,6 @@
 import ConfigParser
 import cgi
+import csv
 import datetime
 import difflib
 import gdata.docs.client
@@ -7,6 +8,7 @@ import gdata.gauth
 import jinja2
 import os
 import string
+import time
 import urllib
 import webapp2
 import diff_match_patch.diff_match_patch
@@ -230,8 +232,15 @@ class RequestAResource(webapp2.RequestHandler):
   def get(self):
     #revision = gdocs.GetRevisionBySelfLink(self.request.get('revisionLink'))
     #revisionLink = gdocs.DownloadRevisionToMemory(revision)
-    resource = gdocs.GetResourceBySelfLink(self.request.get('resourceLink'))
-    revisions = gdocs.GetRevisions(resource)
+    resourceSelfLink = self.request.get('resourceLink')
+    allRevisionsQuery = Revision.all()
+    revisionsOfResourceQuery = allRevisionsQuery.filter("resourceLink = ",
+        resourceSelfLink)
+
+    # TODO: These two lines should only run if it's not stored in the database
+    if True:
+      resource = gdocs.GetResourceBySelfLink(resourceSelfLink)
+      revisions = gdocs.GetRevisions(resource)
     
     originalAuthor = None
     differentAuthor = False
@@ -240,14 +249,10 @@ class RequestAResource(webapp2.RequestHandler):
     
     for revision in revisions.entry:
       revisionLink = revision.GetSelfLink().href
-      resourceSelfLink = self.request.get('resourceLink')
       author = revision.author[0].email.text
-      q = Revision.all()
-      #TODO: Make this query more efficient, don't use *
-      q = db.GqlQuery("SELECT * FROM Revision " +
-          "WHERE resourceLink = :1 AND revisionNumber = :2",
-          resourceSelfLink, revisionLink)
-      results = q.get()
+      currentRevisionQuery = revisionsOfResourceQuery.filter(
+          "revisionNumber =", revisionLink)
+      results = currentRevisionQuery.get()
       revisionText = None
       if (results == None):
         revisionText = gdocs.DownloadRevisionToMemory(
@@ -285,11 +290,14 @@ class RequestRevision(webapp2.RequestHandler):
     resourceId = self.request.get('id')
     
     # TODO(jordan): Figure out how to catch exception with invalid resource
-    resource = gdocs.GetResourceById(resourceId)
+    # TODO: This should only run if it's not in the database
+    if True:
+      resource = gdocs.GetResourceById(resourceId)
+      revisions = gdocs.GetRevisions(resource)
+
     resourceSelfLink = resource.GetSelfLink().href
     resourceTitle = resource.title.text
     untypedResourceId = string.lstrip(resourceId, 'document:')
-    revisions = gdocs.GetRevisions(resource)
     
     acl = gdocs.GetResourceAcl(resource)
 
@@ -301,19 +309,20 @@ class RequestRevision(webapp2.RequestHandler):
     differentAuthor = False
     flagged = False
     
+    allRevisionsQuery = Revision.all()
+    revisionsOfResourceQuery = allRevisionsQuery.filter("resourceLink = ",
+        resourceSelfLink)
+
     for revision in revisions.entry:
       revisionLink = revision.GetSelfLink().href
       revisionLinks.append(revisionLink)
-      # TODO(someone?): Maybe make this download into a separate function
-      # because the client's browser timesout if this takes too long
-      q = Revision.all()
-      #TODO: Make this query more efficient, don't use *
-      q = db.GqlQuery("SELECT * FROM Revision " +
-          "WHERE resourceLink = :1 AND revisionNumber = :2",
-          resourceSelfLink, revisionLink)
-      results = q.get()
+      currentRevisionQuery = revisionsOfResourceQuery.filter(
+          "revisionNumber = ", revisionLink)
+      results = currentRevisionQuery.get()
       revisionText = None
       if (results == None):
+        # TODO(someone?): Maybe make this download into a separate function
+        # because the client's browser timesout if this takes too long
         revisionText = gdocs.DownloadRevisionToMemory(
             revision, {'exportFormat': 'txt'})
         revisionStore = Revision(resourceLink=resourceSelfLink, 
@@ -440,7 +449,8 @@ class RequestRevision(webapp2.RequestHandler):
       'revisionCount': len(revisions.entry),
       'resourceTitle': resourceTitle,
       'untypedResourceId': untypedResourceId,
-      'revisionLinks': revisionLinks
+      'revisionLinks': revisionLinks,
+      'resourceSelfLink': resourceSelfLink
     }
     template = jinja_environment.get_template('templates/step4.html')
     self.response.out.write(template.render(templateValues))
@@ -659,6 +669,16 @@ class RPCMethods:
     ints = [int(arg) for arg in args]
     return sum(ints)
 
+class CsvPlayground(webapp2.RequestHandler):
+  def get(self):
+    # TODO: Connect this request with a call to the datastore
+    self.response.headers['Content-Type'] = 'text/csv'
+    writer = csv.writer(self.response.out)
+    values = [[self.request.get('resourceSelfLink'), 'column 2', 'column 3'],
+        ['value 1', 'value 2', 'value 3'],
+        ['value 4', 'value 5', 'value 6']]
+    writer.writerows(values)
+
 # TODO(mcupino): Maybe find out how to have the GoogleWebmasterVerify
 # automatically route to the html page?
 app = webapp2.WSGIApplication([('/', MainPage),
@@ -675,5 +695,6 @@ app = webapp2.WSGIApplication([('/', MainPage),
     ('/requestARawRevision', RequestARawRevision),
     ('/requestARevision', RequestARevision),
     ('/gdiff', GDiffPlayground),
+    ('/csv-example.csv', CsvPlayground),
     ('/rpc', RPCHandler)],
     debug=True)
