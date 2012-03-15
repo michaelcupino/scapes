@@ -281,6 +281,76 @@ class RequestAResource(webapp2.RequestHandler):
 
 
 class RequestRevision(webapp2.RequestHandler):
+  
+  #Helper functions
+  def isRemove(self, x):
+    return x[0] == gdiff.DIFF_DELETE
+    
+  def isAdd(self, x):
+    return x[0] == gdiff.DIFF_INSERT
+    
+  # TODO(mcupino): Make this into a separate higher level function, so
+  # we don't have to do if elses for every time we reduce
+  # TODO(mcupino): Don't count characters that were appended to a word
+  # as a word added
+  def addWordCount(self, x, y):
+    if type(x) == type(1):
+      return x + y[1]
+    else:
+      return x[1] + y[1]
+
+  def countWords(self, x):
+    splitedString = x[1].split()
+    wordCount = len(splitedString)
+    return (x[0], wordCount)
+    
+  def isRemoveOrAdd(self, x):
+    return x[0] != gdiff.DIFF_EQUAL
+    
+  def getWordCount(self, revisionText):
+    wordCount = 0;
+    for line in revisionText:
+      line = line.split()
+      wordCount = wordCount + len(line)
+    return wordCount
+    
+  def getAddWordCount(self, diffWordCount):
+    newDiffsAdded = filter(self.isAdd, diffWordCount)
+    if newDiffsAdded == []:
+      return 0
+    elif len(newDiffsAdded) == 1:
+      return newDiffsAdded[0][1]
+    else:
+      return reduce(self.addWordCount, newDiffsAdded)
+      
+  def getDeletedWordCount(self, diffWordCount):
+    newDiffsRemoved = filter(self.isRemove, diffWordCount)
+    if newDiffsRemoved == []:
+      return 0
+    elif len(newDiffsRemoved) == 1:
+      return newDiffsRemoved[0][1]
+    else:
+      return reduce(self.addWordCount, newDiffsRemoved)
+      
+  def getRevisionQueryResults(self, revisionSelfLink, revisionsOfResourceQuery):
+    currentRevisionQuery = revisionsOfResourceQuery.filter(
+          "revisionNumber = ", revisionSelfLink)
+    return currentRevisionQuery.get()
+    
+  def getRevisionTextFromQueryResults(self, scapesRevision, revision, resourceLink):
+    revisionText = None
+    if (scapesRevision == None):
+      # TODO(someone?): Maybe make this download into a separate function
+      # because the client's browser timesout if this takes too long
+      revisionText = gdocs.DownloadRevisionToMemory(
+          revision, {'exportFormat': 'txt'})
+      revisionStore = Revision(resourceLink=resourceLink, 
+        revisionNumber=revision.GetSelfLink().href, revisionDownloadedText=revisionText)
+      revisionStore.put()
+    else:
+      revisionText = scapesRevision.revisionDownloadedText
+    return revisionText
+    
   @login_required
   def get(self):
     
@@ -304,7 +374,6 @@ class RequestRevision(webapp2.RequestHandler):
     previousText = "";
     previousTextUnsplitted = "";
     valuesOfRevisions = []
-    revisionLinks = []
     originalAuthor = None
     differentAuthor = False
     flagged = False
@@ -314,94 +383,29 @@ class RequestRevision(webapp2.RequestHandler):
         resourceSelfLink)
 
     for revision in revisions.entry:
-      revisionLink = revision.GetSelfLink().href
-      revisionLinks.append(revisionLink)
-      currentRevisionQuery = revisionsOfResourceQuery.filter(
-          "revisionNumber = ", revisionLink)
-      results = currentRevisionQuery.get()
-      revisionText = None
-      if (results == None):
-        # TODO(someone?): Maybe make this download into a separate function
-        # because the client's browser timesout if this takes too long
-        revisionText = gdocs.DownloadRevisionToMemory(
-            revision, {'exportFormat': 'txt'})
-        revisionStore = Revision(resourceLink=resourceSelfLink, 
-          revisionNumber=revisionLink, revisionDownloadedText=revisionText)
-        revisionStore.put()
-      else:
-        revisionText = results.revisionDownloadedText
-      
+      scapesRevision = self.getRevisionQueryResults(revision.GetSelfLink().href, revisionsOfResourceQuery)
+      revisionText = self.getRevisionTextFromQueryResults(scapesRevision, revision, resourceSelfLink)
       revisionTextUnsplitted = revisionText # TODO(mcupino): I'm hoping a copy of it
       revisionText = string.split(revisionText, '\n')
-      revisionWordCount = 0
+      revisionWordCount = self.getWordCount(revisionText)
       revisionTitle = revision.title.text
       
-      for line in revisionText:
-        line = line.split()
-        revisionWordCount = revisionWordCount + len(line)
-      
-      currentDiff = ""
-      # TODO(dani): Playing with Google API Last Edit
-      lastEdit = revision.updated
       #TODO: find out what the Z at the end of the revision.updated means
       lastEditedDateTime = datetime.strptime(revision.updated.text,
           "%Y-%m-%dT%H:%M:%S.%fZ")
       lastEditedDate = lastEditedDateTime.strftime("%a, %m/%d/%y")
       lastEditedTime = lastEditedDateTime.strftime("%I:%M%p")
-      linesAdded = 0
-      linesDeleted = 0
-      linesChanged = 0
-      for line in difflib.context_diff(previousText, revisionText):
-        currentDiff += line
-        if line.startswith('+ '):
-          linesAdded += 1
-        elif line.startswith('- '):
-          linesDeleted += 1
-        elif line.startswith('! '):
-          linesChanged += 1
-
 
       # TODO(mcupino): Maybe make word acount into a separate function
       newDiffs = gdiff.diff_main(previousTextUnsplitted, revisionTextUnsplitted, False)
       gdiff.diff_cleanupSemantic(newDiffs)
-
-      def isRemoveOrAdd(x):
-        return x[0] != gdiff.DIFF_EQUAL
-      newDiffs = filter(isRemoveOrAdd, newDiffs)
-
-      def countWords(x):
-        splitedString = x[1].split()
-        wordCount = len(splitedString)
-        return (x[0], wordCount)
-      diffWordCount = map(countWords, newDiffs)
-
-      # TODO(mcupino): Make this into a separate higher level function, so
-      # we don't have to do if elses for every time we reduce
-      def addWordCount(x, y):
-        if type(x) == type(1):
-          return x + y[1]
-        else:
-          return x[1] + y[1]
-
-      def isAdd(x):
-        return x[0] == gdiff.DIFF_INSERT
-      newDiffsAdded = filter(isAdd, diffWordCount)
-      if newDiffsAdded == []:
-        addedWordCount = 0
-      elif len(newDiffsAdded) == 1:
-        addedWordCount = newDiffsAdded[0][1]
-      else:
-        addedWordCount = reduce(addWordCount, newDiffsAdded)
-
-      def isRemove(x):
-        return x[0] == gdiff.DIFF_DELETE
-      newDiffsRemoved = filter(isRemove, diffWordCount)
-      if newDiffsRemoved == []:
-        deletedWordCount = 0
-      elif len(newDiffsRemoved) == 1:
-        deletedWordCount = newDiffsRemoved[0][1]
-      else:
-        deletedWordCount = reduce(addWordCount, newDiffsRemoved)
+      newDiffs = filter(self.isRemoveOrAdd, newDiffs)
+      diffWordCount = map(self.countWords, newDiffs)
+      addedWordCount = self.getAddWordCount(diffWordCount)
+      deletedWordCount = self.getDeletedWordCount(diffWordCount)
+      
+      self.response.out.write(newDiffs)
+      self.response.out.write(diffWordCount)
 
       author = revision.author[0].email.text
       if not flagged:
@@ -413,43 +417,26 @@ class RequestRevision(webapp2.RequestHandler):
           #TODO: Move to template values eventually
           self.response.out.write("Flag as author other author <br />")
           flagged = True
+      
       revisionValues = {
-        'currentDiff': currentDiff,
         'author': author,
-        'lastEdit': lastEdit,
         'lastEditedDate': lastEditedDate,
         'lastEditedTime': lastEditedTime,
         'revisionTitle': revisionTitle,
         'revisionWordCount': revisionWordCount,
-        'linesAdded': linesAdded,
-        'linesDeleted': linesDeleted,
-        'linesChanged': linesChanged,
         'addedWordCount': addedWordCount,
         'deletedWordCount': deletedWordCount
-      }  
+      }
       valuesOfRevisions.append(revisionValues)
       
       previousText = revisionText
       previousTextUnsplitted = revisionTextUnsplitted
-      # TODO(dani): Statistics Summary
-      # Lines Added
-      
-
-    # Document Tags
-    # TODO(someone?): Look into parents/ancestors. Maybe we can use this
-    # instead of a documentID row.
-    documentTagQuery = DocumentTag.all()
-    documentTags = documentTagQuery.fetch(10)
 
     templateValues = {
-      'acl': acl,
-      'documentTags': documentTags,
       'valuesOfRevisions': valuesOfRevisions,
-      'linesAdded': linesAdded,
       'revisionCount': len(revisions.entry),
       'resourceTitle': resourceTitle,
       'untypedResourceId': untypedResourceId,
-      'revisionLinks': revisionLinks,
       'resourceSelfLink': resourceSelfLink
     }
     template = jinja_environment.get_template('templates/step4.html')
@@ -658,8 +645,6 @@ class RPCHandler(webapp2.RequestHandler):
 
     result = func(*args)
     self.response.out.write(simplejson.dumps(result))
-
-
 
 class RPCMethods:
   """ Defines the methodsthat can be RPCed.
