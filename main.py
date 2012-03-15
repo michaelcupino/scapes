@@ -26,89 +26,20 @@ jinja_environment = jinja2.Environment(
 config = ConfigParser.RawConfigParser()
 config.read('config.cfg')
 SETTINGS = {
-    'APP_NAME': config.get('gdata_settings', 'APP_NAME'),
-    'CONSUMER_KEY': config.get('gdata_settings', 'CONSUMER_KEY'),
-    'CONSUMER_SECRET': config.get('gdata_settings', 'CONSUMER_SECRET'),
-    'SCOPES': [config.get('gdata_settings', 'SCOPES')]
-    }
+  'APP_NAME': config.get('gdata_settings', 'APP_NAME'),
+  'CONSUMER_KEY': config.get('gdata_settings', 'CONSUMER_KEY'),
+  'CONSUMER_SECRET': config.get('gdata_settings', 'CONSUMER_SECRET'),
+  'SCOPES': [config.get('gdata_settings', 'SCOPES')]
+}
 
 gdocs = gdata.docs.client.DocsClient(source = SETTINGS['APP_NAME'])
 gdiff = diff_match_patch.diff_match_patch()
 
 
-class DocumentTag(db.Model):
-  author = db.UserProperty()
-  documentID = db.StringProperty()
-  content = db.StringProperty()
-  date = db.DateTimeProperty(auto_now_add=True)
-
 class Revision(db.Model):
   resourceLink = db.StringProperty()
   revisionNumber = db.StringProperty()
   revisionDownloadedText = db.BlobProperty()
-
-class DocumentTagger(webapp2.RequestHandler):
-  def post(self):
-    # TODO(someone?): Look into parents/ancestors. Maybe we can use this
-    # instead of a documentID row.
-    documentTag = DocumentTag()
-
-    if users.get_current_user():
-      documentTag.author = users.get_current_user()
-
-    documentTag.content = self.request.get('content')
-    documentTag.documentID = "insert documentID Here"
-    documentTag.put()
-
-    url = self.request.headers.get('Referer')
-    self.redirect(url)
-
-
-class GDiffPlayground(webapp2.RequestHandler):
-  def get(self):
-    a = "Hi my name is Michael Cupino.\nI'm coding python."
-    b = "Hi my name is not Gabriel Apostol Cupino.\nI am coding python. This is 4 words."
-    self.response.out.write(a)
-    self.response.out.write("\n")
-
-    self.response.out.write(b)
-    self.response.out.write("\n")
-
-    diffs = gdiff.diff_main(a, b, False)
-
-    gdiff.diff_cleanupSemantic(diffs)
-
-    def isRemoveOrAdd(x):
-      return x[0] != gdiff.DIFF_EQUAL
-    diffs = filter(isRemoveOrAdd, diffs)
-    self.response.out.write(diffs)
-    self.response.out.write("\n")
-
-    def countWords(x):
-      splitedString = x[1].split()
-      wordCount = len(splitedString)
-      return (x[0], wordCount)
-    diffWordCount = map(countWords, diffs)
-    self.response.out.write(diffWordCount)
-    self.response.out.write("\n")
-
-    def addWordCount(x, y):
-      if type(x) == type(1):
-        return x + y[1]
-      else:
-        return x[1] + y[1]
-
-    def isAdd(x):
-      return x[0] == gdiff.DIFF_INSERT
-    addedWordCount = reduce(addWordCount, filter(isAdd, diffWordCount))
-    self.response.out.write("adedWordCount: " + str(addedWordCount))
-    self.response.out.write("\n")
-
-    def isRemove(x):
-      return x[0] == gdiff.DIFF_DELETE
-    deletedWordCount = reduce(addWordCount, (filter(isRemove, diffWordCount)))
-    self.response.out.write("deletedWordCount: " + str(deletedWordCount))
-    self.response.out.write("\n")
 
 
 class Fetcher(webapp2.RequestHandler):
@@ -134,6 +65,7 @@ class Fetcher(webapp2.RequestHandler):
     template = jinja_environment.get_template('templates/step1.html')
     self.response.out.write(template.render(templateValues))
 
+
 class FetchRevision(webapp2.RequestHandler):
   @login_required
   def get(self):
@@ -149,9 +81,9 @@ class FetchRevision(webapp2.RequestHandler):
     else:
       feed = gdocs.GetResources(uri='/feeds/default/private/full/-/document')
 
-    
+
     documents = []
-    
+
     if flag == "true":
       for entry in feed.entry:
         resource_id = entry.resource_id.text
@@ -162,12 +94,12 @@ class FetchRevision(webapp2.RequestHandler):
           'entry': entry,
           'flag': "",
         }
-        
+
         originalAuthor = None
         differentAuthor = False
         flagged = False
-        
-        
+
+
         for revision in revisions.entry:
           author = revision.author[0].email.text
           if originalAuthor is None:
@@ -182,8 +114,8 @@ class FetchRevision(webapp2.RequestHandler):
             }
             flagged = True
             break
-        
-        documents.append(documentTuple) 
+
+        documents.append(documentTuple)
     else:
       resourceLinks = []
       for entry in feed.entry:
@@ -241,12 +173,12 @@ class RequestAResource(webapp2.RequestHandler):
     if True:
       resource = gdocs.GetResourceBySelfLink(resourceSelfLink)
       revisions = gdocs.GetRevisions(resource)
-    
+
     originalAuthor = None
     differentAuthor = False
     flagged = False
     flag = ""
-    
+
     for revision in revisions.entry:
       revisionLink = revision.GetSelfLink().href
       author = revision.author[0].email.text
@@ -257,7 +189,7 @@ class RequestAResource(webapp2.RequestHandler):
       if (results == None):
         revisionText = gdocs.DownloadRevisionToMemory(
             revision, {'exportFormat': 'txt'})
-        revisionStore = Revision(resourceLink=resourceSelfLink, 
+        revisionStore = Revision(resourceLink=resourceSelfLink,
           revisionNumber=revisionLink, revisionDownloadedText=revisionText)
         revisionStore.put()
       else:
@@ -267,7 +199,6 @@ class RequestAResource(webapp2.RequestHandler):
       elif author != originalAuthor:
         differentAuthor = True
       elif differentAuthor and originalAuthor == author:
-        #TODO: Move to template values eventually
         flag = "Interesting"
         flagged = True
         break
@@ -281,40 +212,67 @@ class RequestAResource(webapp2.RequestHandler):
 
 
 class RequestRevision(webapp2.RequestHandler):
-  
-  #Helper functions
+  """Handles requests to analyze a document."""
+
   def isRemove(self, x):
+    """Determines whether a gdiff tuple signifies a removal. Helps with
+    with the filtering.
+    """
     return x[0] == gdiff.DIFF_DELETE
-    
+
   def isAdd(self, x):
+    """Determines whether a gdiff tuple signifies an add. Helps with
+    with the filtering.
+    """
     return x[0] == gdiff.DIFF_INSERT
-    
+
+  def isRemoveOrAdd(self, x):
+    """Determines whether a gdiff tuple signifies either an add or a removal.
+    Helps with with the filtering.
+    """
+    return x[0] != gdiff.DIFF_EQUAL
+
   # TODO(mcupino): Make this into a separate higher level function, so
   # we don't have to do if elses for every time we reduce
   # TODO(mcupino): Don't count characters that were appended to a word
   # as a word added
   def addWordCount(self, x, y):
+    """Adds "diff tuples" together. Helps with reducing."""
     if type(x) == type(1):
       return x + y[1]
     else:
       return x[1] + y[1]
 
   def countWords(self, x):
+    """Counts the number of words in a String. Helps with mapping."""
     splitedString = x[1].split()
     wordCount = len(splitedString)
     return (x[0], wordCount)
-    
-  def isRemoveOrAdd(self, x):
-    return x[0] != gdiff.DIFF_EQUAL
-    
+
   def getWordCount(self, revisionText):
+    """Counts the number of words in a String
+
+    Args:
+     revisionText: String. Text of the revision.
+
+    Returns:
+      Int. Number of words in revisionText.
+    """
     wordCount = 0;
     for line in revisionText:
       line = line.split()
       wordCount = wordCount + len(line)
     return wordCount
-    
+
   def getAddWordCount(self, diffWordCount):
+    """Returns the word count of "added-diff tuples".
+
+    Args:
+      diffWordCount: [(operator, Int)] List of tuples
+
+    Returns:
+      Int. Number of words added.
+    """
     newDiffsAdded = filter(self.isAdd, diffWordCount)
     if newDiffsAdded == []:
       return 0
@@ -322,8 +280,16 @@ class RequestRevision(webapp2.RequestHandler):
       return newDiffsAdded[0][1]
     else:
       return reduce(self.addWordCount, newDiffsAdded)
-      
+
   def getDeletedWordCount(self, diffWordCount):
+    """Returns the word count of "removed-diff tuples".
+
+    Args:
+      diffWordCount: [(operator, Int)] List of tuples
+
+    Returns:
+      Int. Number of words removed.
+    """
     newDiffsRemoved = filter(self.isRemove, diffWordCount)
     if newDiffsRemoved == []:
       return 0
@@ -331,34 +297,61 @@ class RequestRevision(webapp2.RequestHandler):
       return newDiffsRemoved[0][1]
     else:
       return reduce(self.addWordCount, newDiffsRemoved)
-      
-  def getRevisionQueryResults(self, revisionSelfLink, revisionsOfResourceQuery):
+
+  def getRevisionQueryResults(self, revisionSelfLink,
+      revisionsOfResourceQuery):
+    """Either downloads the reivsion text from the API or reterives the
+    the revision from the datastore.
+
+    Args:
+      scapesRevision: Revision. This can be None
+      revision: gdata.docs.data.revision. The gdata Revision object that
+          helps with downloading
+      resourceLink: String.
+
+    Returns:
+      String that contains the revision text
+    """
     currentRevisionQuery = revisionsOfResourceQuery.filter(
           "revisionNumber = ", revisionSelfLink)
     return currentRevisionQuery.get()
-    
-  def getRevisionTextFromQueryResults(self, scapesRevision, revision, resourceLink):
+
+  def getRevisionTextFromQueryResults(self, scapesRevision, revision,
+      resourceLink):
+    """Either downloads the reivsion text from the API or reterives the
+    the revision from the datastore.
+
+    Args:
+      scapesRevision: Revision. This can be None
+      revision: gdata.docs.data.revision. The gdata Revision object that
+          helps with downloading
+      resourceLink: String.
+
+    Returns:
+      String that contains the revision text
+    """
     revisionText = None
     if (scapesRevision == None):
       # TODO(someone?): Maybe make this download into a separate function
       # because the client's browser timesout if this takes too long
       revisionText = gdocs.DownloadRevisionToMemory(
           revision, {'exportFormat': 'txt'})
-      revisionStore = Revision(resourceLink=resourceLink, 
-        revisionNumber=revision.GetSelfLink().href, revisionDownloadedText=revisionText)
+      revisionStore = Revision(resourceLink=resourceLink,
+          revisionNumber=revision.GetSelfLink().href,
+          revisionDownloadedText=revisionText)
       revisionStore.put()
     else:
       revisionText = scapesRevision.revisionDownloadedText
     return revisionText
-    
+
   @login_required
   def get(self):
-    
+    """GET method for the handler. Analyzezs the resource/document."""
     access_token_key = 'access_token_%s' % users.get_current_user().user_id()
     access_token = gdata.gauth.AeLoad(access_token_key)
     gdocs.auth_token = access_token
     resourceId = self.request.get('id')
-    
+
     # TODO(jordan): Figure out how to catch exception with invalid resource
     # TODO: This should only run if it's not in the database
     if True:
@@ -368,7 +361,7 @@ class RequestRevision(webapp2.RequestHandler):
     resourceSelfLink = resource.GetSelfLink().href
     resourceTitle = resource.title.text
     untypedResourceId = string.lstrip(resourceId, 'document:')
-    
+
     acl = gdocs.GetResourceAcl(resource)
 
     previousText = "";
@@ -377,33 +370,35 @@ class RequestRevision(webapp2.RequestHandler):
     originalAuthor = None
     differentAuthor = False
     flagged = False
-    
+
     allRevisionsQuery = Revision.all()
     revisionsOfResourceQuery = allRevisionsQuery.filter("resourceLink = ",
         resourceSelfLink)
 
     for revision in revisions.entry:
-      scapesRevision = self.getRevisionQueryResults(revision.GetSelfLink().href, revisionsOfResourceQuery)
-      revisionText = self.getRevisionTextFromQueryResults(scapesRevision, revision, resourceSelfLink)
-      revisionTextUnsplitted = revisionText # TODO(mcupino): I'm hoping a copy of it
+      scapesRevision = self.getRevisionQueryResults(revision.GetSelfLink().href,
+          revisionsOfResourceQuery)
+      revisionText = self.getRevisionTextFromQueryResults(scapesRevision,
+          revision, resourceSelfLink)
+      revisionTextUnsplitted = revisionText
       revisionText = string.split(revisionText, '\n')
       revisionWordCount = self.getWordCount(revisionText)
       revisionTitle = revision.title.text
-      
-      #TODO: find out what the Z at the end of the revision.updated means
+
+      # TODO: find out what the Z at the end of the revision.updated means
       lastEditedDateTime = datetime.strptime(revision.updated.text,
           "%Y-%m-%dT%H:%M:%S.%fZ")
       lastEditedDate = lastEditedDateTime.strftime("%a, %m/%d/%y")
       lastEditedTime = lastEditedDateTime.strftime("%I:%M%p")
 
-      # TODO(mcupino): Maybe make word acount into a separate function
-      newDiffs = gdiff.diff_main(previousTextUnsplitted, revisionTextUnsplitted, False)
+      newDiffs = gdiff.diff_main(previousTextUnsplitted,
+          revisionTextUnsplitted, False)
       gdiff.diff_cleanupSemantic(newDiffs)
       newDiffs = filter(self.isRemoveOrAdd, newDiffs)
       diffWordCount = map(self.countWords, newDiffs)
       addedWordCount = self.getAddWordCount(diffWordCount)
       deletedWordCount = self.getDeletedWordCount(diffWordCount)
-      
+
       self.response.out.write(newDiffs)
       self.response.out.write(diffWordCount)
 
@@ -417,7 +412,7 @@ class RequestRevision(webapp2.RequestHandler):
           #TODO: Move to template values eventually
           self.response.out.write("Flag as author other author <br />")
           flagged = True
-      
+
       revisionValues = {
         'author': author,
         'lastEditedDate': lastEditedDate,
@@ -428,7 +423,7 @@ class RequestRevision(webapp2.RequestHandler):
         'deletedWordCount': deletedWordCount
       }
       valuesOfRevisions.append(revisionValues)
-      
+
       previousText = revisionText
       previousTextUnsplitted = revisionTextUnsplitted
 
@@ -442,6 +437,7 @@ class RequestRevision(webapp2.RequestHandler):
     template = jinja_environment.get_template('templates/step4.html')
     self.response.out.write(template.render(templateValues))
 
+
 class RequestARevision(webapp2.RequestHandler):
   @login_required
   def get(self):
@@ -451,11 +447,11 @@ class RequestARevision(webapp2.RequestHandler):
     revisionText = string.split(revisionText, '\n')
     revisionWordCount = 0
     revisionTitle = revision.title.text
-    
+
     for line in revisionText:
       line = line.split()
       revisionWordCount = revisionWordCount + len(line)
-    
+
     currentDiff = ""
     # TODO(dani): Playing with Google API Last Edit
     lastEdit = revision.updated
@@ -578,81 +574,11 @@ class MainPage(webapp2.RequestHandler):
     self.response.out.write(template.render(templateValues))
 
 
-class CanvasPlayground(webapp2.RequestHandler):
-  def get(self):
-    template = jinja_environment.get_template('templates/canvas.html')
-    self.response.out.write(template.render())
-
 class GoogleWebmasterVerify(webapp2.RequestHandler):
   def get(self):
     template = jinja_environment.get_template('google910e6da758dc80f1.html')
     self.response.out.write(template.render())
 
-class RPCHandler(webapp2.RequestHandler):
-  """ Handles RPC calls and calls methods inside the RPCMethods class
-  """
-  def __init__(self, *args, **kwargs):
-    webapp2.RequestHandler.__init__(self, *args, **kwargs)
-    self.methods = RPCMethods()
-
-  def get(self):
-    # Deny access if asking to access private/protected methods
-    action = self.request.get('action')
-    if action:
-      if action[0] == '_':
-        self.error(403)
-        return
-
-    # Return a "Not Found" if the function/method can't be found
-    func = getattr(self.methods, action, None)
-    if not func:
-      self.error(404)
-      return
-
-    args = ()
-    while True:
-      key = 'arg%d' % len(args)
-      val = self.request.get(key)
-      if val:
-        args += (simplejson.loads(val),)
-      else:
-        break
-
-    result = func(*args)
-    self.response.out.write(simplejson.dumps(result))
-
-  def post(self):
-    # Deny access if asking to access private/protected methods
-    action = self.request.get('action')
-    if action == '_':
-      self.error(403)
-      return
-
-    # Return a "Not Found" if the function/method can't be found
-    func = getattr(self.methods, action, None)
-    if not func:
-      self.error(404)
-      return
-
-    args = ()
-    while True:
-      key = 'arg%d' % len(args)
-      val = self.request.get(key)
-      if val:
-        args += (simplejson.loads(val),)
-      else:
-        break
-
-    result = func(*args)
-    self.response.out.write(simplejson.dumps(result))
-
-class RPCMethods:
-  """ Defines the methodsthat can be RPCed.
-  NOTE: Do not allow remote callers to acces to private/protected "_*" methods.
-  """
-  def Add(self, *args):
-    ints = [int(arg) for arg in args]
-    return sum(ints)
 
 class CsvPlayground(webapp2.RequestHandler):
   def get(self):
@@ -667,19 +593,15 @@ class CsvPlayground(webapp2.RequestHandler):
 # TODO(mcupino): Maybe find out how to have the GoogleWebmasterVerify
 # automatically route to the html page?
 app = webapp2.WSGIApplication([('/', MainPage),
-    ('/canvas', CanvasPlayground),
     ('/google910e6da758dc80f1.html', GoogleWebmasterVerify),
     ('/step1', Fetcher),
     ('/step2', RequestTokenCallback),
     ('/step3', FetchRevision),
     ('/step4', RequestRevision),
     ('/collections', FetchCollection),
-    ('/tagDocument', DocumentTagger),
     ('/raw', RequestRawRevision),
     ('/requestAResource', RequestAResource),
     ('/requestARawRevision', RequestARawRevision),
     ('/requestARevision', RequestARevision),
-    ('/gdiff', GDiffPlayground),
-    ('/csv-example.csv', CsvPlayground),
-    ('/rpc', RPCHandler)],
+    ('/csv-example.csv', CsvPlayground)],
     debug=True)
