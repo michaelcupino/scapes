@@ -1,5 +1,6 @@
 import ConfigParser
 import cgi
+import copy
 import csv
 import datetime
 import difflib
@@ -37,9 +38,15 @@ gdiff = diff_match_patch.diff_match_patch()
 
 
 class Revision(db.Model):
-  resourceLink = db.StringProperty()
+  resourceLink = db.StringProperty() # Redundant
   revisionNumber = db.StringProperty()
   revisionDownloadedText = db.BlobProperty()
+  date = db.DateProperty()
+  time = db.TimeProperty()
+  author = db.EmailProperty()
+  wordCount = db.IntegerProperty()
+  wordsAdded = db.IntegerProperty()
+  wordsDeleted = db.IntegerProperty()
 
 
 class Fetcher(webapp2.RequestHandler):
@@ -164,7 +171,7 @@ class RequestAResource(webapp2.RequestHandler):
   def get(self):
     #revision = gdocs.GetRevisionBySelfLink(self.request.get('revisionLink'))
     #revisionLink = gdocs.DownloadRevisionToMemory(revision)
-    resourceSelfLink = self.request.get('resourceLink')
+    resourceSelfLink = urllib.unquote(self.request.get('resourceLink'))
     allRevisionsQuery = Revision.all()
     revisionsOfResourceQuery = allRevisionsQuery.filter("resourceLink = ",
         resourceSelfLink)
@@ -182,11 +189,12 @@ class RequestAResource(webapp2.RequestHandler):
     for revision in revisions.entry:
       revisionLink = revision.GetSelfLink().href
       author = revision.author[0].email.text
-      currentRevisionQuery = revisionsOfResourceQuery.filter(
+      queryCopy = copy.deepcopy(revisionsOfResourceQuery)
+      currentRevisionQuery = queryCopy.filter(
           "revisionNumber =", revisionLink)
-      results = currentRevisionQuery.get()
+      results = queryCopy.get()
       revisionText = None
-      if (results == None):
+      if (results is None):
         revisionText = gdocs.DownloadRevisionToMemory(
             revision, {'exportFormat': 'txt'})
         revisionStore = Revision(resourceLink=resourceSelfLink,
@@ -300,6 +308,7 @@ class RequestRevision(webapp2.RequestHandler):
 
   def getRevisionQueryResults(self, revisionSelfLink,
       revisionsOfResourceQuery):
+    # TODO: Update description and comments
     """Either downloads the reivsion text from the API or reterives the
     the revision from the datastore.
 
@@ -310,11 +319,14 @@ class RequestRevision(webapp2.RequestHandler):
       resourceLink: String.
 
     Returns:
-      String that contains the revision text
+      Revision object
     """
     currentRevisionQuery = revisionsOfResourceQuery.filter(
           "revisionNumber = ", revisionSelfLink)
-    return currentRevisionQuery.get()
+    if (currentRevisionQuery.count(1) == 0):
+      return Revision()
+    else:
+      return currentRevisionQuery.get()
 
   def getRevisionTextFromQueryResults(self, scapesRevision, revision,
       resourceLink):
@@ -331,15 +343,15 @@ class RequestRevision(webapp2.RequestHandler):
       String that contains the revision text
     """
     revisionText = None
-    if (scapesRevision == None):
+    if (scapesRevision.revisionDownloadedText is None):
       # TODO(someone?): Maybe make this download into a separate function
       # because the client's browser timesout if this takes too long
       revisionText = gdocs.DownloadRevisionToMemory(
           revision, {'exportFormat': 'txt'})
-      revisionStore = Revision(resourceLink=resourceLink,
-          revisionNumber=revision.GetSelfLink().href,
-          revisionDownloadedText=revisionText)
-      revisionStore.put()
+      scapesRevision.resourceLink = resourceLink
+      scapesRevision.revisionNumber = revision.GetSelfLink().href
+      scapesRevision.revisionDownloadedText = revisionText
+      scapesRevision.put()
     else:
       revisionText = scapesRevision.revisionDownloadedText
     return revisionText
@@ -358,7 +370,7 @@ class RequestRevision(webapp2.RequestHandler):
       resource = gdocs.GetResourceById(resourceId)
       revisions = gdocs.GetRevisions(resource)
 
-    resourceSelfLink = resource.GetSelfLink().href
+    resourceSelfLink = urllib.unquote(resource.GetSelfLink().href)
     resourceTitle = resource.title.text
     untypedResourceId = string.lstrip(resourceId, 'document:')
 
@@ -376,20 +388,27 @@ class RequestRevision(webapp2.RequestHandler):
         resourceSelfLink)
 
     for revision in revisions.entry:
+      # TODO: We are doing a deepcopy of the revisionsOfResourceQuery, so
+      # it could take up less resources if we either make separte query calls
+      # or iterate through the revisionsOfResourceQuery
       scapesRevision = self.getRevisionQueryResults(revision.GetSelfLink().href,
-          revisionsOfResourceQuery)
+          copy.deepcopy(revisionsOfResourceQuery))
       revisionText = self.getRevisionTextFromQueryResults(scapesRevision,
           revision, resourceSelfLink)
+      # self.response.out.write(resourceSelfLink)
       revisionTextUnsplitted = revisionText
       revisionText = string.split(revisionText, '\n')
       revisionWordCount = self.getWordCount(revisionText)
+      scapesRevision.wordCount = revisionWordCount
       revisionTitle = revision.title.text
 
       # TODO: find out what the Z at the end of the revision.updated means
       lastEditedDateTime = datetime.strptime(revision.updated.text,
           "%Y-%m-%dT%H:%M:%S.%fZ")
-      lastEditedDate = lastEditedDateTime.strftime("%a, %m/%d/%y")
-      lastEditedTime = lastEditedDateTime.strftime("%I:%M%p")
+      lastEditedDateString = lastEditedDateTime.strftime("%a, %m/%d/%y")
+      scapesRevision.date = lastEditedDateTime.date()
+      lastEditedTimeString = lastEditedDateTime.strftime("%I:%M%p")
+      scapesRevision.time = lastEditedDateTime.time()
 
       newDiffs = gdiff.diff_main(previousTextUnsplitted,
           revisionTextUnsplitted, False)
@@ -397,12 +416,22 @@ class RequestRevision(webapp2.RequestHandler):
       newDiffs = filter(self.isRemoveOrAdd, newDiffs)
       diffWordCount = map(self.countWords, newDiffs)
       addedWordCount = self.getAddWordCount(diffWordCount)
+      scapesRevision.wordsAdded = addedWordCount
       deletedWordCount = self.getDeletedWordCount(diffWordCount)
+      scapesRevision.wordsDeleted = deletedWordCount
 
-      self.response.out.write(newDiffs)
-      self.response.out.write(diffWordCount)
+      # self.response.out.write(newDiffs)
+      # self.response.out.write(diffWordCount)
 
+      ###########################
+      # TODO: We are assuming that there is only one author per revision because
+      # the Google Docs API does not return more than one author even though a
+      # revision contains more than one author
+      #
+      # The API could change, and SCAPES is not prepared for a change.
+      ###########################
       author = revision.author[0].email.text
+      scapesRevision.author = author
       if not flagged:
         if originalAuthor is None:
           originalAuthor = author
@@ -413,10 +442,11 @@ class RequestRevision(webapp2.RequestHandler):
           self.response.out.write("Flag as author other author <br />")
           flagged = True
 
+      scapesRevision.put()
       revisionValues = {
         'author': author,
-        'lastEditedDate': lastEditedDate,
-        'lastEditedTime': lastEditedTime,
+        'lastEditedDate': lastEditedDateString,
+        'lastEditedTime': lastEditedTimeString,
         'revisionTitle': revisionTitle,
         'revisionWordCount': revisionWordCount,
         'addedWordCount': addedWordCount,
@@ -580,15 +610,33 @@ class GoogleWebmasterVerify(webapp2.RequestHandler):
     self.response.out.write(template.render())
 
 
-class CsvPlayground(webapp2.RequestHandler):
+class CsvExportRequestHandler(webapp2.RequestHandler):
+  @login_required
   def get(self):
-    # TODO: Connect this request with a call to the datastore
-    self.response.headers['Content-Type'] = 'text/csv'
+    allRevisionsQuery = Revision.all(keys_only=True)
+    resourceSelfLink = self.request.get('resourceSelfLink')
+    revisionsOfResourceQuery = allRevisionsQuery.filter("resourceLink = ",
+        resourceSelfLink)
+    revisionsOfResourceQuery.order('date')
+    revisionsOfResourceQuery.order('time')
+
     writer = csv.writer(self.response.out)
-    values = [[self.request.get('resourceSelfLink'), 'column 2', 'column 3'],
-        ['value 1', 'value 2', 'value 3'],
-        ['value 4', 'value 5', 'value 6']]
+    values = [['Date', 'Time', 'Who in doc', 'Word count', 'Words added',
+        'Words deleted', 'Punct. cap', 'Words moved']]
     writer.writerows(values)
+
+    for revisionKey in revisionsOfResourceQuery:
+      revision = Revision.get(revisionKey)
+      values = [[revision.date, revision.time, revision.author,
+          revision.wordCount, revision.wordsAdded, revision.wordsDeleted,
+          '-', '-']]
+      writer.writerows(values)
+
+    # TODO: Somehow get the title
+    csvFilename = str(Revision.get(revisionsOfResourceQuery.get()).author) + "-title"
+    self.response.headers['Content-Type'] = "text/csv"
+    self.response.headers['Content-Disposition'] = "attachment; " + "filename=" + csvFilename + ".csv"
+
 
 # TODO(mcupino): Maybe find out how to have the GoogleWebmasterVerify
 # automatically route to the html page?
@@ -603,5 +651,5 @@ app = webapp2.WSGIApplication([('/', MainPage),
     ('/requestAResource', RequestAResource),
     ('/requestARawRevision', RequestARawRevision),
     ('/requestARevision', RequestARevision),
-    ('/csv-example.csv', CsvPlayground)],
+    ('/csv', CsvExportRequestHandler)],
     debug=True)

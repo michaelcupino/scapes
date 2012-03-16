@@ -19,6 +19,17 @@ indexes:
 - kind: Revision
   properties:
   - name: resourceLink
+  - name: date
+
+- kind: Revision
+  properties:
+  - name: resourceLink
+  - name: date
+  - name: time
+
+- kind: Revision
+  properties:
+  - name: resourceLink
   - name: revisionNumber
 
 - kind: Revision
@@ -26,3 +37,9 @@ indexes:
   - name: resourceLink
   - name: revisionNumber
     direction: desc
+
+- kind: Revision
+  properties:
+  - name: resourceLink
+  - name: time
+  - name: date
