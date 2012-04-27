@@ -215,6 +215,13 @@ td:nth-child(-n+3) {
   background-color: #999999;
 }
 
+/**
+ * @section Step3
+ */
+ .folders-list {
+  margin-top: 3em;
+ }
+
 /* Convenience */
 .hidden {
   display: none;
