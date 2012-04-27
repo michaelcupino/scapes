@@ -74,69 +74,67 @@ class Fetcher(webapp2.RequestHandler):
 
 
 class FetchRevision(webapp2.RequestHandler):
+  def replaceFirstToken(self, text):
+    """This replaces the first token to 'Folders'. The reason for this is
+    because the API does not return what we would have expected (specifically
+    in the folder feed title).
+    """
+    textList = text.split();
+    if textList[0] == 'Documents':
+      textList[0] = 'Folders'
+      text = ' '.join(textList)
+    return text
+
   @login_required
   def get(self):
     access_token_key = 'access_token_%s' % users.get_current_user().user_id()
     access_token = gdata.gauth.AeLoad(access_token_key)
     gdocs.auth_token = access_token
-    flag = self.request.get('flag')
-    uri = self.request.get('uri')
 
     # TODO(mcupino): AJAXify this
-    if uri:
-      feed = gdocs.GetResources(uri=uri)
+    folderResourceId = self.request.get('resource')
+    documentUri = "/-/document"
+    uri = '/feeds/default/private/full'
+    if folderResourceId:
+      showFolders = True
+      uri = '/feeds/default/private/full/' + folderResourceId
+      documentFeed = gdocs.GetResources(uri=uri + "/contents" + documentUri)
     else:
-      feed = gdocs.GetResources(uri='/feeds/default/private/full/-/document')
-
-
+      showFolders = False
+      documentFeed = gdocs.GetResources(uri=uri + documentUri)
+    
+    documentListTitle = documentFeed.title.text
+    folderListTitle = ""
     documents = []
+    folders = []
+    resourceLinks = []
+    for entry in documentFeed.entry:
+      resourceLink = entry.GetSelfLink().href
+      resourceLinks.append(resourceLink)
+      documentTuple = {
+        'entry': entry,
+      }
+      documents.append(documentTuple)
 
-    if flag == "true":
-      for entry in feed.entry:
-        resource_id = entry.resource_id.text
-        # TODO(mcupino): AJAXify this
-        resource = gdocs.GetResourceById(resource_id)
-        revisions = gdocs.GetRevisions(resource)
-        documentTuple = {
-          'entry': entry,
-          'flag': "",
+    if showFolders:
+      folderUri = "/-/folder"
+      folderFeed = gdocs.GetResources(uri=uri + "/contents" + folderUri)
+      folderListTitle = self.replaceFirstToken(folderFeed.title.text)
+      for entry in folderFeed.entry:
+        folder = {
+          'title': entry.title.text,
+          'id': entry.resource_id.text
         }
-
-        originalAuthor = None
-        differentAuthor = False
-        flagged = False
-
-
-        for revision in revisions.entry:
-          author = revision.author[0].email.text
-          if originalAuthor is None:
-            originalAuthor = author
-          elif author != originalAuthor:
-            differentAuthor = True
-          elif differentAuthor and originalAuthor == author:
-            #TODO: Move to template values eventually
-            documentTuple = {
-              'entry': entry,
-              'flag': "Interesting",
-            }
-            flagged = True
-            break
-
-        documents.append(documentTuple)
-    else:
-      resourceLinks = []
-      for entry in feed.entry:
-        resourceLink = entry.GetSelfLink().href
-        resourceLinks.append(resourceLink)
-        documentTuple = {
-          'entry': entry,
-          'flag': "",
-        }
-        documents.append(documentTuple)
+        folders.append(folder)
+      showFolders = showFolders and folders
 
     templateValues = {
       'entries': documents,
-      'resourceLinks': resourceLinks
+      'resourceLinks': resourceLinks,
+      'showFolders': showFolders,
+      'folders': folders,
+      'folderListTitle': folderListTitle,
+      'documentListTitle': documentListTitle
     }
     template = jinja_environment.get_template('templates/step3.html')
     self.response.out.write(template.render(templateValues))
@@ -155,7 +153,7 @@ class FetchCollection(webapp2.RequestHandler):
     for entry in feed.entry:
       folder = {
         'title': entry.title.text,
-        'id': entry.id.text
+        'id': entry.resource_id.text
       }
       folders.append(folder)
 
