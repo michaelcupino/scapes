@@ -13,6 +13,8 @@ import time
 import urllib
 import webapp2
 import diff_match_patch.diff_match_patch
+import threading
+import re
 
 from datetime import datetime
 from django.utils import simplejson
@@ -127,6 +129,22 @@ class FetchRevision(webapp2.RequestHandler):
         }
         folders.append(folder)
       showFolders = showFolders and folders
+     
+    # TODO: Add a TODO, saying that eventually we want to give the resource 
+    # links of a folder, instead of all the resource links of the docs in the folder.
+    
+    # Appends resourceLinks for table download
+    tableDownloadLink = ""
+    count = 1
+    for resourceLink in resourceLinks:
+      resourceLinkSubStart = resourceLink.find("/folder")
+      resourceLinkSubEnd = resourceLink.find("/document")
+      newResourceLink = resourceLink[:resourceLinkSubStart] + resourceLink[resourceLinkSubEnd:]
+      if tableDownloadLink == "":
+        tableDownloadLink = newResourceLink
+      else:
+        tableDownloadLink = tableDownloadLink + "&resourceSelfLink" + str(count) + "=" + newResourceLink
+      count += 1
 
     templateValues = {
       'entries': documents,
@@ -134,7 +152,8 @@ class FetchRevision(webapp2.RequestHandler):
       'showFolders': showFolders,
       'folders': folders,
       'folderListTitle': folderListTitle,
-      'documentListTitle': documentListTitle
+      'documentListTitle': documentListTitle,
+      'tableDownloadLink': tableDownloadLink
     }
     template = jinja_environment.get_template('templates/step3.html')
     self.response.out.write(template.render(templateValues))
@@ -169,6 +188,7 @@ class RequestAResource(webapp2.RequestHandler):
   def get(self):
     #revision = gdocs.GetRevisionBySelfLink(self.request.get('revisionLink'))
     #revisionLink = gdocs.DownloadRevisionToMemory(revision)
+    # Get revisions from resource link
     resourceSelfLink = urllib.unquote(self.request.get('resourceLink'))
     allRevisionsQuery = Revision.all()
     revisionsOfResourceQuery = allRevisionsQuery.filter("resourceLink = ",
@@ -184,6 +204,7 @@ class RequestAResource(webapp2.RequestHandler):
     flagged = False
     flag = ""
 
+    # Go through each revision and get necessary information
     for revision in revisions.entry:
       revisionLink = revision.GetSelfLink().href
       author = revision.author[0].email.text
@@ -611,24 +632,35 @@ class GoogleWebmasterVerify(webapp2.RequestHandler):
 class CsvExportRequestHandler(webapp2.RequestHandler):
   @login_required
   def get(self):
-    allRevisionsQuery = Revision.all(keys_only=True)
-    resourceSelfLink = self.request.get('resourceSelfLink')
-    revisionsOfResourceQuery = allRevisionsQuery.filter("resourceLink = ",
-        resourceSelfLink)
-    revisionsOfResourceQuery.order('date')
-    revisionsOfResourceQuery.order('time')
-
+    count = 1
+    listOfSelfLinks = []
+    moreLinks = True
+    while moreLinks:
+      resourceSelfLink = self.request.get('resourceSelfLink' + str(count))
+      if resourceSelfLink == "":
+        moreLinks = False
+      else:
+        listOfSelfLinks.append(resourceSelfLink)
+      count += 1
+    
     writer = csv.writer(self.response.out)
     values = [['Date', 'Time', 'Who in doc', 'Word count', 'Words added',
         'Words deleted', 'Punct. cap', 'Words moved']]
     writer.writerows(values)
+    
+    for selfLink in listOfSelfLinks:
+      allRevisionsQuery = Revision.all(keys_only=True)
+      revisionsOfResourceQuery = allRevisionsQuery.filter("resourceLink = ",
+          selfLink)
+      revisionsOfResourceQuery.order('date')
+      revisionsOfResourceQuery.order('time')
 
-    for revisionKey in revisionsOfResourceQuery:
-      revision = Revision.get(revisionKey)
-      values = [[revision.date, revision.time, revision.author,
-          revision.wordCount, revision.wordsAdded, revision.wordsDeleted,
-          '-', '-']]
-      writer.writerows(values)
+      for revisionKey in revisionsOfResourceQuery:
+        revision = Revision.get(revisionKey)
+        values = [[revision.date, revision.time, revision.author,
+            revision.wordCount, revision.wordsAdded, revision.wordsDeleted,
+            '-', '-']]
+        writer.writerows(values)
 
     # TODO: Somehow get the title
     csvFilename = str(Revision.get(revisionsOfResourceQuery.get()).author) + "-title"
