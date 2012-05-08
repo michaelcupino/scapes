@@ -139,7 +139,7 @@ class RequestRevision(webapp2.RequestHandler):
       return currentRevisionQuery.get()
 
   def getRevisionTextFromQueryResults(self, scapesRevision, revision,
-      resourceLink):
+      resourceLink, resourceID, resourceTitle):
     """Either downloads the reivsion text from the API or reterives the
     the revision from the datastore.
 
@@ -161,6 +161,8 @@ class RequestRevision(webapp2.RequestHandler):
       scapesRevision.resourceLink = resourceLink
       scapesRevision.revisionNumber = revision.GetSelfLink().href
       scapesRevision.revisionDownloadedText = revisionText
+      scapesRevision.documentID = resourceID
+      scapesRevision.documentName = resourceTitle
       scapesRevision.put()
     else:
       revisionText = scapesRevision.revisionDownloadedText
@@ -201,7 +203,7 @@ class RequestRevision(webapp2.RequestHandler):
       scapesRevision = self.getRevisionQueryResults(revision.GetSelfLink().href,
           copy.deepcopy(revisionsOfResourceQuery))
       revisionText = self.getRevisionTextFromQueryResults(scapesRevision,
-          revision, resourceSelfLink)
+          revision, resourceSelfLink, untypedResourceId, resourceTitle)
       # self.response.out.write(resourceSelfLink)
       revisionTextUnsplitted = revisionText
       revisionText = string.split(revisionText, '\n')

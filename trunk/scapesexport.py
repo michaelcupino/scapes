@@ -19,7 +19,7 @@ class CsvExportRequestHandler(webapp2.RequestHandler):
     
     writer = csv.writer(self.response.out)
     values = [['Date', 'Time', 'Who in doc', 'Word count', 'Words added',
-        'Words deleted', 'Punct. cap', 'Words moved']]
+        'Words deleted', 'Punct. cap', 'Words moved', 'Document ID', 'Document Name']]
     writer.writerows(values)
     
     for selfLink in listOfSelfLinks:
@@ -33,7 +33,7 @@ class CsvExportRequestHandler(webapp2.RequestHandler):
         revision = Revision.get(revisionKey)
         values = [[revision.date, revision.time, revision.author,
             revision.wordCount, revision.wordsAdded, revision.wordsDeleted,
-            '-', '-']]
+            '-', '-', revision.documentID, revision.documentName]]
         writer.writerows(values)
 
     # TODO: Somehow get the title
