@@ -7,8 +7,10 @@
           <h1>{{ documentListTitle }}</h1>
           <span>Choose a document to analyze</span>
           <p>
-          <a href="/csv?resourceSelfLink1={{ tableDownloadLink }}">
-            Download table</a>
+          {% if folderResourceId %}
+            <a href="/csv?folderResourceId={{ folderResourceId }}">
+              Download table</a>
+          {% endif %}
           </p>
         </div>
         <div class="resources"></div>

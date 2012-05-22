@@ -79,21 +79,6 @@ class FetchRevision(webapp2.RequestHandler):
         folders.append(folder)
       showFolders = showFolders and folders
      
-    # TODO: Add a TODO, saying that eventually we want to give the resource 
-    # links of a folder, instead of all the resource links of the docs in the folder.
-    
-    # Appends resourceLinks for table download
-    tableDownloadLink = ""
-    count = 1
-    for resourceLink in resourceLinks:
-      resourceLinkSubStart = resourceLink.find("/folder")
-      resourceLinkSubEnd = resourceLink.find("/document")
-      newResourceLink = resourceLink[:resourceLinkSubStart] + resourceLink[resourceLinkSubEnd:]
-      if tableDownloadLink == "":
-        tableDownloadLink = newResourceLink
-      else:
-        tableDownloadLink = tableDownloadLink + "&resourceSelfLink" + str(count) + "=" + newResourceLink
-      count += 1
 
     templateValues = {
       'entries': documents,
@@ -102,7 +87,7 @@ class FetchRevision(webapp2.RequestHandler):
       'folders': folders,
       'folderListTitle': folderListTitle,
       'documentListTitle': documentListTitle,
-      'tableDownloadLink': tableDownloadLink
+      'folderResourceId': folderResourceId
     }
     template = jinja_environment.get_template('templates/step3.html')
     self.response.out.write(template.render(templateValues))
