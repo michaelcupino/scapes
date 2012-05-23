@@ -168,6 +168,111 @@ class RequestRevision(webapp2.RequestHandler):
       revisionText = scapesRevision.revisionDownloadedText
     return revisionText
 
+  def post(self): # should run at most 1/s
+    documentSelfLink = self.request.get('documentSelfLink')
+    userId = self.request.get('userId')
+    access_token_key = 'access_token_%s' % userId 
+    access_token = gdata.gauth.AeLoad(access_token_key)
+    gdocs.auth_token = access_token
+
+    # TODO(jordan): Figure out how to catch exception with invalid resource
+    # TODO: This should only run if it's not in the database
+    if True:
+      resource = gdocs.GetResourceBySelfLink(documentSelfLink)
+      resourceId = resource.resource_id.text
+      revisions = gdocs.GetRevisions(resource)
+
+    resourceSelfLink = urllib.unquote(resource.GetSelfLink().href)
+    resourceTitle = resource.title.text
+    untypedResourceId = string.lstrip(resourceId, 'document:')
+
+    previousTextUnsplitted = "";
+    valuesOfRevisions = []
+    originalAuthor = None
+    differentAuthor = False
+    flagged = False
+
+    allRevisionsQuery = Revision.all()
+    revisionsOfResourceQuery = allRevisionsQuery.filter("resourceLink = ",
+        resourceSelfLink)
+
+    for revision in revisions.entry:
+      # TODO: We are doing a deepcopy of the revisionsOfResourceQuery, so
+      # it could take up less resources if we either make separte query calls
+      # or iterate through the revisionsOfResourceQuery
+      scapesRevision = self.getRevisionQueryResults(revision.GetSelfLink().href,
+          copy.deepcopy(revisionsOfResourceQuery))
+      revisionText = self.getRevisionTextFromQueryResults(scapesRevision,
+          revision, resourceSelfLink, untypedResourceId, resourceTitle)
+      # self.response.out.write(resourceSelfLink)
+      revisionTextUnsplitted = revisionText
+      revisionText = string.split(revisionText, '\n')
+      revisionWordCount = self.getWordCount(revisionText)
+      scapesRevision.wordCount = revisionWordCount
+      revisionTitle = revision.title.text
+
+      # TODO: find out what the Z at the end of the revision.updated means
+      lastEditedDateTime = datetime.strptime(revision.updated.text,
+          "%Y-%m-%dT%H:%M:%S.%fZ")
+      lastEditedDateString = lastEditedDateTime.strftime("%a, %m/%d/%y")
+      scapesRevision.date = lastEditedDateTime.date()
+      lastEditedTimeString = lastEditedDateTime.strftime("%I:%M%p")
+      scapesRevision.time = lastEditedDateTime.time()
+
+      newDiffs = gdiff.diff_main(previousTextUnsplitted,
+          revisionTextUnsplitted, False)
+      gdiff.diff_cleanupSemantic(newDiffs)
+      newDiffs = filter(self.isRemoveOrAdd, newDiffs)
+      diffWordCount = map(self.countWords, newDiffs)
+      addedWordCount = self.getAddWordCount(diffWordCount)
+      scapesRevision.wordsAdded = addedWordCount
+      deletedWordCount = self.getDeletedWordCount(diffWordCount)
+      scapesRevision.wordsDeleted = deletedWordCount
+
+      # self.response.out.write(newDiffs)
+      # self.response.out.write(diffWordCount)
+
+      ###########################
+      # TODO: We are assuming that there is only one author per revision because
+      # the Google Docs API does not return more than one author even though a
+      # revision contains more than one author
+      #
+      # The API could change, and SCAPES is not prepared for a change.
+      ###########################
+      author = revision.author[0].email.text
+      scapesRevision.author = author
+      if not flagged:
+        if originalAuthor is None:
+          originalAuthor = author
+        elif author != originalAuthor:
+          differentAuthor = True
+        elif differentAuthor and originalAuthor == author:
+          #TODO: Move to template values eventually
+          self.response.out.write("Flag as author other author <br />")
+          flagged = True
+
+      scapesRevision.put()
+      revisionValues = {
+        'author': author,
+        'lastEditedDate': lastEditedDateString,
+        'lastEditedTime': lastEditedTimeString,
+        'revisionTitle': revisionTitle,
+        'revisionWordCount': revisionWordCount,
+        'addedWordCount': addedWordCount,
+        'deletedWordCount': deletedWordCount
+      }
+      valuesOfRevisions.append(revisionValues)
+
+      previousTextUnsplitted = revisionTextUnsplitted
+
+    templateValues = {
+      'valuesOfRevisions': valuesOfRevisions,
+      'revisionCount': len(revisions.entry),
+      'resourceTitle': resourceTitle,
+      'untypedResourceId': untypedResourceId,
+      'resourceSelfLink': resourceSelfLink
+    }
+
   @login_required
   def get(self):
     """GET method for the handler. Analyzezs the resource/document."""
