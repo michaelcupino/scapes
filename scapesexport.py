@@ -3,6 +3,7 @@ import csv
 import gdata.gauth
 import webapp2
 import urllib
+from google.appengine.api import taskqueue
 from google.appengine.api import users
 from google.appengine.ext.webapp.util import login_required
 from scapesmodel import Revision
@@ -68,26 +69,40 @@ class CsvExportRequestHandler(webapp2.RequestHandler):
       listOfSelfLinks: list of self links used to write values
 
     Returns:
-      Does not return anything
+      Returns a boolean if csv is ready for download
     """
     writer = csv.writer(self.response.out)
     values = [['Date', 'Time', 'Who in doc', 'Word count', 'Words added',
         'Words deleted', 'Punct. cap', 'Words moved', 'Document ID', 'Document Name']]
     writer.writerows(values)
     
+    isCsvReadyForDownload = True
     for selfLink in listOfSelfLinks:
       allRevisionsQuery = Revision.all(keys_only=True)
       revisionsOfResourceQuery = allRevisionsQuery.filter("resourceLink = ",
           selfLink)
-      revisionsOfResourceQuery.order('date')
-      revisionsOfResourceQuery.order('time')
+      if revisionsOfResourceQuery.count() > 0:
+        revisionsOfResourceQuery.order('date')
+        revisionsOfResourceQuery.order('time')
 
-      for revisionKey in revisionsOfResourceQuery:
-        revision = Revision.get(revisionKey)
-        values = [[revision.date, revision.time, revision.author,
-            revision.wordCount, revision.wordsAdded, revision.wordsDeleted,
-            '-', '-', revision.documentID, revision.documentName]]
-        writer.writerows(values)
+        for revisionKey in revisionsOfResourceQuery:
+          revision = Revision.get(revisionKey)
+          values = [[revision.date, revision.time, revision.author,
+              revision.wordCount, revision.wordsAdded, revision.wordsDeleted,
+              '-', '-', revision.documentID, revision.documentName]]
+          writer.writerows(values)
+      else:
+        isCsvReadyForDownload = False
+        taskqueue.add(
+            url = '/step4',
+            params = {
+                'documentSelfLink': selfLink,
+                 'userId': users.get_current_user().user_id()
+                }
+        )
+
+    return isCsvReadyForDownload
+        
         
     
   def getFileName(self, folderResourceId, resourceLink):
@@ -110,12 +125,12 @@ class CsvExportRequestHandler(webapp2.RequestHandler):
   
     folderResourceId = self.request.get('folderResourceId')
     resourceLink = self.request.get('resourceSelfLink')
-    
     listOfSelfLinks = self.getSelfLinks(folderResourceId, resourceLink)
     
-    self.writeValues(listOfSelfLinks)
-    
-    csvFilename = self.getFileName(folderResourceId, resourceLink)
-
-    self.response.headers['Content-Type'] = "text/csv"
-    self.response.headers['Content-Disposition'] = "attachment; " + "filename=" + csvFilename + ".csv"
+    isCsvReadyForDownload = self.writeValues(listOfSelfLinks)
+    if isCsvReadyForDownload:
+      csvFilename = self.getFileName(folderResourceId, resourceLink)
+      self.response.headers['Content-Type'] = "text/csv"
+      self.response.headers['Content-Disposition'] = "attachment; " + "filename=" + csvFilename + ".csv"
+    else:
+      self.response.out.write('<script>alert("Not ready for download");</script>')
