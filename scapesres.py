@@ -1,6 +1,6 @@
 class ScapesResource():
   """ScapesResource is the parent class"""
-  resourceId = None
+  resourceID = None
 
   def __init__(self):
     """Initializes the object"""

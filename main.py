@@ -18,6 +18,7 @@ from scapesresource import RequestAResource
 from scapesother import RequestARawRevision
 from scapesrevision import RequestARevision
 from scapesexport import CsvExportRequestHandler
+from scapesmanualtests import ScapesManualTests
 from step3 import FetchRevision
 from step4 import RequestRevision
 
@@ -53,5 +54,6 @@ app = webapp2.WSGIApplication([('/', MainPage),
     ('/requestARevision', RequestARevision),
     ('/asyncExample', AsyncExampleRequestHandler),
     ('/worker', CounterWorker),
-    ('/csv', CsvExportRequestHandler)],
+    ('/csv', CsvExportRequestHandler),
+    ('/runTest', ScapesManualTests)],
     debug=True)
