@@ -3,20 +3,23 @@ from scapesres import ScapesResource
 class ScapesRevision(ScapesResource):
   """ScapesRevision represents a gdoc revision"""
   name = None
+  author = None
+  date = None
+  time = None
+  revisionText = None
+  wordCount = None
+  wordsAdded = None
+  wordsDeleted = None
 
-  def __init__(self):
+  def __init__(self, selfLink):
     """Initializes the object"""
-
-    print "ScapesResource.__init__()"
-    pass
-
-  def getRevisionText(self):
-    """Gets the revision text
-
-    Args:
-
-    Returns:
-      Returns the revision text
-    """
-
-    print "ScapesRevision.getRevisionText()"
+    ScapesResource.resourceID = selfLink
+    
+  def putWordsAdded(self, added):
+    wordsAdded = added
+    
+  def putWordsDeleted(self, removed):
+    wordsDeleted = removed
+    
+  def putWordCount(self, count):
+    wordCount = count
