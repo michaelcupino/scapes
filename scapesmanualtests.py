@@ -9,16 +9,17 @@ from google.appengine.ext.webapp.util import login_required
 
 class ScapesManualTests(webapp2.RequestHandler):
   def runFolderTests(self):
-    folder = ScapesFolder("folder:0B-iFCM0alu9_NGE1MTcyNTktOWQxYS00N2UwLTk2YzMtY2IxZTg5MWY5N2Uw")
+    folder = ScapesFolder("folder:0BzgGloh-1l4LYTlkZTQ4MDQtMjMxMC00MzE2LWJkNDgtYWVlN2VkZWIwMDRh")
     print folder.getDocumentsResourceIDs()
 
   def runDocumentTests(self):
-    document = ScapesDocument("document:15FIAabxIpb1OVkZth3vz75PxjsWm6Smxki-7uEXwZuU")
+    document = ScapesDocument("document:1sIKrGsH0XODRvB7rBLpAUo3p1gF1S-advzoD3c5S1FM")
     print document.getRevisionsSelfLinks()
 
   def runRevisionTests(self):
-    revision = ScapesRevision("https://docs.google.com/feeds/default/private/full/document%3A15FIAabxIpb1OVkZth3vz75PxjsWm6Smxki-7uEXwZuU/revisions/59")
-    print revision.revisionText
+    # revision = ScapesRevision("https://docs.google.com/feeds/default/private/full/document%3A1sIKrGsH0XODRvB7rBLpAUo3p1gF1S-advzoD3c5S1FM/revisions/212")
+    revision = ScapesRevision("https://docs.google.com/feeds/default/private/full/document%3A1a-yd_uRrkeJWlXBt7HRPbsyy7JrpYqepo7yzilo0KvI/revisions/185")
+    print revision.getRevisionText()
 
   def runDriveTests(self):
     drive = ScapesDrive()
@@ -26,12 +27,22 @@ class ScapesManualTests(webapp2.RequestHandler):
   def run(self):
     """This is the run method that manually runs other stuff"""
     
-    self.runFolderTests()
-    self.runDocumentTests()
+    print "Running ScapesFolder use case"
+    #self.runFolderTests()
+    print
+
+    print "Running ScapesDocument use case"
+    #self.runDocumentTests()
+    print
+
+    print "Running Revision use case"
     self.runRevisionTests()
+    print
+
     #self.runDriveTests()
   
   @login_required
   def get(self):
-    print "Running scapesmanualtests"
+    print "Running scapesmanualtests use cases"
+    print
     self.run()
