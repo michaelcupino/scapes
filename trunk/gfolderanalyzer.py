@@ -1,10 +1,58 @@
 from analyzer import Analyzer
+from gdocumentanalyzer import GDocumentAnalyzer
+from google.appengine.ext import deferred
+from scapesfolder import ScapesFolder
+from sets import Set
 
 class GFolderAnalyzer(Analyzer):
   """GFolderAnalyzer contains the logic to analyze a folder"""
 
-  def __init__(self):
+  def __init__(self, folderResourceID, requesterUserID):
     """Initializes the object"""
 
-    print "GFolderAnalyzer.__init__()"
-    pass
+    super(GFolderAnalyzer, self).__init__()
+    self.folderResourceID = folderResourceID
+    self.firingInfo["folderResourceID"] = self.folderResourceID
+    self.requesterUserID = requesterUserID
+    self.fetchedDocumentsResourceIDs = None
+
+  def notify(self, firingInfo):
+    """This function is called when a document is finished being analyzed"""
+
+    documentResourceID = firingInfo["documentResourceID"]
+    self.addFinishedAnalyzedIDToAnalyzerTracker(documentResourceID)
+    if self.areAllDocumentsFinishedBeingAnalyzed():
+      self.fireDoneAnalyzing()
+      self.cleanupAnalyzerTracker()
+
+  def areAllDocumentsFinishedBeingAnalyzed(self):
+    """Check if all documents are done being analyzed"""
+
+    return self.fetchedDocumentsResourceIDs == self.getFinishedAnalyzedIDs()
+
+  def analyze(self):
+    """Starts the analysis of the folder by making async calls"""
+
+    deferred.defer(self.fetchDocuments, self.folderResourceID,
+        self.requesterUserID)
+
+  def fetchDocuments(self, folderResourceID, requesterUserID):
+    """Fetch the document IDs of the documents inside the folder"""
+
+    folder = ScapesFolder(folderResourceID)
+    self.fetchedDocumentsResourceIDs = Set(folder.getDocumentsResourceIDs(
+        requesterUserID))
+    deferred.defer(self.doneFetchingListOfDocumentsIDs,
+        self.fetchedDocumentsResourceIDs, requesterUserID)
+
+  def doneFetchingListOfDocumentsIDs(self, scapesDocumentsResourceIDs,
+      requesterUserID):
+    """Create GDocumentAnalyzers for each of the document id, and start
+    analyzing them
+    """
+
+    for scapesDocumentResourceID in scapesDocumentsResourceIDs:
+      documentAnalyzer = GDocumentAnalyzer(scapesDocumentResourceID,
+          requesterUserID)
+      documentAnalyzer.addListener(self)
+      documentAnalyzer.analyze()

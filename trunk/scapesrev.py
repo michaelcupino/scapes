@@ -1,7 +1,7 @@
+from datetime import datetime
 from scapesmodel import Revision
 import ConfigParser
 import gdata.gauth
-from google.appengine.api import users
 
 # Configure gdata
 config = ConfigParser.RawConfigParser()
@@ -17,18 +17,40 @@ gdocs = gdata.docs.client.DocsClient(source = SETTINGS['APP_NAME'])
 
 class ScapesRevision():
   """ScapesRevision represents a gdoc revision"""
-  datastoreRevision = None
 
-  def __init__(self, selfLink):
+  def __init__(self, selfLink, requesterUserID):
     """Initializes the object"""
 
     self.selfLink = selfLink
-    revisionQuery = Revision.all()
+    self.requesterUserID = requesterUserID
+    self.datastoreRevision = None
+    self.gdataRevision = None
+
+    revisionQuery = Revision.all(keys_only = True)
     revisionQuery.filter("revisionNumber = ", self.selfLink)
     if (revisionQuery.count(1) == 0):
       self.datastoreRevision = Revision()
+      self.datastoreRevision.revisionNumber = selfLink
+      self.datastoreRevision.put()
     else:
-      self.datastoreRevision = revisionQuery.get()
+      self.datastoreRevision = Revision.get(revisionQuery.get())
+
+  def setGdataAuth(self):
+    """Sets the authorization for gdata"""
+
+    access_token_key = 'access_token_%s' % self.requesterUserID
+    access_token = gdata.gauth.AeLoad(access_token_key)
+    gdocs.auth_token = access_token
+
+  def getGdataRevision(self):
+    """Gets the gdata revision"""
+
+    if self.gdataRevision is None:
+      self.setGdataAuth()
+      self.gdataRevision = gdocs.GetRevisionBySelfLink(self.selfLink)
+
+
+    return self.gdataRevision
 
   def getRevisionTextFromQueryResults(self, datastoreRevision,
       revisionSelfLink):
@@ -38,22 +60,16 @@ class ScapesRevision():
     Args:
       datastoreRevision: Revision. This can be None
       revisionSelfLink: String. Represents the self link of the revision
-      
+
     Returns:
       String that contains the revision text
     """
 
-    access_token_key = 'access_token_%s' % users.get_current_user().user_id()
-    access_token = gdata.gauth.AeLoad(access_token_key)
-    gdocs.auth_token = access_token
-
     revisionText = None
     if (datastoreRevision.revisionDownloadedText is None):
-      gdataRevision = gdocs.GetRevisionBySelfLink(self.selfLink)
+      gdataRevision = self.getGdataRevision()
       revisionText = gdocs.DownloadRevisionToMemory(
           gdataRevision, {'exportFormat': 'txt'})
-
-      datastoreRevision.revisionNumber = revisionSelfLink
       datastoreRevision.revisionDownloadedText = revisionText
       datastoreRevision.put()
 
@@ -76,6 +92,69 @@ class ScapesRevision():
         self.selfLink)
     return revisionText
 
+  def getAuthors(self):
+    """Returns the authors associated with the revision. At the time of
+    implementation, the gdata library only returns one author for any revision,
+    even revisions with multiple authors."""
+
+    revisionAuthors = None
+    if (self.datastoreRevision.author is None):
+      gdataRevision = self.getGdataRevision()
+      revisionAuthorsRaw = gdataRevision.author[0].email
+      if revisionAuthorsRaw is None:
+        revisionAuthors = "anonymous (Anyone with link. No sign-in required.)"
+      else:
+        revisionAuthors = revisionAuthorsRaw.text
+      self.datastoreRevision.author = revisionAuthors
+      self.datastoreRevision.put()
+
+    else:
+      revisionAuthors = self.datastoreRevision.author
+
+    return revisionAuthors
+
+  def getDateTimeOfGdataRevision(self, gdataRevision):
+    """Returns the datetime object associated with this revision"""
+
+    return datetime.strptime(gdataRevision.updated.text,
+        "%Y-%m-%dT%H:%M:%S.%fZ")
+
+  def getDate(self):
+    """Returns the date that the revision was created. It's still unknown
+    what timezone the dates are in"""
+
+    revisionDate = None
+    if (self.datastoreRevision.date is None):
+      gdataRevision = self.getGdataRevision()
+      revisionLastEditedDateTime = self.getDateTimeOfGdataRevision(gdataRevision)
+      revisionDate = revisionLastEditedDateTime.date()
+      self.datastoreRevision.date = revisionDate
+      self.datastoreRevision.time = revisionLastEditedDateTime.time()
+      self.datastoreRevision.put()
+
+    else:
+      revisionDate = self.datastoreRevision.date
+
+    return revisionDate
+
+  def getTime(self):
+    """Returns the time that the revision was created. It's still unknown
+    what timezone the times are in"""
+
+    revisionTime = None
+    if (self.datastoreRevision.time is None):
+      gdataRevision = self.getGdataRevision()
+      revisionLastEditedDateTime = self.getDateTimeOfGdataRevision(gdataRevision)
+      self.datastoreRevision.date = revisionLastEditedDateTime.date()
+      revisionTime = revisionLastEditedDateTime.time()
+      self.datastoreRevision.time = revisionTime
+      self.datastoreRevision.put()
+
+    else:
+      revisionTime = self.datastoreRevision.time
+
+    return revisionTime
+
   def putWordsAdded(self, wordsAdded):
     """This puts the number of the words added for this revision to the
         datastore
@@ -88,7 +167,7 @@ class ScapesRevision():
     """
 
     self.datastoreRevision.wordsAdded = wordsAdded
-    datastoreRevision.put()
+    self.datastoreRevision.put()
 
   def putWordsDeleted(self, wordsDeleted):
     """This puts the number of the words deleted for this revision to the
@@ -102,7 +181,7 @@ class ScapesRevision():
     """
 
     self.datastoreRevision.wordsDeleted = wordsDeleted
-    datastoreRevision.put()
+    self.datastoreRevision.put()
 
   def putWordCount(self, wordCount):
     """This puts the word count for this revision to the datastore
@@ -115,4 +194,16 @@ class ScapesRevision():
     """
 
     self.datastoreRevision.wordCount = wordCount
-    datastoreRevision.put()
+    self.datastoreRevision.put()
+
+  def putDocumentResourceID(self, documentResourceID):
+    """This puts the document resource ID of the document of the revision"""
+
+    self.datastoreRevision.documentID = documentResourceID
+    self.datastoreRevision.put()
+
+  def putDocumentTitle(self, documentTitle):
+    """This puts the document title of the revision"""
+
+    self.datastoreRevision.documentName = documentTitle
+    self.datastoreRevision.put()
