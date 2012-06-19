@@ -21,6 +21,7 @@ from scapesexport import CsvExportRequestHandler
 from scapesmanualtests import ScapesManualTests
 from step3 import FetchRevision
 from step4 import RequestRevision
+from folderexport import FolderExportRequestHandler
 
 jinja_environment = jinja2.Environment(
     loader=jinja2.FileSystemLoader(os.path.dirname(__file__)))
@@ -55,5 +56,6 @@ app = webapp2.WSGIApplication([('/', MainPage),
     ('/asyncExample', AsyncExampleRequestHandler),
     ('/worker', CounterWorker),
     ('/csv', CsvExportRequestHandler),
+    ('/folderexport', FolderExportRequestHandler),
     ('/runTest', ScapesManualTests)],
     debug=True)

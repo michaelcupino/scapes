@@ -1,3 +1,4 @@
+import logging
 from scapesres import ScapesResource
 from datetime import datetime
 from scapesmodel import Revision
@@ -24,10 +25,23 @@ class ScapesDocument(ScapesResource):
   """ScapesDocument represents a gdoc document"""
   name = None
 
-  def __init__(self, resourceID):
+  def __init__(self, resourceID, requesterUserID):
     """Initializes the object"""
-    
+
     self.resourceID = resourceID
+    self.requesterUserID = requesterUserID
+    self.gdataResource = None
+
+  def getGdataResource(self):
+    """Gets the gdataResource"""
+
+    if self.gdataResource is None:
+      access_token_key = 'access_token_%s' % self.requesterUserID
+      access_token = gdata.gauth.AeLoad(access_token_key)
+      gdocs.auth_token = access_token
+      self.gdataResource = gdocs.GetResourceById(self.resourceID)
+
+    return self.gdataResource
 
   def getRevisionsSelfLinks(self):
     """Gets the self links of the revisions associated with this document
@@ -37,17 +51,21 @@ class ScapesDocument(ScapesResource):
     Returns:
       A list of self links
     """
-    access_token_key = 'access_token_%s' % users.get_current_user().user_id()
-    access_token = gdata.gauth.AeLoad(access_token_key)
-    gdocs.auth_token = access_token
 
-    resource = gdocs.GetResourceById(self.resourceID)
-    revisions = gdocs.GetRevisions(resource)
-    
+    gdataResource = self.getGdataResource()
+    revisions = gdocs.GetRevisions(gdataResource)
+
     scapesRevisionIDs = []
-    
+
     for revision in revisions.entry:
       scapesRevisionIDs.append(revision.GetSelfLink().href)
-      
+
+
     return scapesRevisionIDs
-        
+
+  def getTitle(self):
+    """Gets the title of the document"""
+
+    gdataResource = self.getGdataResource()
+    documentTitle = gdataResource.title.text
+    return documentTitle

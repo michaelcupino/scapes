@@ -12,3 +12,7 @@ class Revision(db.Model):
   wordCount = db.IntegerProperty()
   wordsAdded = db.IntegerProperty()
   wordsDeleted = db.IntegerProperty()
+
+class AnalyzerTracker(db.Model):
+  analyzerID = db.StringProperty()
+  analyzedID = db.StringProperty()

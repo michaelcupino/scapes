@@ -8,8 +8,14 @@
           <span>Choose a document to analyze</span>
           <p>
           {% if folderResourceId %}
-            <a href="/csv?folderResourceId={{ folderResourceId }}">
-              Download table</a>
+            <div>
+              <a href="/csv?folderResourceId={{ folderResourceId }}">
+                Download table</a>
+            </div>
+            <div>
+              <a href="/folderexport?resourceID={{ folderResourceId }}">
+                  Folder export (new)</a>
+            </div>
           {% endif %}
           </p>
         </div>

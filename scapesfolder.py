@@ -25,15 +25,16 @@ class ScapesFolder(ScapesResource):
 
     self.resourceID = resourceID
 
-  def getDocumentsResourceIDs(self):
+  def getDocumentsResourceIDs(self, userID):
     """Gets the documents associated with this folder
     
     Args:
+      userID: The userID of the user that requested
      
     Returns:
       A list of document resource IDs
     """
-    access_token_key = 'access_token_%s' % users.get_current_user().user_id()
+    access_token_key = 'access_token_%s' % userID
     access_token = gdata.gauth.AeLoad(access_token_key)
     gdocs.auth_token = access_token
     
