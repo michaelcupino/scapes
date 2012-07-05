@@ -1,7 +1,9 @@
 from datetime import datetime
 from scapesmodel import Revision
 import ConfigParser
+import gdata.docs.client
 import gdata.gauth
+import scapesgdocsfacade
 
 # Configure gdata
 config = ConfigParser.RawConfigParser()
@@ -47,7 +49,8 @@ class ScapesRevision():
 
     if self.gdataRevision is None:
       self.setGdataAuth()
-      self.gdataRevision = gdocs.GetRevisionBySelfLink(self.selfLink)
+      self.gdataRevision = scapesgdocsfacade.run(gdocs.GetRevisionBySelfLink,
+          self.selfLink)
 
 
     return self.gdataRevision
@@ -68,7 +71,7 @@ class ScapesRevision():
     revisionText = None
     if (datastoreRevision.revisionDownloadedText is None):
       gdataRevision = self.getGdataRevision()
-      revisionText = gdocs.DownloadRevisionToMemory(
+      revisionText = scapesgdocsfacade.run(gdocs.DownloadRevisionToMemory,
           gdataRevision, {'exportFormat': 'txt'})
       datastoreRevision.revisionDownloadedText = revisionText
       datastoreRevision.put()

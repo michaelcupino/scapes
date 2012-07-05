@@ -1,13 +1,8 @@
-import logging
-from scapesres import ScapesResource
-from datetime import datetime
-from scapesmodel import Revision
 from scapesres import ScapesResource
 import ConfigParser
+import gdata.docs.client
 import gdata.gauth
-from google.appengine.api import users
-from google.appengine.ext.webapp.util import login_required
-
+import scapesgdocsfacade
 
 # Configure gdata
 config = ConfigParser.RawConfigParser()
@@ -39,7 +34,8 @@ class ScapesDocument(ScapesResource):
       access_token_key = 'access_token_%s' % self.requesterUserID
       access_token = gdata.gauth.AeLoad(access_token_key)
       gdocs.auth_token = access_token
-      self.gdataResource = gdocs.GetResourceById(self.resourceID)
+      self.gdataResource = scapesgdocsfacade.run(gdocs.GetResourceById,
+          self.resourceID)
 
     return self.gdataResource
 
@@ -53,13 +49,11 @@ class ScapesDocument(ScapesResource):
     """
 
     gdataResource = self.getGdataResource()
-    revisions = gdocs.GetRevisions(gdataResource)
+    revisions = scapesgdocsfacade.run(gdocs.GetRevisions, gdataResource)
 
     scapesRevisionIDs = []
-
     for revision in revisions.entry:
       scapesRevisionIDs.append(revision.GetSelfLink().href)
-
 
     return scapesRevisionIDs
 

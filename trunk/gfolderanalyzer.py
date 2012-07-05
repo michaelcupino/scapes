@@ -1,5 +1,7 @@
+import logging
 from analyzer import Analyzer
 from gdocumentanalyzer import GDocumentAnalyzer
+from google.appengine.ext import db
 from google.appengine.ext import deferred
 from scapesfolder import ScapesFolder
 from sets import Set
@@ -21,14 +23,24 @@ class GFolderAnalyzer(Analyzer):
 
     documentResourceID = firingInfo["documentResourceID"]
     self.addFinishedAnalyzedIDToAnalyzerTracker(documentResourceID)
-    if self.areAllDocumentsFinishedBeingAnalyzed():
+
+    logging.getLogger().setLevel(logging.DEBUG)
+    logging.debug("GFolderAnalyzer.notify(firingInfo)")
+    areAllFinished = self.areAllDocumentsFinishedBeingAnalyzed()
+    logging.debug(areAllFinished)
+    logging.debug(self.fetchedDocumentsResourceIDs)
+
+    if areAllFinished:
       self.fireDoneAnalyzing()
       self.cleanupAnalyzerTracker()
 
   def areAllDocumentsFinishedBeingAnalyzed(self):
     """Check if all documents are done being analyzed"""
 
-    return self.fetchedDocumentsResourceIDs == self.getFinishedAnalyzedIDs()
+    logging.getLogger().setLevel(logging.DEBUG)
+    finishedAnalyzed = self.getFinishedAnalyzedIDs()
+    logging.debug(finishedAnalyzed)
+    return self.fetchedDocumentsResourceIDs == finishedAnalyzed
 
   def analyze(self):
     """Starts the analysis of the folder by making async calls"""

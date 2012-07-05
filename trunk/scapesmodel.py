@@ -14,5 +14,4 @@ class Revision(db.Model):
   wordsDeleted = db.IntegerProperty()
 
 class AnalyzerTracker(db.Model):
-  analyzerID = db.StringProperty()
-  analyzedID = db.StringProperty()
+  pass
