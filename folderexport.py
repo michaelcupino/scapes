@@ -2,7 +2,7 @@ import webapp2
 from gfolderanalyzer import GFolderAnalyzer
 from google.appengine.api import users
 from google.appengine.ext.webapp.util import login_required
-from mailman import FunClass
+from scapesmailman import ScapesMailman
 
 class FolderExportRequestHandler(webapp2.RequestHandler):
 
@@ -13,7 +13,7 @@ class FolderExportRequestHandler(webapp2.RequestHandler):
     folderResourceID = self.request.get("resourceID")
     requesterUserID = users.get_current_user().user_id()
 
-    mailman = FunClass()
+    mailman = ScapesMailman()
 
     folderAnalyzer = GFolderAnalyzer(folderResourceID, requesterUserID)
     folderAnalyzer.addListener(mailman)

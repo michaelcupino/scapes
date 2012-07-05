@@ -13,7 +13,7 @@ handlers:
   static_dir: js
 - url: /pde
   static_dir: pde
-- url: /_ah/mail/.+ 
+- url: /_ah/mail/.+
   script: handle_incoming_email.app
   login: admin
 - url: /.*

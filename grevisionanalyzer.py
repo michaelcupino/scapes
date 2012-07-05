@@ -1,4 +1,3 @@
-import logging
 import string
 from analyzer import Analyzer
 from google.appengine.ext import deferred
@@ -58,3 +57,4 @@ class GRevisionAnalyzer(Analyzer):
     revisionTime = scapesRevision.getTime()
 
     self.fireDoneAnalyzing()
+    self.cleanupAnalyzerTracker()

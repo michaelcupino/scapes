@@ -1,6 +1,7 @@
 import diff_match_patch.diff_match_patch
 import logging
 from analyzer import Analyzer
+from google.appengine.ext import db
 from google.appengine.ext import deferred
 from grevisionanalyzer import GRevisionAnalyzer
 from scapesdocument import ScapesDocument
@@ -95,6 +96,8 @@ class GDocumentAnalyzer(Analyzer):
   def analyzeRevisionDiffs(self):
     """After all the revisions are fetched, let's start analyzing the diffs
     between each revision
+
+    TODO: Make a check if there's already a words added
     """
 
     previousRevisionText = ""
@@ -109,6 +112,7 @@ class GDocumentAnalyzer(Analyzer):
       diffWordCount = map(self.countWords, revisionDiffs)
       addedWordCount = self.getAddWordCount(diffWordCount)
       deletedWordCount = self.getDeletedWordCount(diffWordCount)
+      previousRevisionText = currentRevisionText
 
       scapesDocument = self.getScapesDocument()
       documentTitle = scapesDocument.getTitle()
@@ -118,25 +122,33 @@ class GDocumentAnalyzer(Analyzer):
       scapesRevision.putDocumentResourceID(self.documentResourceID)
       scapesRevision.putDocumentTitle(documentTitle)
 
-      logging.getLogger().setLevel(logging.DEBUG)
-      logging.debug("documentTItle: %s" % documentTitle)
-
-      previousRevisionText = currentRevisionText
+    logging.getLogger().setLevel(logging.DEBUG)
+    logging.debug("GDocumentAnalyzer.analyzeRevisionDiffs()")
 
     self.fireDoneAnalyzing()
+    self.cleanupAnalyzerTracker()
 
   def notify(self, firingInfo):
     """This function is called when a revision is finished being analyzed"""
-
     revisionSelfLink = firingInfo["revisionSelfLink"]
     self.addFinishedAnalyzedIDToAnalyzerTracker(revisionSelfLink)
-    if self.areAllRevisionsFinishedBeingAnalyzed():
+
+    logging.getLogger().setLevel(logging.DEBUG)
+    logging.debug("GDocumentAnalyzer.notify(firingInfo)")
+    logging.debug(self.fetchedRevisionsSelfLinks)
+    areAllFinished = self.areAllRevisionsFinishedBeingAnalyzed()
+    logging.debug(areAllFinished)
+
+    if areAllFinished:
       deferred.defer(self.analyzeRevisionDiffs)
 
   def areAllRevisionsFinishedBeingAnalyzed(self):
     """Finds out if all revisions are done being analyzed"""
 
-    return self.getFinishedAnalyzedIDs() == self.fetchedRevisionsSelfLinks
+    logging.getLogger().setLevel(logging.DEBUG)
+    finishedAnalyzedIDs = self.getFinishedAnalyzedIDs()
+    logging.debug(finishedAnalyzedIDs)
+    return finishedAnalyzedIDs == self.fetchedRevisionsSelfLinks
 
   def analyze(self):
     """Analyze the document"""
