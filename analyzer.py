@@ -1,11 +1,11 @@
-import logging
 from google.appengine.ext import db
 from google.appengine.ext import deferred
 from scapesmodel import AnalyzerTracker
 from sets import Set
 
 class Analyzer(object):
-  """Analyzer is the parent class"""
+  """Analyzer is the parent class. In the future, we might want to separate
+  the publisher part and the analyzer specific part"""
 
   def __init__(self):
     """Initializes the object"""

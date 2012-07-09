@@ -17,6 +17,22 @@ class GFolderAnalyzer(Analyzer):
     self.firingInfo["folderResourceID"] = self.folderResourceID
     self.requesterUserID = requesterUserID
     self.fetchedDocumentsResourceIDs = None
+    self.scapesFolder = None
+
+  def getScapesFolder(self):
+    """Get the ScapesFolder related to the resource ID"""
+
+    if self.scapesFolder is None:
+      self.scapesFolder = ScapesFolder(self.folderResourceID,
+          self.requesterUserID)
+    return self.scapesFolder
+
+  def setFiringInfo(self):
+    """Set the firing info"""
+
+    folder = self.getScapesFolder()
+    self.firingInfo["folderTitle"] = folder.getTitle()
+    self.firingInfo["documentsResourceIDs"] = self.fetchedDocumentsResourceIDs
 
   def notify(self, firingInfo):
     """This function is called when a document is finished being analyzed"""
@@ -31,6 +47,7 @@ class GFolderAnalyzer(Analyzer):
     logging.debug(self.fetchedDocumentsResourceIDs)
 
     if areAllFinished:
+      self.setFiringInfo()
       self.fireDoneAnalyzing()
       self.cleanupAnalyzerTracker()
 
@@ -45,15 +62,13 @@ class GFolderAnalyzer(Analyzer):
   def analyze(self):
     """Starts the analysis of the folder by making async calls"""
 
-    deferred.defer(self.fetchDocuments, self.folderResourceID,
-        self.requesterUserID)
+    deferred.defer(self.fetchDocuments, self.requesterUserID)
 
-  def fetchDocuments(self, folderResourceID, requesterUserID):
+  def fetchDocuments(self, requesterUserID):
     """Fetch the document IDs of the documents inside the folder"""
 
-    folder = ScapesFolder(folderResourceID)
-    self.fetchedDocumentsResourceIDs = Set(folder.getDocumentsResourceIDs(
-        requesterUserID))
+    folder = self.getScapesFolder()
+    self.fetchedDocumentsResourceIDs = Set(folder.getDocumentsResourceIDs())
     deferred.defer(self.doneFetchingListOfDocumentsIDs,
         self.fetchedDocumentsResourceIDs, requesterUserID)
 
