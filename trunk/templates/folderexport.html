@@ -1,0 +1,9 @@
+{% extends "templates/defaultLayout.html" %}
+{% block content %}
+  <div>
+    When the folder is done being analyzed, the SCAPES Robot will e-mail
+    {% for recipientAddress in recipientsAddresses %}
+      {{ recipientAddress }}
+    {% endfor %}
+  </div>
+{% endblock %}

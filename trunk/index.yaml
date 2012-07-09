@@ -18,6 +18,12 @@ indexes:
 
 - kind: Revision
   properties:
+  - name: documentID
+  - name: date
+  - name: time
+
+- kind: Revision
+  properties:
   - name: resourceLink
   - name: date
 
