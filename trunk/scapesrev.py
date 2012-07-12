@@ -103,11 +103,14 @@ class ScapesRevision():
     revisionAuthors = None
     if (self.datastoreRevision.author is None):
       gdataRevision = self.getGdataRevision()
-      revisionAuthorsRaw = gdataRevision.author[0].email
-      if revisionAuthorsRaw is None:
-        revisionAuthors = "anonymous (Anyone with link. No sign-in required.)"
+      if len(gdataRevision.author) > 0:
+        revisionAuthorsRaw = gdataRevision.author[0].email
+        if revisionAuthorsRaw is None:
+          revisionAuthors = "anonymous (Anyone with link. No sign-in required.)"
+        else:
+          revisionAuthors = revisionAuthorsRaw.text
       else:
-        revisionAuthors = revisionAuthorsRaw.text
+        revisionAuthor = "No author"
       self.datastoreRevision.author = revisionAuthors
       self.datastoreRevision.put()
 
