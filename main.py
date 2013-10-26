@@ -57,5 +57,6 @@ app = webapp2.WSGIApplication([('/', MainPage),
     ('/worker', CounterWorker),
     ('/csv', CsvExportRequestHandler),
     ('/folderexport', FolderExportRequestHandler),
-    ('/runTest', ScapesManualTests)],
+    ('/runTest', ScapesManualTests)
+    ('/naren', TestNaren)],
     debug=True)
