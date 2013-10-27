@@ -170,7 +170,29 @@ class TestNaren(webapp2.RequestHandler):
     template = jinja_environment.get_template('templates/TestNaren.html')
     self.response.out.write(template.render(templateValues))
 
+class TestTristan(webapp2.RequestHandler):
+  @login_required
+  def get(self):
+    current_user = users.get_current_user()
 
+    scopes = SETTINGS['SCOPES']
+    oauth_callback = 'http://%s/step2' % self.request.host
+    consumer_key = SETTINGS['CONSUMER_KEY']
+    consumer_secret = SETTINGS['CONSUMER_SECRET']
+    request_token = gdocs.get_oauth_token(scopes, oauth_callback,
+        consumer_key, consumer_secret)
+
+    request_token_key = 'request_token_%s' % current_user.user_id()
+    gdata.gauth.ae_save(request_token, request_token_key)
+
+    approvalPageUrl = request_token.generate_authorization_url()
+
+    templateValues = {
+      'approvalPageUrl': approvalPageUrl,
+    }
+    template = jinja_environment.get_template('templates/TestTristan.html')
+    self.response.out.write(template.render(templateValues))
+    
 class GoogleWebmasterVerify(webapp2.RequestHandler):
   def get(self):
     template = jinja_environment.get_template('google910e6da758dc80f1.html')
