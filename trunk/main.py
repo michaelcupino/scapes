@@ -13,6 +13,7 @@ from scapesother import RequestTokenCallback
 from scapesother import FetchCollection
 from scapesother import RequestRawRevision
 from scapesother import TestNaren
+from scapesother import TestTristan
 from scapesasync import AsyncExampleRequestHandler
 from scapesasync import CounterWorker
 from scapesresource import RequestAResource
@@ -59,5 +60,6 @@ app = webapp2.WSGIApplication([('/', MainPage),
     ('/csv', CsvExportRequestHandler),
     ('/folderexport', FolderExportRequestHandler),
     ('/runTest', ScapesManualTests),
-    ('/naren', TestNaren),],
+    ('/naren', TestNaren),
+    ('/tristan', TestTristan)],
     debug=True)
