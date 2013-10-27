@@ -15,6 +15,7 @@ from scapesother import RequestRawRevision
 from scapesother import TestNaren
 from scapesother import TestTristan
 from scapesother import TestFoster
+from scapesother import TestJonathan
 from scapesother import TestHelio
 from scapesasync import AsyncExampleRequestHandler
 from scapesasync import CounterWorker
@@ -64,6 +65,7 @@ app = webapp2.WSGIApplication([('/', MainPage),
     ('/runTest', ScapesManualTests),
     ('/naren', TestNaren),
     ('/tristan', TestTristan),
-    ('/foster', TestFoster)
+    ('/foster', TestFoster),
+    ('/jonathan', TestJonathan),
     ('/helio', TestHelio)],
     debug=True)
