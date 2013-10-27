@@ -213,7 +213,7 @@ class TestFoster(webapp2.RequestHandler):
     templateValues = {
       'approvalPageUrl': approvalPageUrl,
     }
-    template = jinja_environment.get_template('templates/foster.html')
+    template = jinja_environment.get_template('templates/TestFoster.html')
     self.response.out.write(template.render(templateValues))
     
 class GoogleWebmasterVerify(webapp2.RequestHandler):
