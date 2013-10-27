@@ -61,5 +61,6 @@ app = webapp2.WSGIApplication([('/', MainPage),
     ('/folderexport', FolderExportRequestHandler),
     ('/runTest', ScapesManualTests),
     ('/naren', TestNaren),
-    ('/tristan', TestTristan)],
+    ('/tristan', TestTristan),
+    ('/foster', TestFoster)],
     debug=True)
