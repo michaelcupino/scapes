@@ -14,6 +14,7 @@ from scapesother import FetchCollection
 from scapesother import RequestRawRevision
 from scapesother import TestNaren
 from scapesother import TestTristan
+from scapesother import TestFoster
 from scapesasync import AsyncExampleRequestHandler
 from scapesasync import CounterWorker
 from scapesresource import RequestAResource
