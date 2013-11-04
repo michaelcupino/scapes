@@ -1,8 +1,10 @@
-from scapesfolder import ScapesFolder
 from scapesres import ScapesResource
-from scapesdocument import ScapesDocument
 from scapesrev import ScapesRevision
-from scapesdrive import ScapesDrive
+
+from model.scapesdocument import ScapesDocument
+from model.scapesdrive import ScapesDrive
+from model.scapesfolder import ScapesFolder
+
 import webapp2
 from google.appengine.api import users
 from google.appengine.ext.webapp.util import login_required

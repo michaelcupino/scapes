@@ -4,8 +4,8 @@ from analyzer import Analyzer
 from google.appengine.ext import db
 from google.appengine.ext import deferred
 from grevisionanalyzer import GRevisionAnalyzer
-from scapesdocument import ScapesDocument
 from scapesrev import ScapesRevision
+from model.scapesdocument import ScapesDocument
 from sets import Set
 
 gdiff = diff_match_patch.diff_match_patch()

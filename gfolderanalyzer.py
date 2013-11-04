@@ -3,7 +3,7 @@ from analyzer import Analyzer
 from gdocumentanalyzer import GDocumentAnalyzer
 from google.appengine.ext import db
 from google.appengine.ext import deferred
-from scapesfolder import ScapesFolder
+from model.scapesfolder import ScapesFolder
 from sets import Set
 
 class GFolderAnalyzer(Analyzer):
