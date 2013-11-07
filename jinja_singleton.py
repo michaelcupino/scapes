@@ -14,5 +14,8 @@ class _Singleton(type):
             cls._instances[cls] = super(_Singleton, cls).__call__(*args, **kwargs)
         return cls._instances[cls]
 
+# requires jinja2
 class J2EnviornmentSingleton(jinja2.Enviornment):
+    """A singleton of jinja2.Enviornment"""
     __metaclass__ = _Singleton
+
