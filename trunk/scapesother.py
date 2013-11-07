@@ -260,6 +260,7 @@ class TestJonathan(webapp2.RequestHandler):
     templateValues = {
         'approvalPageUrl': approvalPageUrl,}
     template = jinja_environment.get_template('templates/TestJonathan.html')
+    
     self.response.out.write(template.render(templateValues))
     
 class GoogleWebmasterVerify(webapp2.RequestHandler):
