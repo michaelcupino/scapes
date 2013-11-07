@@ -242,6 +242,7 @@ class TestHelio(webapp2.RequestHandler):
 class TestJonathan(webapp2.RequestHandler):
   @login_required
   def get(self):
+    import scapesrevisiondrive
     current_user = users.get_current_user()
     
     scopes = SETTINGS['SCOPES']
