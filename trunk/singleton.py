@@ -13,3 +13,6 @@ class _Singleton(type):
         if cls not in cls._instances:
             cls._instances[cls] = super(_Singleton, cls).__call__(*args, **kwargs)
         return cls._instances[cls]
+
+class J2EnviornmentSingleton(jinja2.Enviornment):
+    __metaclass__ = _Singleton
