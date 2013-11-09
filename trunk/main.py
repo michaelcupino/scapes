@@ -6,6 +6,8 @@ import os
 import webapp2
 import diff_match_patch.diff_match_patch
 
+import config
+
 from scapesother import MainPage
 from scapesother import GoogleWebmasterVerify
 from scapesother import Fetcher

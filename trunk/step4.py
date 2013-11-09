@@ -1,29 +1,32 @@
-import ConfigParser
-import copy
-import diff_match_patch.diff_match_patch
-import jinja2
-import gdata.gauth
 import os
 import string
 import urllib
+import copy
+import ConfigParser
+import jinja2
+import gdata.gauth
 import webapp2
+import diff_match_patch.diff_match_patch
+
+import config
+
 from datetime import datetime
 from google.appengine.api import users
 from google.appengine.ext.webapp.util import login_required
 from scapesmodel import Revision
 
 # TODO: Find out if we can have only one reference of this
-jinja_environment = jinja2.Environment(
-    loader=jinja2.FileSystemLoader(os.path.dirname(__file__)))
+# jinja_environment = jinja2.Environment(
+#     loader=jinja2.FileSystemLoader(os.path.dirname(__file__)))
 
 # Configure gdata
-config = ConfigParser.RawConfigParser()
-config.read('config.cfg')
+config_parser = ConfigParser.RawConfigParser()
+config_parser.read('config.cfg')
 SETTINGS = {
-  'APP_NAME': config.get('gdata_settings', 'APP_NAME'),
-  'CONSUMER_KEY': config.get('gdata_settings', 'CONSUMER_KEY'),
-  'CONSUMER_SECRET': config.get('gdata_settings', 'CONSUMER_SECRET'),
-  'SCOPES': [config.get('gdata_settings', 'SCOPES')]
+  'APP_NAME': config_parser.get('gdata_settings', 'APP_NAME'),
+  'CONSUMER_KEY': config_parser.get('gdata_settings', 'CONSUMER_KEY'),
+  'CONSUMER_SECRET': config_parser.get('gdata_settings', 'CONSUMER_SECRET'),
+  'SCOPES': [config_parser.get('gdata_settings', 'SCOPES')]
 }
 
 gdocs = gdata.docs.client.DocsClient(source = SETTINGS['APP_NAME'])
@@ -377,5 +380,5 @@ class RequestRevision(webapp2.RequestHandler):
       'untypedResourceId': untypedResourceId,
       'resourceSelfLink': resourceSelfLink
     }
-    template = jinja_environment.get_template('templates/step4.html')
+    template = config.jinja_environment.get_template('templates/step4.html')
     self.response.out.write(template.render(templateValues))
