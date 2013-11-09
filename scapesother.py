@@ -1,25 +1,27 @@
-import ConfigParser
+import os
+import webapp2
 import gdata.docs.client
 import gdata.gauth
 import jinja2
-import os
-import webapp2
+import ConfigParser
 import diff_match_patch.diff_match_patch
+
+import config
 
 from google.appengine.api import users
 from google.appengine.ext.webapp.util import login_required
 
-jinja_environment = jinja2.Environment(
-    loader=jinja2.FileSystemLoader(os.path.dirname(__file__)))
+# jinja_environment = jinja2.Environment(
+#     loader=jinja2.FileSystemLoader(os.path.dirname(__file__)))
 
 # Configure gdata
-config = ConfigParser.RawConfigParser()
-config.read('config.cfg')
+config_parser = ConfigParser.RawConfigParser()
+config_parser.read('config.cfg')
 SETTINGS = {
-  'APP_NAME': config.get('gdata_settings', 'APP_NAME'),
-  'CONSUMER_KEY': config.get('gdata_settings', 'CONSUMER_KEY'),
-  'CONSUMER_SECRET': config.get('gdata_settings', 'CONSUMER_SECRET'),
-  'SCOPES': [config.get('gdata_settings', 'SCOPES')]
+  'APP_NAME': config_parser.get('gdata_settings', 'APP_NAME'),
+'CONSUMER_KEY': config_parser.get('gdata_settings', 'CONSUMER_KEY'),
+'CONSUMER_SECRET': config_parser.get('gdata_settings', 'CONSUMER_SECRET'),
+'SCOPES': [config_parser.get('gdata_settings', 'SCOPES')]
 }
 
 gdocs = gdata.docs.client.DocsClient(source = SETTINGS['APP_NAME'])
@@ -46,7 +48,7 @@ class Fetcher(webapp2.RequestHandler):
     templateValues = {
       'approvalPageUrl': approvalPageUrl,
     }
-    template = jinja_environment.get_template('templates/step1.html')
+    template = config.jinja_environment.get_template('templates/step1.html')
     self.response.out.write(template.render(templateValues))
 
 
@@ -71,7 +73,7 @@ class FetchCollection(webapp2.RequestHandler):
       'entries': "",
       'folders': folders
     }
-    template = jinja_environment.get_template('templates/collections.html')
+    template = config.jinja_environment.get_template('templates/collections.html')
     self.response.out.write(template.render(templateValues))
 
 
@@ -95,7 +97,7 @@ class RequestRawRevision(webapp2.RequestHandler):
     templateValues = {
       'revisionLinks': revisionLinks,
     }
-    template = jinja_environment.get_template('templates/raw.html')
+    template = config.jinja_environment.get_template('templates/raw.html')
     self.response.out.write(template.render(templateValues))
 
 
@@ -127,7 +129,7 @@ class RequestTokenCallback(webapp2.RequestHandler):
 
     # TODO(someone?): Find out what webap2.redirect does
     webapp2.redirect('step3')
-    template = jinja_environment.get_template('templates/step2.html')
+    template = config.jinja_environment.get_template('templates/step2.html')
     self.response.out.write(template.render())
 
 
@@ -135,13 +137,13 @@ class MainPage(webapp2.RequestHandler):
   def get(self):
     user = users.get_current_user()
     if user:
-      template = jinja_environment.get_template('templates/indexUser.html')
+      template = config.jinja_environment.get_template('templates/indexUser.html')
       templateValues = {
         'nickname': user.nickname(),
         'logoutLink': users.create_logout_url(self.request.uri),
       }
     else:
-      template = jinja_environment.get_template('templates/indexNoUser.html')
+      template = config.jinja_environment.get_template('templates/indexNoUser.html')
       templateValues = {
         'loginLink': users.create_login_url(self.request.uri),
       }
@@ -167,7 +169,7 @@ class TestNaren(webapp2.RequestHandler):
     templateValues = {
       'approvalPageUrl': approvalPageUrl,
     }
-    template = jinja_environment.get_template('templates/TestNaren.html')
+    template = config.jinja_environment.get_template('templates/TestNaren.html')
     self.response.out.write(template.render(templateValues))
 
 class TestTristan(webapp2.RequestHandler):
@@ -190,7 +192,7 @@ class TestTristan(webapp2.RequestHandler):
     templateValues = {
       'approvalPageUrl': approvalPageUrl,
     }
-    template = jinja_environment.get_template('templates/TestTristan.html')
+    template = config.jinja_environment.get_template('templates/TestTristan.html')
     self.response.out.write(template.render(templateValues))
     
 class TestFoster(webapp2.RequestHandler):
@@ -213,7 +215,7 @@ class TestFoster(webapp2.RequestHandler):
     templateValues = {
       'approvalPageUrl': approvalPageUrl,
     }
-    template = jinja_environment.get_template('templates/TestFoster.html')
+    template = config.jinja_environment.get_template('templates/TestFoster.html')
     self.response.out.write(template.render(templateValues))
     
 class TestHelio(webapp2.RequestHandler):
@@ -236,7 +238,7 @@ class TestHelio(webapp2.RequestHandler):
     
     templateValues = {
         'approvalPageUrl': approvalPageUrl,}
-    template = jinja_environment.get_template('templates/TestHelio.html')
+    template = config.jinja_environment.get_template('templates/TestHelio.html')
     self.response.out.write(template.render(templateValues))
     
 class TestJonathan(webapp2.RequestHandler):
@@ -260,11 +262,11 @@ class TestJonathan(webapp2.RequestHandler):
     
     templateValues = {
         'approvalPageUrl': approvalPageUrl,}
-    template = jinja_environment.get_template('templates/TestJonathan.html')
+    template = config.jinja_environment.get_template('templates/TestJonathan.html')
     
     self.response.out.write(template.render(templateValues))
     
 class GoogleWebmasterVerify(webapp2.RequestHandler):
   def get(self):
-    template = jinja_environment.get_template('google910e6da758dc80f1.html')
+    template = config.jinja_environment.get_template('google910e6da758dc80f1.html')
     self.response.out.write(template.render())

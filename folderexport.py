@@ -1,14 +1,17 @@
-import jinja2
 import os
+import jinja2
 import webapp2
+
+import config
+
 from csvfolderexporter import CsvFolderExporter
 from google.appengine.api import users
 from google.appengine.ext.webapp.util import login_required
 from scapesmailman import ScapesMailman
 
 # TODO: Find out if we can have only one reference of this
-jinja_environment = jinja2.Environment(
-    loader=jinja2.FileSystemLoader(os.path.dirname(__file__)))
+# jinja_environment = jinja2.Environment(
+#     loader=jinja2.FileSystemLoader(os.path.dirname(__file__)))
 
 class FolderExportRequestHandler(webapp2.RequestHandler):
 
@@ -29,6 +32,6 @@ class FolderExportRequestHandler(webapp2.RequestHandler):
     templateValues = {
       'recipientsAddresses': mailman.getRecipientsAddresses()
     }
-    template = jinja_environment.get_template('templates/folderexport.html')
+    template = config.jinja_environment.get_template('templates/folderexport.html')
     self.response.out.write(template.render(templateValues))
 
