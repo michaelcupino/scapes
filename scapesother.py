@@ -244,7 +244,11 @@ class TestHelio(webapp2.RequestHandler):
 class TestJonathan(webapp2.RequestHandler):
   @login_required
   def get(self):
-    import scapesrevisiondrive
+    import sys
+    sys.path.append("drive_appengine/")
+    import scapes_revision_drive
+    for x in range(100):
+      print "Hello world!"
     current_user = users.get_current_user()
     
     scopes = SETTINGS['SCOPES']
