@@ -30,6 +30,7 @@ from apiclient import discovery
 from oauth2client import appengine
 from oauth2client import client
 from google.appengine.api import memcache
+from handler.revision_handler import RevisionHandler
 
 import webapp2
 import jinja2
@@ -88,10 +89,10 @@ class MainHandler(webapp2.RequestHandler):
     template = JINJA_ENVIRONMENT.get_template('main.html')
     self.response.write(template.render(variables))
 
-
 app = webapp2.WSGIApplication(
     [
      ('/', MainHandler),
+     ('/revisions', RevisionHandler), 
      (decorator.callback_path, decorator.callback_handler()),
     ],
     debug=True)
