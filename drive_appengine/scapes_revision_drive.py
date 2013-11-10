@@ -1,4 +1,4 @@
-from drive_appengine.apiclient import errors
+from apiclient import errors
 
 # from the Google API reference
 def retrieve_revisions(service, file_id):
@@ -16,6 +16,7 @@ def retrieve_revisions(service, file_id):
         print 'An error occurred: %s' % error
     return None
 
+# also from the Google reference
 def print_revision(service, file_id, revision_id):
     """Print information about the specified revision.
     Args:
@@ -35,3 +36,4 @@ def print_revision(service, file_id, revision_id):
         )
     except errors.HttpError, err:
         print 'An error occurred: %s' % err
+

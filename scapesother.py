@@ -21,7 +21,7 @@ SETTINGS = {
   'APP_NAME': config_parser.get('gdata_settings', 'APP_NAME'),
 'CONSUMER_KEY': config_parser.get('gdata_settings', 'CONSUMER_KEY'),
 'CONSUMER_SECRET': config_parser.get('gdata_settings', 'CONSUMER_SECRET'),
-'SCOPES': [config_parser.get('gdata_settings', 'SCOPES')]
+  'SCOPES': [config_parser.get('gdata_settings', 'SCOPES')]
 }
 
 gdocs = gdata.docs.client.DocsClient(source = SETTINGS['APP_NAME'])
@@ -245,10 +245,18 @@ class TestJonathan(webapp2.RequestHandler):
   @login_required
   def get(self):
     import sys
+    import drive_appengine.httplib2
     sys.path.append("drive_appengine/")
-    import scapes_revision_drive
-    for x in range(100):
-      print "Hello world!"
+    import drive_appengine.scapes_revision_drive as srevision_drive
+    import drive_appengine.scapes_file_drive     as sfile_drive
+    from apiclient import discovery
+    from google.appengine.api import memcache
+
+    http = drive_appengine.httplib2.Http(memcache)
+    service = discovery.build('drive', 'v2', http=http)
+
+    print sfile_drive.retrieve_all_files(service)
+    
     current_user = users.get_current_user()
     
     scopes = SETTINGS['SCOPES']
