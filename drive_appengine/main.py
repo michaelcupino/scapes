@@ -26,7 +26,8 @@ import httplib2
 import logging
 import os
 
-from apiclient import discovery
+from apiclient import discovery, errors
+from google.appengine.ext.webapp.util import login_required
 from oauth2client import appengine
 from oauth2client import client
 from google.appengine.api import memcache
@@ -79,7 +80,6 @@ decorator = appengine.oauth2decorator_from_clientsecrets(
     message=MISSING_CLIENT_SECRETS_MESSAGE)
 
 class MainHandler(webapp2.RequestHandler):
-
   @decorator.oauth_aware
   def get(self):
     variables = {
@@ -87,12 +87,14 @@ class MainHandler(webapp2.RequestHandler):
         'has_credentials': decorator.has_credentials()
         }
     template = JINJA_ENVIRONMENT.get_template('main.html')
+    import scapes_file_drive
+    print scapes_file_drive.retrieve_all_files(service)
     self.response.write(template.render(variables))
 
 app = webapp2.WSGIApplication(
     [
      ('/', MainHandler),
-     ('/revisions', RevisionHandler), 
+     ('/revisions', RevisionHandler),
      (decorator.callback_path, decorator.callback_handler()),
     ],
     debug=True)

@@ -1,7 +1,7 @@
-# from apiclient import errors, discovery
-# from google.appengine.ext.webapp.util import login_required
-# from oauth2client import appengine, client
-# import os, jinja2, webapp2, httplib2
+from apiclient import errors, discovery
+from google.appengine.ext.webapp.util import login_required
+from oauth2client import appengine, client
+import os, jinja2, webapp2, httplib2
 
 # MISSING_CLIENT_SECRETS_MESSAGE="Oh, ok and error."
 # CLIENT_SECRETS = os.path.join(os.path.dirname(__file__), 'client_secrets.json')
