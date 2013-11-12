@@ -31,6 +31,7 @@ from google.appengine.ext.webapp.util import login_required
 from oauth2client import appengine
 from oauth2client import client
 from google.appengine.api import memcache
+from handler.email_handler import EmailHandler
 from handler.revision_handler import RevisionHandler
 
 import webapp2
@@ -95,6 +96,7 @@ class MainHandler(webapp2.RequestHandler):
 app = webapp2.WSGIApplication(
     [
      ('/', MainHandler),
+     ('/email', EmailHandler),
      ('/revisions', RevisionHandler),
      (decorator.callback_path, decorator.callback_handler()),
     ],
