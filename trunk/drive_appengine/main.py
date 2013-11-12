@@ -80,16 +80,17 @@ decorator = appengine.oauth2decorator_from_clientsecrets(
     message=MISSING_CLIENT_SECRETS_MESSAGE)
 
 class MainHandler(webapp2.RequestHandler):
-  @decorator.oauth_aware
+  @decorator.oauth_required
   def get(self):
     variables = {
         'url': decorator.authorize_url(),
         'has_credentials': decorator.has_credentials()
         }
     template = JINJA_ENVIRONMENT.get_template('main.html')
-    import scapes_file_drive
-    print scapes_file_drive.retrieve_all_files(service)
-    self.response.write(template.render(variables))
+    http = decorator.http()
+    documentId = '185HNj3KWZ_LQcwY2X_659djUKf4xI_yEPJ__G2rQCog'
+    revisions = service.revisions().list(fileId=documentId).execute(http=http)
+    self.response.write(revisions)
 
 app = webapp2.WSGIApplication(
     [
