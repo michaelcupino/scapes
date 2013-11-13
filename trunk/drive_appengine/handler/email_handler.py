@@ -13,9 +13,8 @@ class EmailHandler(webapp2.RequestHandler):
         subject='Getting through the first sprint')
 
     message.to = 'Tristan Biles <tbawaz@gmail.com>'
-    message.body = 'Dear Tristan:\n\n'
-        'Finally getting this to work!'
+    message.body = 'Dear Tristan:\n\n' + 'Finally getting this to work!'
 
     message.send()
-    self.response.write('Details of the email message will be here. Hopefully
-        the email will have been sent!')
+    self.response.write('Details of the email message will be here. Hopefully '
+        'the email will have been sent!')
