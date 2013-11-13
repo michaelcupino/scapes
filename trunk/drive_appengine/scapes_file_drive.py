@@ -3,32 +3,21 @@ from google.appengine.ext.webapp.util import login_required
 from oauth2client import appengine, client
 import os, jinja2, webapp2, httplib2
 
-# MISSING_CLIENT_SECRETS_MESSAGE="Oh, ok and error."
-# CLIENT_SECRETS = os.path.join(os.path.dirname(__file__), 'client_secrets.json')
+import config
 
-# decorator = appengine.oauth2decorator_from_clientsecrets(
-#   CLIENT_SECRETS,
-#   scope=[
-#     'https://www.googleapis.com/auth/drive',
-#     'https://www.googleapis.com/auth/drive.appdata',
-#     'https://www.googleapis.com/auth/drive.apps.readonly',
-#     'https://www.googleapis.com/auth/drive.file',
-#     'https://www.googleapis.com/auth/drive.metadata.readonly',
-#     'https://www.googleapis.com/auth/drive.readonly',
-#     'https://www.googleapis.com/auth/drive.scripts',
-#   ],
-#     message=MISSING_CLIENT_SECRETS_MESSAGE)
-
-#@decorator.oauth_aware
-def retrieve_all_files(service):
+def retrieve_all_files(service = None, http = None):
   """Retrieve a list of File resources.
-  
+
   Args:
     service: Drive API service instance.
 
   Returns:
   List of File resources.
   """
+
+  http    = http    if http    else config.http
+  service = service if service else config.service
+
   result = []
   page_token = None
   while True:
@@ -36,7 +25,7 @@ def retrieve_all_files(service):
       param = {}
       if page_token:
         param['pageToken'] = page_token
-      files = service.files().list(**param).execute()
+      files = service.files().list(**param).execute(http=http)
 
       result.extend(files['items'])
       page_token = files.get('nextPageToken')
@@ -46,5 +35,4 @@ def retrieve_all_files(service):
       print 'An error occurred: %s' % error
       break
   return result
-
 
