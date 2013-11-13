@@ -10,7 +10,7 @@ import config
 
 from google.appengine.api import users
 from google.appengine.ext.webapp.util import login_required
-
+from google.appengine.api import mail
 # jinja_environment = jinja2.Environment(
 #     loader=jinja2.FileSystemLoader(os.path.dirname(__file__)))
 
@@ -194,6 +194,25 @@ class TestTristan(webapp2.RequestHandler):
     }
     template = config.jinja_environment.get_template('templates/TestTristan.html')
     self.response.out.write(template.render(templateValues))
+    message = mail.EmailMessage(sender="Example.com Support <tristan.d.biles@gmail.com>",
+                            subject="Your account has been approved")
+
+    message.to = "Albert Johnson <tbawaz@gmail.com>"
+    message.body = """
+    Dear Albert:
+    
+    Your example.com account has been approved.  You can now visit
+    http://www.example.com/ and sign in using your Google Account to
+    access new features.
+    
+    Please let us know if you have any questions.
+    
+    The example.com Team
+    """
+    
+    message.send()
+    # look to change templateValues with appropriate 
+    # method to send out an email to "tbawaz@gmail.com"
     
 class TestFoster(webapp2.RequestHandler):
   @login_required
