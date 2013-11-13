@@ -37,11 +37,15 @@ from handler.revision_handler import RevisionHandler
 import webapp2
 import jinja2
 
+import config
 
-JINJA_ENVIRONMENT = jinja2.Environment(
-    loader=jinja2.FileSystemLoader(os.path.dirname(__file__)),
-    autoescape=True,
-    extensions=['jinja2.ext.autoescape'])
+import scapes_file_drive
+import scapes_revision_drive
+
+# JINJA_ENVIRONMENT = jinja2.Environment(
+#     loader=jinja2.FileSystemLoader(os.path.dirname(__file__)),
+#     autoescape=True,
+#     extensions=['jinja2.ext.autoescape'])
 
 # CLIENT_SECRETS, name of a file containing the OAuth 2.0 information for this
 # application, including client_id and client_secret, which are found
@@ -65,8 +69,7 @@ href="https://code.google.com/apis/console">APIs Console</a>.
 </p>
 """ % CLIENT_SECRETS
 
-http = httplib2.Http(memcache)
-service = discovery.build('drive', 'v2', http=http)
+
 decorator = appengine.oauth2decorator_from_clientsecrets(
     CLIENT_SECRETS,
     scope=[
@@ -83,15 +86,23 @@ decorator = appengine.oauth2decorator_from_clientsecrets(
 class MainHandler(webapp2.RequestHandler):
   @decorator.oauth_required
   def get(self):
+    import pprint, random
+
+    config.http = decorator.http()
     variables = {
-        'url': decorator.authorize_url(),
-        'has_credentials': decorator.has_credentials()
-        }
-    template = JINJA_ENVIRONMENT.get_template('main.html')
-    http = decorator.http()
-    documentId = '185HNj3KWZ_LQcwY2X_659djUKf4xI_yEPJ__G2rQCog'
-    revisions = service.revisions().list(fileId=documentId).execute(http=http)
-    self.response.write(revisions)
+      'url': decorator.authorize_url(),
+      'has_credentials': decorator.has_credentials()
+    }
+    template = config.jinja_environment.get_template('main.html')
+
+    # TODO(PythonNut) get service and http from config
+    file_id = scapes_file_drive.retrieve_all_files()
+    num = len(file_id)
+    revisions = scapes_revision_drive.retrieve_revisions(random.choice(file_id)['id'])
+
+    text = pprint.pformat(revisions, width = 20)
+    text = text.replace("u'","'")
+    self.response.write("<h1>" + str(num) + " Documents!</h1><br><pre>" + text + "</pre>")
 
 app = webapp2.WSGIApplication(
     [
