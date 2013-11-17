@@ -1,9 +1,8 @@
 from apiclient import errors
-
-import config
+from service import config
 
 # from the Google API reference
-def retrieve_revisions(file_id, service = None, http = None):
+def retrieve_revisions(http, file_id, service = None):
     """Retrieve a list of revisions.
     Args:
       service: Drive API service instance.
@@ -12,7 +11,6 @@ def retrieve_revisions(file_id, service = None, http = None):
       List of revisions.
     """
 
-    http    = http    or config.http
     service = service or config.service
 
     try:
@@ -24,7 +22,7 @@ def retrieve_revisions(file_id, service = None, http = None):
     return None
 
 # also from the Google reference
-def print_revision(file_id, revision_id, service = None, http = None):
+def revision_details(http, file_id, revision_id, service = None):
     """Print information about the specified revision.
     Args:
     service: Drive API service instance.
@@ -33,7 +31,6 @@ def print_revision(file_id, revision_id, service = None, http = None):
 
     """
 
-    http    = http    or config.http
     service = service or config.service
 
     try:

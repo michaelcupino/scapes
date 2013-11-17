@@ -16,7 +16,8 @@ jinja_environment = jinja2.Environment(
     extensions=['jinja2.ext.autoescape'])
 
 # client secrets - the location of our authentication keys
-CLIENT_SECRETS = os.path.join(os.path.dirname(__file__), 'client_secrets.json')
+CLIENT_SECRETS = os.path.join(os.path.dirname(__file__),
+    '../client_secrets.json')
 
 # decorators for oauth2 manipulation
 MISSING_CLIENT_SECRETS_MESSAGE = """

@@ -3,9 +3,9 @@ from google.appengine.ext.webapp.util import login_required
 from oauth2client import appengine, client
 import os, jinja2, webapp2, httplib2
 
-import config
+from service import config
 
-def retrieve_all_files(service = None, http = None):
+def retrieve_all_files(http, service = None):
   """Retrieve a list of File resources.
 
   Args:
@@ -15,8 +15,7 @@ def retrieve_all_files(service = None, http = None):
   List of File resources.
   """
 
-  http    = http    if http    else config.http
-  service = service if service else config.service
+  service = service or config.service
 
   result = []
   page_token = None
