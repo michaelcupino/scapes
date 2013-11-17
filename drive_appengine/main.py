@@ -22,9 +22,11 @@ be obtained from the Developer Console <https://code.google.com/apis/console/>
 and save them as 'client_secrets.json' in the project directory.
 """
 
-import httplib2
-import logging
 import os
+import logging
+import httplib2
+import pprint
+import random
 
 from apiclient import discovery, errors
 from google.appengine.ext.webapp.util import login_required
@@ -37,78 +39,22 @@ from handler.revision_handler import RevisionHandler
 import webapp2
 import jinja2
 
-import config
+from service import config
 
-import scapes_file_drive
-import scapes_revision_drive
+from handler import scapes_file_drive
+from handler import scapes_revision_drive
 
-# JINJA_ENVIRONMENT = jinja2.Environment(
-#     loader=jinja2.FileSystemLoader(os.path.dirname(__file__)),
-#     autoescape=True,
-#     extensions=['jinja2.ext.autoescape'])
-
-# CLIENT_SECRETS, name of a file containing the OAuth 2.0 information for this
-# application, including client_id and client_secret, which are found
-# on the API Access tab on the Google APIs
-# Console <http://code.google.com/apis/console>
-CLIENT_SECRETS = os.path.join(os.path.dirname(__file__), 'client_secrets.json')
-
-# Helpful message to display in the browser if the CLIENT_SECRETS file
-# is missing.
-MISSING_CLIENT_SECRETS_MESSAGE = """
-<h1>Warning: Please configure OAuth 2.0</h1>
-<p>
-To make this sample run you will need to populate the client_secrets.json file
-found at:
-</p>
-<p>
-<code>%s</code>.
-</p>
-<p>with information found on the <a
-href="https://code.google.com/apis/console">APIs Console</a>.
-</p>
-""" % CLIENT_SECRETS
-
-
-decorator = appengine.oauth2decorator_from_clientsecrets(
-    CLIENT_SECRETS,
-    scope=[
-      'https://www.googleapis.com/auth/drive',
-      'https://www.googleapis.com/auth/drive.appdata',
-      'https://www.googleapis.com/auth/drive.apps.readonly',
-      'https://www.googleapis.com/auth/drive.file',
-      'https://www.googleapis.com/auth/drive.metadata.readonly',
-      'https://www.googleapis.com/auth/drive.readonly',
-      'https://www.googleapis.com/auth/drive.scripts',
-    ],
-    message=MISSING_CLIENT_SECRETS_MESSAGE)
 
 class MainHandler(webapp2.RequestHandler):
-  @decorator.oauth_required
+  @config.decorator.oauth_required
   def get(self):
-    import pprint, random
-
-    config.http = decorator.http()
-    variables = {
-      'url': decorator.authorize_url(),
-      'has_credentials': decorator.has_credentials()
-    }
-    template = config.jinja_environment.get_template('main.html')
-
-    # TODO(PythonNut) get service and http from config
-    file_id = scapes_file_drive.retrieve_all_files()
-    num = len(file_id)
-    revisions = scapes_revision_drive.retrieve_revisions(random.choice(file_id)['id'])
-
-    text = pprint.pformat(revisions, width = 20)
-    text = text.replace("u'","'")
-    self.response.write("<h1>" + str(num) + " Documents!</h1><br><pre>" + text + "</pre>")
+    self.response.write("Welcome to SCAPES!")
 
 app = webapp2.WSGIApplication(
     [
      ('/', MainHandler),
      ('/email', EmailHandler),
      ('/revisions', RevisionHandler),
-     (decorator.callback_path, decorator.callback_handler()),
+     (config.decorator.callback_path, config.decorator.callback_handler()),
     ],
     debug=True)
