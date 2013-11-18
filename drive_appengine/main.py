@@ -35,6 +35,7 @@ from oauth2client import client
 from google.appengine.api import memcache
 from handler.email_handler import EmailHandler
 from handler.revision_handler import RevisionHandler
+from handler.file_id_handler import FileIDHandler
 
 import webapp2
 import jinja2
@@ -55,6 +56,7 @@ app = webapp2.WSGIApplication(
      ('/', MainHandler),
      ('/email', EmailHandler),
      ('/revisions', RevisionHandler),
+     ('/fileids',FileIDHandler),
      (config.decorator.callback_path, config.decorator.callback_handler()),
     ],
     debug=True)
