@@ -1,73 +1,62 @@
-import ConfigParser
-import gdata.docs.client
-import gdata.gauth
-import jinja2
+#!/usr/bin/env python
+#
+# Copyright 2013 Google Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+"""Starting template for Google App Engine applications.
+
+Use this project as a starting point if you are just beginning to build a Google
+App Engine project. Remember to download the OAuth 2.0 client secrets which can
+be obtained from the Developer Console <https://code.google.com/apis/console/>
+and save them as 'client_secrets.json' in the project directory.
+"""
+
 import os
+import logging
+import httplib2
+import pprint
+import random
+
+from apiclient import discovery, errors
+from google.appengine.ext.webapp.util import login_required
+from oauth2client import appengine
+from oauth2client import client
+from google.appengine.api import memcache
+from handler.email_handler import EmailHandler
+from handler.revision_handler import RevisionHandler
+from handler.file_id_handler import FileIDHandler
+
 import webapp2
-import diff_match_patch.diff_match_patch
+import jinja2
 
-import config
+from service import config
 
-from scapesother import MainPage
-from scapesother import GoogleWebmasterVerify
-from scapesother import Fetcher
-from scapesother import RequestTokenCallback
-from scapesother import FetchCollection
-from scapesother import RequestRawRevision
-from scapesother import TestNaren
-from scapesother import TestTristan
-from scapesother import TestFoster
-from scapesother import TestJonathan
-from scapesother import TestHelio
-from scapesasync import AsyncExampleRequestHandler
-from scapesasync import CounterWorker
-from scapesresource import RequestAResource
-from scapesother import RequestARawRevision
-from scapesrevision import RequestARevision
-from scapesexport import CsvExportRequestHandler
-from scapesmanualtests import ScapesManualTests
-from step3 import FetchRevision
-from step4 import RequestRevision
-from folderexport import FolderExportRequestHandler
-
-jinja_environment = jinja2.Environment(
-    loader=jinja2.FileSystemLoader(os.path.dirname(__file__)))
-
-# Configure gdata
-config = ConfigParser.RawConfigParser()
-config.read('config.cfg')
-SETTINGS = {
-  'APP_NAME': config.get('gdata_settings', 'APP_NAME'),
-  'CONSUMER_KEY': config.get('gdata_settings', 'CONSUMER_KEY'),
-  'CONSUMER_SECRET': config.get('gdata_settings', 'CONSUMER_SECRET'),
-  'SCOPES': [config.get('gdata_settings', 'SCOPES')]
-}
-
-gdocs = gdata.docs.client.DocsClient(source = SETTINGS['APP_NAME'])
-gdiff = diff_match_patch.diff_match_patch()
+from handler import scapes_file_drive
+from handler import scapes_revision_drive
 
 
-# TODO(mcupino): Maybe find out how to have the GoogleWebmasterVerify
-# automatically route to the html page?
-app = webapp2.WSGIApplication([('/', MainPage),
-    ('/google910e6da758dc80f1.html', GoogleWebmasterVerify),
-    ('/step1', Fetcher),
-    ('/step2', RequestTokenCallback),
-    ('/step3', FetchRevision),
-    ('/step4', RequestRevision),
-    ('/collections', FetchCollection),
-    ('/raw', RequestRawRevision),
-    ('/requestAResource', RequestAResource),
-    ('/requestARawRevision', RequestARawRevision),
-    ('/requestARevision', RequestARevision),
-    ('/asyncExample', AsyncExampleRequestHandler),
-    ('/worker', CounterWorker),
-    ('/csv', CsvExportRequestHandler),
-    ('/folderexport', FolderExportRequestHandler),
-    ('/runTest', ScapesManualTests),
-    ('/naren', TestNaren),
-    ('/tristan', TestTristan),
-    ('/foster', TestFoster),
-    ('/jonathan', TestJonathan),
-    ('/helio', TestHelio)],
-                              debug=True)
+class MainHandler(webapp2.RequestHandler):
+  @config.decorator.oauth_required
+  def get(self):
+    self.response.write("Welcome to SCAPES!")
+
+app = webapp2.WSGIApplication(
+    [
+     ('/', MainHandler),
+     ('/email', EmailHandler),
+     ('/revisions', RevisionHandler),
+     ('/fileids',FileIDHandler),
+     (config.decorator.callback_path, config.decorator.callback_handler()),
+    ],
+    debug=True)
