@@ -23,6 +23,7 @@ class EmailHandler(webapp2.RequestHandler):
     writer.writerows(values)
     csvFile.seek(0)
     csvFileBytes = csvFile.read()  # <--- this is what you're looking for
+    csvFileBytes = bytes(csvFileBytes)
     csvFile.close()
 	
     mail.send_mail(sender = "Scapes Robot <robot@scapes-uci.appspotmail.com>",
@@ -31,7 +32,7 @@ class EmailHandler(webapp2.RequestHandler):
               body = """
 				Testing the mail.send_mail() function over the mail.EmailMessage()
 				""", 
-              attachments = [("csvTempFilee",csvFileBytes)])
+			  attachments = [("csvTempFilee",csvFileBytes)])
     
     self.response.write('Email has been successfully sent. Making sure CSV1 sends as well')
     logging.info("value of my csv is %s", csvFileBytes)
