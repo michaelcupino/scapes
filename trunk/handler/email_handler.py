@@ -31,7 +31,7 @@ class EmailHandler(webapp2.RequestHandler):
               body = """
 				Testing the mail.send_mail() function over the mail.EmailMessage()
 				""", 
-				attachments = [("csvTempFilee",csvFileBytes)])
+              attachments = [("csvTempFilee",csvFileBytes)])
     
     self.response.write('Email has been successfully sent. Making sure CSV1 sends as well')
     logging.info("value of my csv is %s", csvFileBytes)
