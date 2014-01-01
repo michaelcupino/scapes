@@ -34,14 +34,12 @@ def revision_details(http, file_id, revision_id, service = None):
     service = service or config.service
 
     try:
-        revision = service.revisions().get(fileId=file_id, revisionId=revision_id)
-        revision = revision.execute(http=http)
-
-        return (
-            revision['id'],
-            revision['modifiedDate'],
-            revision.get('pinned')
+        revision = service.revisions().get(
+            fileId     = file_id,
+            revisionId = revision_id
         )
+
+        return revision.execute(http=http)
     except errors.HttpError, err:
         print 'An error occurred: %s' % err
 

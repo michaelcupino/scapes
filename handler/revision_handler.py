@@ -4,6 +4,7 @@ import webapp2
 from service import config
 import scapes_file_drive
 import scapes_revision_drive
+from google.appengine.api import urlfetch
 
 class RevisionHandler(webapp2.RequestHandler):
   """The RevisionHandler handles revision requests and gives a response with a
@@ -20,13 +21,34 @@ class RevisionHandler(webapp2.RequestHandler):
       'has_credentials': config.decorator.has_credentials()
     }
 
-    # TODO(PythonNut) get service and http from config
-    file_id = scapes_file_drive.retrieve_all_files(http)
-    num = len(file_id)
-    revisions = scapes_revision_drive.retrieve_revisions(http,
-        random.choice(file_id)['id'])
+    master_id = scapes_file_drive.retrieve_all_files(http)
+    
+    error = True
+    while error:
+      try:
+        file_id = random.choice(master_id)['id']
+        # file_id = file_id[0]['id']
+        num = len(file_id)
+        revision = scapes_revision_drive.retrieve_revisions(http, file_id)[0]["id"]
+        import scapes_revision_analyzer_drive as s_revad
+        text = s_revad.revision_text(http, file_id, revision)
+        
+        try:
+          if text.status != "200":
+            error=False
+        except AttributeError as e:
+          print e
+          error=False
+          
+      except TypeError as e:
+        print "="*80
+        print e
+        print "="*80
+        
+      # except KeyError as e:
+      #   print "="*80
+      #   print e
+      #   print "="*80
 
-    text = pprint.pformat(revisions, width = 20)
-    text = text.replace("u'","'")
     self.response.write("<h1>" + str(num) + " Documents!</h1><br>\
-        <pre>" + text + "</pre>")
+        "+str(len(text.split(" ")))+"<pre>" + str(text[:1000]) + "</pre>")
