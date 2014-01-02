@@ -1,7 +1,7 @@
 import webapp2
 from service import config
-import scapes_file_drive
-import scapes_revision_drive
+import file_core
+import revision_core
 
 class FileIDHandler(webapp2.RequestHandler):
   """prints out the files in a google drive folder
@@ -18,7 +18,7 @@ class FileIDHandler(webapp2.RequestHandler):
       'has_credentials': config.decorator.has_credentials()
     }
 
-    self.file_id = scapes_file_drive.retrieve_all_files(http)
+    self.file_id = file_core.retrieve_all_files(http)
     output = self.list_by_field('id')
     string_output  = ''#temporary, testing purposes
     
