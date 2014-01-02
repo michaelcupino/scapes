@@ -2,8 +2,8 @@ import pprint
 import random
 import webapp2
 from service import config
-import scapes_file_drive
-import scapes_revision_drive
+import file_core
+import revision_core
 from google.appengine.api import urlfetch
 
 class RevisionHandler(webapp2.RequestHandler):
@@ -21,7 +21,7 @@ class RevisionHandler(webapp2.RequestHandler):
       'has_credentials': config.decorator.has_credentials()
     }
 
-    master_id = scapes_file_drive.retrieve_all_files(http)
+    master_id = file_core.retrieve_all_files(http)
     
     error = True
     while error:
@@ -29,8 +29,8 @@ class RevisionHandler(webapp2.RequestHandler):
         file_id = random.choice(master_id)['id']
         # file_id = file_id[0]['id']
         num = len(file_id)
-        revision = scapes_revision_drive.retrieve_revisions(http, file_id)[0]["id"]
-        import scapes_revision_analyzer_drive as s_revad
+        revision = revision_core.retrieve_revisions(http, file_id)[0]["id"]
+        import revision_analyzer_core as s_revad
         text = s_revad.revision_text(http, file_id, revision)
         
         try:
