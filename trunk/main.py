@@ -42,8 +42,8 @@ import jinja2
 
 from service import config
 
-from handler import scapes_file_drive
-from handler import scapes_revision_drive
+from handler import file_core
+from handler import revision_core
 
 
 class MainHandler(webapp2.RequestHandler):
