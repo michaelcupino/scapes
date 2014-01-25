@@ -10,14 +10,11 @@ class EmailHandler(webapp2.RequestHandler):
   """
   
 
-
   def get(self):
     """Sends an email."""
 
     # TODO(tbawaz): Send a hardcoded email.
 
-    raise ValueError("3141F")
-    
     import cStringIO
     
     csvFile = tempfile.TemporaryFile() #makes a temp file
