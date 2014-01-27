@@ -14,16 +14,18 @@ class EmailHandler(webapp2.RequestHandler):
     """Sends an email."""
 
     # TODO(tbawaz): Send a hardcoded email.
-
-    import cStringIO
     
-    csvFile = tempfile.TemporaryFile() #makes a temp file
-    writer = csv.writer(csvFile) # makes the temp file a csv file
+    # makes a temp file for csv writer
+    csvFile = tempfile.TemporaryFile()
+    writer = csv.writer(csvFile)
+    
     values = [['Date', 'Time']]
     writer.writerows(values)
     csvFile.seek(0)
-    csvFileBytes = csvFile.read()  # <--- this is what you're looking for
-    csvFileBytes = cStringIO.StringIO(csvFileBytes).getvalue()
+    csvFileBytes = csvFile.read()
+
+    # ensure it is a plain byte string
+    csvFileBytes = bytes(csvFileBytes)
     csvFile.close()
         
     mail.send_mail(sender = "Scapes Robot <robot@scapes-uci.appspotmail.com>",
@@ -32,7 +34,7 @@ class EmailHandler(webapp2.RequestHandler):
               body = """
                                 Testing the mail.send_mail() function over the mail.EmailMessage()
                                 """, 
-                          attachments = [("csvTempFilee",csvFileBytes)])
+                          attachments = [("csvTempFile.csv",csvFileBytes)])
     
     self.response.write('Email has been successfully sent. Making sure CSV1 sends as well')
     logging.info("value of my csv is %s", csvFileBytes)
