@@ -23,7 +23,7 @@ from mapreduce_dependencies import shuffler
 
 from service import config
 
-import scapes_revision_drive 
+# import scapes_revision_drive is this necessary?
 
 """
 
@@ -80,11 +80,13 @@ class IndexHandler(webapp2.RequestHandler):
     self.redirect(pipeline.base_path + "/status?root=" + pipeline.pipeline_id)
 """
 
+class MREmailHandler(webapp2.RequestHandler):
+    pass
+
 def revision_map(file_id):
   http = config.decorator.http()
   for revisions in retrieve_revisions(http, file_id):
       yield (file_id, "")
-
 
 def revision_reduce(key, values):
   yield "%s: %d\n" % (key, len(values))

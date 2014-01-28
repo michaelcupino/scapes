@@ -24,10 +24,10 @@ __all__ = [
 
 
 from google.appengine.api import files
-from mapreduce import control
-from mapreduce import model
-from mapreduce import parameters
-from mapreduce import pipeline_base
+from handler.mapreduce_dependencies import control
+from handler.mapreduce_dependencies import model
+from handler.mapreduce_dependencies import parameters
+from handler.mapreduce_dependencies import pipeline_base
 
 # pylint: disable=g-bad-name
 # pylint: disable=protected-access

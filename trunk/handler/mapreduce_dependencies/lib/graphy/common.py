@@ -19,8 +19,8 @@
 import copy
 import warnings
 
-from mapreduce.lib.graphy import formatters
-from mapreduce.lib.graphy import util
+from handler.mapreduce_dependencies.lib.graphy import formatters
+from handler.mapreduce_dependencies.lib.graphy import util
 
 
 class Marker(object):

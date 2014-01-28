@@ -69,8 +69,8 @@ import struct
 
 # Note: this will be scrubbed to google.appengine.api.files import crc32c
 # when mapreduce is pushed to runtime.
-from mapreduce.lib import crc32c
-from mapreduce import errors
+from handler.mapreduce_dependencies.lib import crc32c
+from handler.mapreduce_dependencies import errors
 
 
 # pylint: disable=g-bad-name

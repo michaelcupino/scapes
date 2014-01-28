@@ -29,7 +29,7 @@ import logging
 import os
 
 # Relative imports
-from mapreduce.lib import simplejson
+from handler.mapreduce_dependencies.lib import simplejson
 
 # pylint: disable=protected-access
 

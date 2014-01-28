@@ -24,11 +24,11 @@
 
 import httplib
 import logging
-from mapreduce.lib import simplejson
+from handler.mapreduce_dependencies.lib import simplejson
 
 
 try:
-  from mapreduce import pipeline_base
+  from handler.mapreduce_dependencies import pipeline_base
 except ImportError:
   pipeline_base = None
 try:
@@ -40,9 +40,9 @@ except ImportError:
   cloudstorage = None
 
 from google.appengine.ext import webapp
-from mapreduce import errors
-from mapreduce import model
-from mapreduce import parameters
+from handler.mapreduce_dependencies import errors
+from handler.mapreduce_dependencies import model
+from handler.mapreduce_dependencies import parameters
 
 
 class Error(Exception):

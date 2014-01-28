@@ -2,9 +2,9 @@
 """Base pipelines."""
 
 
-from mapreduce.lib import pipeline
+from handler.mapreduce_dependencies.lib import pipeline
 
-from mapreduce import parameters
+from handler.mapreduce_dependencies import parameters
 
 # pylint: disable=g-bad-name
 

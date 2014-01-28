@@ -11,8 +11,8 @@ import datetime
 from google.appengine.ext import ndb
 
 from google.appengine.ext import db
-from mapreduce import errors
-from mapreduce import util
+from handler.mapreduce_dependencies import errors
+from handler.mapreduce_dependencies import util
 
 __all__ = [
     "should_shard_by_property_range",

@@ -30,9 +30,9 @@ from google.appengine.api import yaml_listener
 from google.appengine.api import yaml_object
 from google.appengine.ext import db
 from google.appengine.ext import webapp
-from mapreduce import base_handler
-from mapreduce import errors
-from mapreduce import model
+from handler.mapreduce_dependencies import base_handler
+from handler.mapreduce_dependencies import errors
+from handler.mapreduce_dependencies import model
 
 
 # TODO(user): a list of features we'd like to have in status page:
