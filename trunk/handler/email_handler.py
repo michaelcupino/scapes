@@ -27,7 +27,7 @@ class EmailHandler(webapp2.RequestHandler):
     # ensure it is a plain byte string
     csvFileBytes = bytes(csvFileBytes)
     csvFile.close()
-        
+    
     mail.send_mail(sender = "Scapes Robot <robot@scapes-uci.appspotmail.com>",
               to = "Tristan Biles <tbawaz@gmail.com>",
               subject = "Getting through the first sprint",
@@ -38,3 +38,5 @@ class EmailHandler(webapp2.RequestHandler):
     
     self.response.write('Email has been successfully sent. Making sure CSV1 sends as well')
     logging.info("value of my csv is %s", csvFileBytes)
+    
+    # trying a practice commit
