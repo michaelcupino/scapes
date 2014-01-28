@@ -47,11 +47,11 @@ import time
 
 from google.appengine.api import files
 from google.appengine.api.files import file_service_pb
-from mapreduce import context
-from mapreduce import errors
-from mapreduce import model
-from mapreduce import operation
-from mapreduce import records
+from handler.mapreduce_dependencies import context
+from handler.mapreduce_dependencies import errors
+from handler.mapreduce_dependencies import model
+from handler.mapreduce_dependencies import operation
+from handler.mapreduce_dependencies import records
 
 # pylint: disable=g-import-not-at-top
 # TODO(user): Cleanup imports if/when cloudstorage becomes part of runtime.

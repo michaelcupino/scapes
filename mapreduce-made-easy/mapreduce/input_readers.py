@@ -64,18 +64,18 @@ from google.appengine.ext import blobstore
 from google.appengine.ext import db
 from google.appengine.ext import key_range
 from google.appengine.ext.db import metadata
-from mapreduce import context
-from mapreduce import datastore_range_iterators as db_iters
-from mapreduce import errors
-from mapreduce import file_format_parser
-from mapreduce import file_format_root
-from mapreduce import key_ranges
-from mapreduce import model
-from mapreduce import namespace_range
-from mapreduce import operation
-from mapreduce import property_range
-from mapreduce import records
-from mapreduce import util
+from handler.mapreduce_dependencies import context
+from handler.mapreduce_dependencies import datastore_range_iterators as db_iters
+from handler.mapreduce_dependencies import errors
+from handler.mapreduce_dependencies import file_format_parser
+from handler.mapreduce_dependencies import file_format_root
+from handler.mapreduce_dependencies import key_ranges
+from handler.mapreduce_dependencies import model
+from handler.mapreduce_dependencies import namespace_range
+from handler.mapreduce_dependencies import operation
+from handler.mapreduce_dependencies import property_range
+from handler.mapreduce_dependencies import records
+from handler.mapreduce_dependencies import util
 
 # pylint: disable=g-import-not-at-top
 # TODO(user): Cleanup imports if/when cloudstorage becomes part of runtime.

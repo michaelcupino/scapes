@@ -4,7 +4,7 @@
 
 
 from google.appengine.ext import key_range
-from mapreduce import namespace_range
+from handler.mapreduce_dependencies import namespace_range
 
 
 __all__ = [

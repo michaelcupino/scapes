@@ -9,11 +9,11 @@ from google.appengine.datastore import datastore_query
 from google.appengine.datastore import datastore_rpc
 from google.appengine.ext import db
 from google.appengine.ext import key_range
-from mapreduce import key_ranges
-from mapreduce import model
-from mapreduce import namespace_range
-from mapreduce import property_range
-from mapreduce import util
+from handler.mapreduce_dependencies import key_ranges
+from handler.mapreduce_dependencies import model
+from handler.mapreduce_dependencies import namespace_range
+from handler.mapreduce_dependencies import property_range
+from handler.mapreduce_dependencies import util
 
 
 __all__ = [

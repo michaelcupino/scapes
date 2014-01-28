@@ -21,7 +21,7 @@
 __all__ = ['Increment']
 
 
-from mapreduce.operation import base
+from handler.mapreduce_dependencies.operation import base
 
 # pylint: disable=protected-access
 

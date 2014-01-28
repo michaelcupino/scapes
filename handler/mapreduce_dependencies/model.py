@@ -47,7 +47,7 @@ import datetime
 import logging
 import os
 import random
-from mapreduce.lib import simplejson
+from handler.mapreduce_dependencies.lib import simplejson
 import time
 import urllib
 import zlib
@@ -58,10 +58,10 @@ from google.appengine.api import memcache
 from google.appengine.api import taskqueue
 from google.appengine.datastore import datastore_rpc
 from google.appengine.ext import db
-from mapreduce import context
-from mapreduce import hooks
-from mapreduce import util
-from mapreduce.lib.graphy.backends import google_chart_api
+from handler.mapreduce_dependencies import context
+from handler.mapreduce_dependencies import hooks
+from handler.mapreduce_dependencies import util
+from handler.mapreduce_dependencies.lib.graphy.backends import google_chart_api
 
 
 # Special datastore kinds for MR.

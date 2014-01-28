@@ -30,14 +30,14 @@ This module should be specified as a handler for mapreduce URLs in app.yaml:
 
 # Pipeline has to be imported before webapp.
 try:
-  from mapreduce.lib import pipeline
+  from handler.mapreduce_dependencies.lib import pipeline
 except ImportError:
   pipeline = None
 
 # pylint: disable=g-import-not-at-top
 from google.appengine.ext import webapp
-from mapreduce import handlers
-from mapreduce import status
+from handler.mapreduce_dependencies import handlers
+from handler.mapreduce_dependencies import status
 from google.appengine.ext.webapp import util
 
 

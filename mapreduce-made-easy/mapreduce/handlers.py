@@ -30,7 +30,7 @@ import random
 import sys
 import time
 import traceback
-from mapreduce.lib import simplejson
+from handler.mapreduce_dependencies.lib import simplejson
 
 from google.appengine.ext import ndb
 
@@ -40,14 +40,14 @@ from google.appengine.api import logservice
 from google.appengine.api import modules
 from google.appengine.api import taskqueue
 from google.appengine.ext import db
-from mapreduce import base_handler
-from mapreduce import context
-from mapreduce import errors
-from mapreduce import input_readers
-from mapreduce import model
-from mapreduce import operation
-from mapreduce import parameters
-from mapreduce import util
+from handler.mapreduce_dependencies import base_handler
+from handler.mapreduce_dependencies import context
+from handler.mapreduce_dependencies import errors
+from handler.mapreduce_dependencies import input_readers
+from handler.mapreduce_dependencies import model
+from handler.mapreduce_dependencies import operation
+from handler.mapreduce_dependencies import parameters
+from handler.mapreduce_dependencies import util
 from google.appengine.runtime import apiproxy_errors
 
 # pylint: disable=g-import-not-at-top

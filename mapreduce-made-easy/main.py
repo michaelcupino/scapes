@@ -43,10 +43,10 @@ from google.appengine.api import files
 from google.appengine.api import taskqueue
 from google.appengine.api import users
 
-from mapreduce import base_handler
-from mapreduce import mapreduce_pipeline
-from mapreduce import operation as op
-from mapreduce import shuffler
+from handler.mapreduce_dependencies import base_handler
+from handler.mapreduce_dependencies import mapreduce_pipeline
+from handler.mapreduce_dependencies import operation as op
+from handler.mapreduce_dependencies import shuffler
 
 
 class FileMetadata(db.Model):

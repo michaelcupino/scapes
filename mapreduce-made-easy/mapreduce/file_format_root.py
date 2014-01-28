@@ -24,11 +24,11 @@ __all__ = ['FileFormatRoot',
            'split']
 
 import copy
-import mapreduce.file_format_parser as parser
+import handler.mapreduce_dependencies.file_format_parser as parser
 
 from google.appengine.api.files import file as files
-from mapreduce import model
-from mapreduce import file_formats
+from handler.mapreduce_dependencies import model
+from handler.mapreduce_dependencies import file_formats
 
 
 def split(filenames, format_string, shards):

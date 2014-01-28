@@ -42,7 +42,7 @@ import types
 from google.appengine.ext import ndb
 
 from google.appengine.datastore import datastore_rpc
-from mapreduce import parameters
+from handler.mapreduce_dependencies import parameters
 
 # Taskqueue task header for mr id. Use internal by MR.
 _MR_ID_TASK_HEADER = "AE-MR-ID"

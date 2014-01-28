@@ -25,10 +25,10 @@ __all__ = ["start_map"]
 import logging
 
 from google.appengine.ext import db
-from mapreduce import handlers
-from mapreduce import model
-from mapreduce import parameters
-from mapreduce import util
+from handler.mapreduce_dependencies import handlers
+from handler.mapreduce_dependencies import model
+from handler.mapreduce_dependencies import parameters
+from handler.mapreduce_dependencies import util
 
 
 def start_map(name,

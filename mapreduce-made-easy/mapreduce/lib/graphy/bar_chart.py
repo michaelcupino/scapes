@@ -19,8 +19,8 @@
 import copy
 import warnings
 
-from mapreduce.lib.graphy import common
-from mapreduce.lib.graphy import util
+from handler.mapreduce_dependencies.lib.graphy import common
+from handler.mapreduce_dependencies.lib.graphy import util
 
 
 class BarsStyle(object):
