@@ -20,7 +20,7 @@ from mapreduce_dependencies import base_handler
 from mapreduce_dependencies import mapreduce_pipeline
 from mapreduce_dependencies import operation as op
 from mapreduce_dependencies import shuffler
-
+from handler.email_handler import EmailHandler
 from service import config
 
 # import scapes_revision_drive is this necessary?
@@ -80,8 +80,44 @@ class IndexHandler(webapp2.RequestHandler):
     self.redirect(pipeline.base_path + "/status?root=" + pipeline.pipeline_id)
 """
 
+
+    
+def send_email_map(data):
+    """Send email map function"""
+    raise TypeError()
+    return data
+    
+def send_email_reduce(key,values):
+    """Send email reduce function"""
+    # yield 
+    EmailHandler.run()
+    
+class SendEmailPipeline(base_handler.PipelineBase):
+    """A pipeline to run Send email demo. """
+    
+    def run(self, filekey, blobkey):
+        logging.debug("filename is %s" % filekey)
+        output = yield mapreduce_pipeline.MapreducePipeline(
+            "send_email",
+            "main.send_email_map",
+            "main.send_email_reduce",
+            "mapreduce.input_readers.BlobstoreZipInputReader",
+            "mapreduce.output_readers.BlobstoreOutputWriter",
+            mapper_params={
+            "blob_key": blobkey,
+        },
+        reducer_params={
+            "mime_type": "text/plain",
+        },
+        shards=16)
+        yield StoreOutput("MRSendEmail", filekey, output)
+
 class MREmailHandler(webapp2.RequestHandler):
-    pass
+    temp = SendEmailPipeline()
+    temp.start()
+    print("="*99)
+    
+    
 
 def revision_map(file_id):
   http = config.decorator.http()
@@ -107,4 +143,5 @@ class RevisionCountPipeline(base_handler.PipelineBase):
             "mime_type": "text/plain",
         },
         shards=16)
+    self.response.write('Email has been successfully sent using a mapreduce')
     yield StoreOutput("RevisionCount", filekey, output)

@@ -47,6 +47,7 @@ from handler.mapreduce_dependencies import base_handler
 from handler.mapreduce_dependencies import mapreduce_pipeline
 from handler.mapreduce_dependencies import operation as op
 from handler.mapreduce_dependencies import shuffler
+from handler.email_handler.py import EmailHandler
 
 
 class FileMetadata(db.Model):
@@ -188,20 +189,7 @@ def split_into_words(s):
   return s.split()
 
 
-def word_count_map(data):
-  """Word count map function."""
-  (entry, text_fn) = data
-  text = text_fn()
 
-  logging.debug("Got %s", entry.filename)
-  for s in split_into_sentences(text):
-    for w in split_into_words(s.lower()):
-      yield (w, "")
-
-
-def word_count_reduce(key, values):
-  """Word count reduce function."""
-  yield "%s: %d\n" % (key, len(values))
 
 
 def index_map(data):
@@ -252,6 +240,22 @@ def phrases_reduce(key, values):
   for filename, count in counts.items():
     if count > threshold:
       yield "%s:%s\n" % (words, filename)
+
+def word_count_map(data):
+  """Word count map function."""
+  (entry, text_fn) = data
+  text = text_fn()
+
+  logging.debug("Got %s", entry.filename)
+  for s in split_into_sentences(text):
+    for w in split_into_words(s.lower()):
+      yield (w, "")
+
+
+def word_count_reduce(key, values):
+  """Word count reduce function."""
+  yield "%s: %d\n" % (key, len(values))
+
 
 class WordCountPipeline(base_handler.PipelineBase):
   """A pipeline to run Word count demo.
