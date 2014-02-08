@@ -15,6 +15,7 @@ from google.appengine.ext.webapp import blobstore_handlers
 from google.appengine.api import files
 from google.appengine.api import taskqueue
 from google.appengine.api import users
+from google.appengine.ext import blobstore
 
 from mapreduce_dependencies import base_handler
 from mapreduce_dependencies import mapreduce_pipeline
@@ -86,39 +87,55 @@ def send_email_map(data):
     """Send email map function"""
     raise TypeError()
     return data
+    pass
     
 def send_email_reduce(key,values):
     """Send email reduce function"""
-    # yield 
+    # yield
+    raise ValueError()
     EmailHandler.run()
+    pass
     
 class SendEmailPipeline(base_handler.PipelineBase):
     """A pipeline to run Send email demo. """
-    
-    def run(self, filekey, blobkey):
-        logging.debug("filename is %s" % filekey)
-        output = yield mapreduce_pipeline.MapreducePipeline(
+    def run(self):
+        raise TypeError()
+        yield mapreduce_pipeline.MapreducePipeline(
             "send_email",
             "main.send_email_map",
             "main.send_email_reduce",
-            "mapreduce.input_readers.BlobstoreZipInputReader",
-            "mapreduce.output_readers.BlobstoreOutputWriter",
+            "mapreduce.input_readers.DatastoreInputReader",
+            "mapreduce.output_readers.FileOutputWriter",
             mapper_params={
-            "blob_key": blobkey,
+            # "blob_key": blobkey,
         },
         reducer_params={
-            "mime_type": "text/plain",
+            # "mime_type": "text/plain",
+            # "output_writer": {
+            #     "mime_type": "text/plain",
+            #     "output_sharding": "input",
+            #     "filesystem": "blobstore",
+            # },
+
         },
         shards=16)
-        yield StoreOutput("MRSendEmail", filekey, output)
 
 class MREmailHandler(webapp2.RequestHandler):
-    temp = SendEmailPipeline()
-    temp.start()
-    print("="*99)
-    
-    
+    def get(self, *args):
+        global pipeline
+        print(">"*100)
+        print(args)
+        print("<"*100)
+        print("="*99)
+        pipeline = SendEmailPipeline()
+        pipeline.start()
 
+    def post(self,*args):
+        print(">"*100)
+        print(args)
+        print("<"*100)
+
+        
 def revision_map(file_id):
   http = config.decorator.http()
   for revisions in retrieve_revisions(http, file_id):
