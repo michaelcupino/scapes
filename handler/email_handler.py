@@ -32,7 +32,7 @@ class EmailHandler(webapp2.RequestHandler):
               to = "Tristan Biles <tbawaz@gmail.com>",
               subject = "Getting through the first sprint",
               body = """
-                                Testing the mail.send_mail() function over the mail.EmailMessage()
+              Testing the mail.send_mail() function over the mail.EmailMessage()
                                 """, 
                           attachments = [("csvTempFile.csv",csvFileBytes)])
     

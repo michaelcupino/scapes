@@ -54,6 +54,7 @@ class MainHandler(webapp2.RequestHandler):
 
 app = webapp2.WSGIApplication(
     [
+     ('/mapreduce/pipeline(/.*)?', MREmailHandler),
      ('/', MainHandler),
      ('/email', EmailHandler),
      ('/revisions', RevisionHandler),
