@@ -36,7 +36,8 @@ from google.appengine.api import memcache
 from handler.email_handler import EmailHandler
 from handler.revision_handler import RevisionHandler
 from handler.file_id_handler import FileIDHandler
-from handler.map_reduce_handler import MREmailHandler
+#from handler.map_reduce_handler import MREmailHandler
+from handler.mr_demo_handler import MRDemoHandler
 
 import webapp2
 import jinja2
@@ -54,12 +55,13 @@ class MainHandler(webapp2.RequestHandler):
 
 app = webapp2.WSGIApplication(
     [
-     ('/mapreduce/pipeline(/.*)?', MREmailHandler),
+     #('/mapreduce/pipeline(/.*)?', MREmailHandler),
      ('/', MainHandler),
      ('/email', EmailHandler),
      ('/revisions', RevisionHandler),
      ('/fileids',FileIDHandler),
-     ('/MREmail',MREmailHandler),
+    # ('/MREmail',MREmailHandler),
+     ('/demo', MRDemoHandler),
      (config.decorator.callback_path, config.decorator.callback_handler()),
     ],
     debug=True)
