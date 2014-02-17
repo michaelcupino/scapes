@@ -19,8 +19,8 @@ class FileIDHandler(webapp2.RequestHandler):
     }
 
     self.file_id = file_core.retrieve_all_files(http)
-    output = self.list_by_field('id')
-    string_output  = ''#temporary, testing purposes
+    output = self.list_by_field('lastModifyingUser','displayName')
+    string_output  = ''
     
     for item in output:
       string_output += '<pre>'
@@ -28,7 +28,7 @@ class FileIDHandler(webapp2.RequestHandler):
       string_output += '</pre>'
     self.response.write(string_output)
 
-  def list_by_field(self,field_name):
+  def list_by_field(self,field_name,second_field = None):
     '''downloadUrl': 
        'etag':
        'fileSize':
@@ -49,9 +49,15 @@ class FileIDHandler(webapp2.RequestHandler):
        'selfLink': 
        
        This is the template for a response object. This function takes in a fieldname and returns a list of all the responses with just that field
-           --oops, can't return, guess I'll just print for now
-       (Ill add error handling later, but I'm not sure how to go about that atm) '''
-    result = [item[field_name] for item in self.file_id]
+           --oops, can't return, guess I'll just print for now '''
+      
+    if second_field != None and field_name == 'lastModifyingUser':
+      if second_field == 'picture':
+        result = [item[field_name][second_field]['url'] for item in self.file_id]
+      else:
+        result = [item[field_name][second_field] for item in self.file_id]
+    else:
+      result = [item[field_name] for item in self.file_id]
     return result
         
         
