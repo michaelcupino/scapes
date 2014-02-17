@@ -38,7 +38,7 @@ from handler.email_handler import EmailHandler
 from handler.revision_handler import RevisionHandler
 from handler.file_id_handler import FileIDHandler
 #from handler.map_reduce_handler import MREmailHandler
-from handler.mr_demo_handler import MRDemoHandler
+#from handler.mr_demo_handler import MRDemoHandler
 from handler.wordcount_handler import WordcountHandler, UploadHandler, ServeHandler
 
 import webapp2
@@ -81,7 +81,7 @@ app = webapp2.WSGIApplication(
      ('/revisions', RevisionHandler),
      ('/fileids',FileIDHandler),
     # ('/MREmail',MREmailHandler),
-     ('/demo', MRDemoHandler),
+     #('/demo', MRDemoHandler),
      ('/wordcount',WordcountHandler),
      ('/serve/([^/]+)?',ServeHandler),
      ('/upload',UploadHandler),
