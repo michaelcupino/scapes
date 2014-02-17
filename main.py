@@ -28,6 +28,7 @@ import httplib2
 import pprint
 import random
 
+
 from apiclient import discovery, errors
 from google.appengine.ext.webapp.util import login_required
 from oauth2client import appengine
@@ -38,20 +39,39 @@ from handler.revision_handler import RevisionHandler
 from handler.file_id_handler import FileIDHandler
 #from handler.map_reduce_handler import MREmailHandler
 from handler.mr_demo_handler import MRDemoHandler
+from handler.wordcount_handler import WordcountHandler, UploadHandler, ServeHandler
 
 import webapp2
 import jinja2
+
+from google.appengine.ext import blobstore,db
 
 from service import config
 
 from handler import file_core
 from handler import revision_core
 
+JINJA_ENVIRONMENT = jinja2.Environment(
+  loader=jinja2.FileSystemLoader(os.path.dirname(__file__)),
+  extensions=['jinja2.ext.autoescape'],
+  autoescape=True)
 
+class Wrapper(db.Model):
+  user = db.UserProperty(auto_current_user=True)
+  blob = blobstore.BlobReferenceProperty(required=True)
+  date = db.DateTimeProperty(auto_now_add=True)
+    
 class MainHandler(webapp2.RequestHandler):
   @config.decorator.oauth_required
   def get(self):
     self.response.write("Welcome to SCAPES!")
+    values = {
+      'upload_url' : blobstore.create_upload_url('/upload'),
+      'wrappers' : Wrapper.all(),
+    }
+    path = os.path.join(os.path.dirname(__file__), 'main.html')
+    template = JINJA_ENVIRONMENT.get_template('main.html')
+    self.response.out.write(template.render(values))
 
 app = webapp2.WSGIApplication(
     [
@@ -62,6 +82,9 @@ app = webapp2.WSGIApplication(
      ('/fileids',FileIDHandler),
     # ('/MREmail',MREmailHandler),
      ('/demo', MRDemoHandler),
+     ('/wordcount',WordcountHandler),
+     ('/serve/([^/]+)?',ServeHandler),
+     ('/upload',UploadHandler),
      (config.decorator.callback_path, config.decorator.callback_handler()),
     ],
     debug=True)
