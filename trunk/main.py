@@ -37,9 +37,10 @@ from google.appengine.api import memcache
 from handler.email_handler import EmailHandler
 from handler.revision_handler import RevisionHandler
 from handler.file_id_handler import FileIDHandler
-#from handler.map_reduce_handler import MREmailHandler
-#from handler.mr_demo_handler import MRDemoHandler
+from handler.map_reduce_handler import MREmailHandler
+from handler.mr_demo_handler import MRDemoHandler
 from handler.wordcount_handler import WordcountHandler, UploadHandler, ServeHandler
+from handler.hello_world_handler import HelloWorldHandler
 
 import webapp2
 import jinja2
@@ -73,15 +74,53 @@ class MainHandler(webapp2.RequestHandler):
     template = JINJA_ENVIRONMENT.get_template('main.html')
     self.response.out.write(template.render(values))
 
+MAIN_PAGE_HTML = '''\
+<html>
+    <body>
+        <form action = "%s" method = 'POST' enctype = 'mutipart/form-data'>
+
+        <input type="button" value="Click me" onclick="msg()">
+        # TODO: HAVE onclick = ____ send out the email
+        </form>
+    </body>
+</html>
+
+'''
+
+
+                                                   
+    
+    
+# class WordCountPipeline(base_handler.PipelineBase):
+# 
+#     def run(self, filekey, blobkey):
+#         logging.debug("filename is %s" % filekey)
+#         output = yield mapreduce_pipeline.MapreducePipeline(
+#             "word_count",
+#             "main.word_count_map",
+#             "main.word_count_reduce",
+#             "mapreduce.input_readers.BlobstoreZipInputReader",
+#             "mapreduce.output_writers.BlobstoreOutputWriter",
+#         mapper_params={
+#             "blob_key": blobkey,
+#         },
+#         reducer_params={
+#             "mime_type": "text/plain",
+#         },
+#         shards=16)
+#         yield StoreOutput("WordCount", filekey, output)
+#     
+
 app = webapp2.WSGIApplication(
     [
      #('/mapreduce/pipeline(/.*)?', MREmailHandler),
      ('/', MainHandler),
+     ('/helloWorld', HelloWorldHandler),
      ('/email', EmailHandler),
      ('/revisions', RevisionHandler),
      ('/fileids',FileIDHandler),
-    # ('/MREmail',MREmailHandler),
-     #('/demo', MRDemoHandler),
+     ('/MREmail',MREmailHandler),
+     ('/demo', MRDemoHandler),
      ('/wordcount',WordcountHandler),
      ('/serve/([^/]+)?',ServeHandler),
      ('/upload',UploadHandler),
