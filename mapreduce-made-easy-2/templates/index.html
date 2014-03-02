@@ -18,8 +18,6 @@
           <td>uploaded on</td>
           <td>source</td>
           <td>wordcount link</td>
-          <td>index link</td>
-          <td>phrases link</td>
         </tr>
         {% for item in items %}
         <tr>
@@ -31,16 +29,6 @@
           <td>
             {% if item.wordcount_link %}
             <a href="{{ item.wordcount_link }}">wordcount</a>
-            {% endif %}
-          </td>
-          <td>
-            {% if item.index_link %}
-            <a href="{{ item.index_link }}">index</a>
-            {% endif %}
-          </td>
-          <td>
-            {% if item.phrases_link %}
-            <a href="{{ item.phrases_link }}">phrases</a>
             {% endif %}
           </td>
         </tr>
@@ -77,8 +65,6 @@
         <table>
           <tr>
             <td><input type="submit" id="word_count" name="word_count" value="Word Count" disabled="true"></td>
-            <td><input type="submit" id="index" name="index" value="Index" disabled="true"></td>
-            <td><input type="submit" id="phrases" name="phrases" value="Phrases" disabled="true"></td>
           </tr>
         </table>
       </form>
