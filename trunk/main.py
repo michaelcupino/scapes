@@ -114,7 +114,7 @@ app = webapp2.WSGIApplication(
     [
      #('/mapreduce/pipeline(/.*)?', MREmailHandler),
      ('/', MainHandler),
-     ('/helloWorld', HelloWorldHandler),
+     ('/mapreduce/helloWorld', HelloWorldHandler),
      ('/email', EmailHandler),
      ('/revisions', RevisionHandler),
      ('/fileids',FileIDHandler),

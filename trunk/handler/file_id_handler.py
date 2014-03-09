@@ -19,7 +19,7 @@ class FileIDHandler(webapp2.RequestHandler):
     }
 
     self.file_id = file_core.retrieve_all_files(http)
-    output = self.list_by_field('lastModifyingUser','displayName')
+    output = self.list_by_field('modifiedDate')
     string_output  = ''
     
     for item in output:
