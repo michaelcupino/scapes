@@ -54,7 +54,7 @@ class UploadHandler(blobstore_handlers.BlobstoreUploadHandler):
         blob_key = self.request.get('blobkey')
         filekey = self.request.get('filekey')
         pipeline = MRSendEmailPipeline(filekey,blob_key)
-        logging.debu("got to pipeline start")
+        logging.debug("got to pipeline start")
         print("got to pipeline.start")
         pipeline.start()
         self.redirect('/serve/{}'.format(blob_info.key()))

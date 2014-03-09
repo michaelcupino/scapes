@@ -1,13 +1,15 @@
 application: scapes-uci
 version: 2
 runtime: python27
-threadsafe: true
+threadsafe: false
 api_version: 1
 
 handlers:
+- url: /mapreduce(/.*)?
+  script: main.app
+#  login: admin
 - url: .*
   script: main.app
-
 libraries:
 - name: jinja2
   version: "latest"
