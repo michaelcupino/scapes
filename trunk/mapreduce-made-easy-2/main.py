@@ -38,7 +38,7 @@ import tempfile
 from google.appengine.api import mail
 from google.appengine.ext import blobstore
 from google.appengine.ext import db
-
+from google.appengine.ext import ndb
 from google.appengine.ext.webapp import blobstore_handlers
 
 from google.appengine.api import files
@@ -129,6 +129,36 @@ class FileMetadata(db.Model):
     sep = FileMetadata.__SEP
     return str(username + sep + str(date) + sep + blob_key)
 
+DEFAULT_FOLDER_NAME = 'default_folder'
+
+
+# We set a parent key on the 'Greetings' to ensure that they are all in the same
+# entity group. Queries across the single entity group will be consistent.
+# However, the write rate should be limited to ~1/second.
+
+def folder_key(folder_name=DEFAULT_FOLDER_NAME):
+    """Constructs a Datastore key for a folder entity with folder_name."""
+    return ndb.Key('Folder', folder_name)
+
+
+class File(ndb.Model):
+    """Models an individual File entry with author, content and date."""
+    author = ndb.UserProperty()
+    list_of_id = ndb.StringProperty(indexed=False)
+    date = ndb.DateTimeProperty(auto_now_add=True)
+
+class Folder(webapp2.RequestHandler):
+  def post(self, file_content):
+    folder_name = self.request.get('folder_name', DEFAULT_FOLDER_NAME)
+    file = File(parent=folder_key(folder_name))
+    
+    if users.get_current_user():
+      file.author = users.get_current_user()
+
+    file.list_of_id = file_content
+    file.put()
+
+    query_params = {'folder_name': folder_name}
 
 class IndexHandler(webapp2.RequestHandler):
   """The main page that users will interact with, which presents users with
@@ -161,10 +191,15 @@ class IndexHandler(webapp2.RequestHandler):
          "length": length,
          "upload_url": upload_url}))
 
-  def post(self):
+  def post(self, file_content):
+    '''
     filekey = self.request.get("filekey")
     blob_key = self.request.get("blobkey")
+    '''
+    folder = Folder()
+    folder.post(file_content)
 
+    '''make pipeline run() and pass in datastore key'''
     if self.request.get("word_count"):
       pipeline = WordCountPipeline(filekey, blob_key)
 
