@@ -214,17 +214,14 @@ def send_email():
     logging.info("value of my csv is %s", csvFileBytes)
 
 def word_count_map(data):
+  """Word count map function."""
+  (entry, text_fn) = data
+  text = text_fn()
     
-    #send_email()
-    
-    """Word count map function."""
-    (entry, text_fn) = data
-    text = text_fn()
-    
-    logging.debug("Got %s", entry.filename)
-    for s in split_into_sentences(text):
-      for w in split_into_words(s.lower()):
-        yield (w, "")
+  logging.debug("Got %s", entry.filename)
+  for s in split_into_sentences(text):
+    for w in split_into_words(s.lower()):
+      yield (w, "")
 
 
 def word_count_reduce(key, values):

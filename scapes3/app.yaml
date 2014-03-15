@@ -1,5 +1,5 @@
-application: mapreduce-demo
-version: 1
+application: scapes-uci
+version: 3
 runtime: python27
 api_version: 1
 threadsafe: no
@@ -17,13 +17,11 @@ handlers:
 
 - url: /mapreduce(/.*)?
   script: mapreduce.main.APP
-  login: admin
 
 - url: .*
   script: main.app
-  login: required
+  login: admin
 
-  
 libraries:
 - name: webapp2
   version: "2.5.1"
