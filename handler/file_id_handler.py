@@ -9,8 +9,6 @@ class FileIDHandler(webapp2.RequestHandler):
         
   @config.decorator.oauth_required
   def get(self):
-    """print out documents in a folder"""
-
     ##very similar to jonathan's work##
     http = config.decorator.http()
     variables = {
@@ -19,46 +17,24 @@ class FileIDHandler(webapp2.RequestHandler):
     }
 
     self.file_id = file_core.retrieve_all_files(http)
-    output = self.list_by_field('modifiedDate')
-    string_output  = ''
+    self.ids_string = self.documents_in_folder('0B8tE36D1lgLVYWRFSkJBVnZOY00')
+    print(self.ids_string)
     
-    for item in output:
-      string_output += '<pre>'
-      string_output += item
-      string_output += '</pre>'
-    self.response.write(string_output)
-
-  def list_by_field(self,field_name,second_field = None):
-    '''downloadUrl': 
-       'etag':
-       'fileSize':
-       'id': 
-       'kind': 
-       'lastModifyingUser': {'displayName'
-                             'isAuthenticatedUser':
-                             'kind': 
-                             'permissionId': 
-                             'picture': {'url': }},
-       'lastModifyingUserName': 
-       'md5Checksum': 
-       'mimeType': 
-       'modifiedDate':
-       'originalFilename': 
-       'pinned': 
-       'published': 
-       'selfLink': 
-       
-       This is the template for a response object. This function takes in a fieldname and returns a list of all the responses with just that field
-           --oops, can't return, guess I'll just print for now '''
-      
-    if second_field != None and field_name == 'lastModifyingUser':
-      if second_field == 'picture':
-        result = [item[field_name][second_field]['url'] for item in self.file_id]
-      else:
-        result = [item[field_name][second_field] for item in self.file_id]
-    else:
-      result = [item[field_name] for item in self.file_id]
+  def documents_in_folder(self,folder_id):
+    '''retrieve all documents from the given folder id'''
+    result = ''
+    for item in self.file_id:
+      try:
+        if item['parents'][0]['id'] == folder_id:
+          if item['mimeType'].endswith('folder'):
+            result += self.documents_in_folder(item['id'])
+          elif item['mimeType'].endswith('document'):
+            result += item['id']
+            result += '\n'
+          else:
+            pass
+      except:
+        pass
     return result
-        
         
         
