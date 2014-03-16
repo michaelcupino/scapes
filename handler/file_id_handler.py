@@ -20,6 +20,7 @@ DEFAULT_FOLDER_NAME = 'default_folder'
 def folder_key(title,folder_name=DEFAULT_FOLDER_NAME):
     """Constructs a Datastore key for a folder entity with folder_name."""
     #parameter order is reversed because of kwargs necessities :(
+    #i dont use this atm
     return ndb.Key('Folder', folder_name,'File',title)
 
 
@@ -27,7 +28,7 @@ class File(ndb.Model):
     """Models an individual File entry with author, content and date."""
     author = ndb.UserProperty()
     title = ndb.StringProperty()
-    content = ndb.StringProperty(indexed=False)
+    content = ndb.StringProperty()
     date = ndb.DateTimeProperty(auto_now_add=True)
 
 class FileIDHandler(webapp2.RequestHandler):
@@ -44,34 +45,22 @@ class FileIDHandler(webapp2.RequestHandler):
 
     self.file_id = file_core.retrieve_all_files(http)
     self.ids_string = self.documents_in_folder('0B8tE36D1lgLVYWRFSkJBVnZOY00')
-    print(self.ids_string)
     
     parent_folder = 'file_ids'
-    title = 'file_ids'
-    file = File(content = self.ids_string,
+    title = 'file_ids'  
+    
+    file_query = File.query(File.title=='file_ids')
+    item_found = False
+    for item in file_query:
+      item.content = self.ids_string
+      item_found = True
+    if not item_found:
+      file = File(content = self.ids_string,
                 title = 'file_ids')
-    file_list = []
-    file_list.append(file)
-    a='a'
-    for i in range(10):
-        file_list.append(File(content = 'blah',
-                              title = a))
-        a+='a'
-        
-    
-    for item in file_list:
-        item.put()
-    if users.get_current_user():
-      file.author = users.get_current_user()
-    
-    file_id = File.query(File.title=='file_ids')
-#     file_id.filter(ndb.GenericProperty('title') != 'fileids')
-    for item in file_id:
-        print(item)
-    
-    x = File.query()
-    for item in x:
-      item.key.delete()
+      if users.get_current_user():
+        file.author = users.get_current_user()
+      file.put()
+
     query_params = {'title': title}
     
   def documents_in_folder(self,folder_id):
