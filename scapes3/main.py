@@ -195,14 +195,13 @@ class IndexHandler(webapp2.RequestHandler):
          "upload_url": upload_url}))
 
   def post(self):
-    filekey = self.request.get("filekey")
-    blob_key = self.request.get("blobkey")
-
-    if self.request.get("word_count"):
-      pipeline = WordCountPipeline(filekey, blob_key)
+    folder_id = self.request.get("scapes_folder_id")
+    if self.request.get("scapes_folder"):
+      pipeline = ScapesAnalysisPipeline(folder_id)
 
     pipeline.start()
     self.redirect(pipeline.base_path + "/status?root=" + pipeline.pipeline_id)
+    
 
 
 def split_into_sentences(s):
@@ -263,6 +262,7 @@ def word_count_reduce(key, values):
   yield "%s: %d\n" % (key, len(values))
 
 
+
 class WordCountPipeline(base_handler.PipelineBase):
   """A pipeline to run Word count demo.
 
@@ -274,20 +274,19 @@ class WordCountPipeline(base_handler.PipelineBase):
   def run(self, filekey, blobkey):
     logging.debug("filename is %s" % filekey)
     output = yield mapreduce_pipeline.MapreducePipeline(
-        "word_count",
-        "main.word_count_map",
-        "main.word_count_reduce",
-        "mapreduce.input_readers.BlobstoreZipInputReader",
-        "mapreduce.output_writers.BlobstoreOutputWriter",
-        mapper_params={
-            "blob_key": blobkey,
-        },
+      "word_count",
+      "main.word_count_map",
+      "main.word_count_reduce",
+      "mapreduce.input_readers.BlobstoreZipInputReader",
+      "mapreduce.output_writers.BlobstoreOutputWriter",
+      mapper_params={
+        "blob_key": blobkey,
+      },
         reducer_params={
-            "mime_type": "text/plain",
+          "mime_type": "text/plain",
         },
         shards=16)
     yield StoreOutput("WordCount", filekey, output)
-
 
 class StoreOutput(base_handler.PipelineBase):
   """A pipeline to store the result of the MapReduce job in the database.
@@ -307,7 +306,7 @@ class StoreOutput(base_handler.PipelineBase):
       m.wordcount_link = output[0]
 
     m.put()
-
+    
 class UploadHandler(blobstore_handlers.BlobstoreUploadHandler):
   """Handler to upload data to blobstore."""
 
@@ -352,3 +351,53 @@ app = webapp2.WSGIApplication(
         (r'/blobstore/(.*)', DownloadHandler),
     ],
     debug=True)
+
+def scapes_generate_datastore_record(folder_id):
+  # TODO: blocked on Fosters code
+  raise NotImplementedError("We haven't fixed the TODOs yet! :(")
+  return # <Datastore_ID>
+
+def scapes_analyse_document_by_id(file_id):
+  # TODO: blocked on Jonathan's code
+  raise NotImplementedError("We haven't fixed the TODOs yet! :(")
+
+  # Preprocess code (None should be needed)
+  
+  revisions = [] # TODO: should be list of revision IDs
+  revisions = map(scapes_analyze_revision, revisions)
+
+  # Postprocess code (Serialization etc.?)
+  
+  return revisions
+  
+
+def scapes_analyze_revision(revision_id):
+  # TODO: blocked on Jonathan's code
+  raise NotImplementedError("We haven't fixed the TODOs yet! :(")
+  text = "" # should be the text of the indicated revision
+  words = 0 # should become the number of words total
+  return words
+
+class ScapesAnalysisPipeline(base_handler.PipelineBase):
+  """A pipeline to run SCAPES demo. """
+
+  def run(self, folder_id):
+    mapper_data_id = scapes_generate_datastore_record(folder_id)
+    output = yield mapreduce_pipeline.MapreducePipeline(
+      "word_count",
+      "main.word_count_map",
+      "main.word_count_reduce",
+      # TODO: DatastoreLineInputReader doesn't exists.
+      # Find out how to use DatastoreInputReader.
+      "mapreduce.input_readers.DatastoreLineInputReader",
+      # TODO: find a datastore output writer as well
+      "mapreduce.output_writers.BlobstoreOutputWriter",
+      mapper_params={
+        "blob_key": blobkey,# TODO: this should be replaced
+      },
+      reducer_params={
+        "mime_type": "text/plain",
+      },
+      shards=16)
+    # TODO: replace this with out own cleanup code.
+    yield StoreOutput("WordCount", filekey, output)
