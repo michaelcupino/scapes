@@ -38,8 +38,10 @@ import tempfile
 from google.appengine.api import mail
 from google.appengine.ext import blobstore
 from google.appengine.ext import db
+from google.appengine.ext import ndb
 
 from google.appengine.ext.webapp import blobstore_handlers
+from google.appengine.ext.webapp.util import login_required
 
 from google.appengine.api import files
 from google.appengine.api import taskqueue
@@ -167,7 +169,8 @@ class IndexHandler(webapp2.RequestHandler):
 
   template_env = jinja2.Environment(loader=jinja2.FileSystemLoader("templates"),
                                     autoescape=True)
-
+  
+  @login_required
   def get(self):
     user = users.get_current_user()
     username = user.nickname()

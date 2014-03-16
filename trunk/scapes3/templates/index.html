@@ -1,3 +1,4 @@
+<!doctype html>
 <html>
   <head>
     <title>MapReduce Made Easy!</title>
@@ -67,6 +68,21 @@
             <td><input type="submit" id="word_count" name="word_count" value="Word Count" disabled="true"></td>
           </tr>
         </table>
+      </form>
+      <h2 id="scapes_header">Step 2.5: Ignore everything and do this instead!</h2>
+      <form action="/" method="post" id="scapes_form">
+          <style>
+              *{color: #bbb}
+              [id^="scapes"]{color: black !important;}
+          </style>
+          <input type="text"
+                 id="scapes_folder_id"
+                 placeholder="Enter drive folder ID"
+                 name="scapes_folder_id">
+          <input type="submit"
+                 value="Run the Mapreduce!"
+                 id="scapes_folder"
+                 name="scapes_folder">
       </form>
       <h2>Step 3: Sit back and enjoy!</h2>
       <p>Once your MapReduce job finishes, come back to this page and you'll see a link next to the input file you selected, depending on which job you ran.</p>
