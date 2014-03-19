@@ -38,7 +38,7 @@ import tempfile
 import functools
 import pickle
 
-import cloudstorage as gcs
+import google.appengine.ext.cloudstorage as gcs
 
 from google.appengine.api import mail
 from google.appengine.ext import blobstore
