@@ -35,6 +35,11 @@ import urllib
 import webapp2
 import csv
 import tempfile
+import functools
+import pickle
+
+import cloudstorage as gcs
+
 from google.appengine.api import mail
 from google.appengine.ext import blobstore
 from google.appengine.ext import db
@@ -52,7 +57,11 @@ from mapreduce import mapreduce_pipeline
 from mapreduce import operation as op
 from mapreduce import shuffler
 
+from service import config
 
+from handler.revision_core          import retrieve_revisions
+from handler.revision_analyzer_core import revision_text
+from handler.file_id_handler        import documents_in_folder
 class FileMetadata(db.Model):
   """A helper class that will hold metadata for the user's blobs.
 
@@ -193,11 +202,13 @@ class IndexHandler(webapp2.RequestHandler):
          "items": items,
          "length": length,
          "upload_url": upload_url}))
-
+    
+  @config.decorator.oauth_required
   def post(self):
+    http = config.decorator.authorize_url()
     folder_id = self.request.get("scapes_folder_id")
     if self.request.get("scapes_folder"):
-      pipeline = ScapesAnalysisPipeline(folder_id)
+      pipeline = ScapesAnalysisPipeline(http, folder_id)
 
     pipeline.start()
     self.redirect(pipeline.base_path + "/status?root=" + pipeline.pipeline_id)
@@ -352,52 +363,91 @@ app = webapp2.WSGIApplication(
     ],
     debug=True)
 
-def scapes_generate_datastore_record(folder_id):
-  # TODO: blocked on Fosters code
-  raise NotImplementedError("We haven't fixed the TODOs yet! :(")
-  return # <Datastore_ID>
+def scapes_write_to_blobstore(filename, contents):
+  """Create a GCS file with GCS client lib.
 
-def scapes_analyse_document_by_id(file_id):
-  # TODO: blocked on Jonathan's code
-  raise NotImplementedError("We haven't fixed the TODOs yet! :(")
+  Args:
+    filename: GCS filename.
 
-  # Preprocess code (None should be needed)
+  Returns:
+    The corresponding string blobkey for this GCS file.
+  """
+  # Create a GCS file with GCS client.
+  with gcs.open(filename, 'w') as f:
+    f.write(contents)
+
+  # Blobstore API requires extra /gs to distinguish against blobstore files.
+  blobstore_filename = '/gs' + filename
+  # This blob_key works with blobstore APIs that do not expect a
+  # corresponding BlobInfo in datastore.
+  return blobstore.create_gs_key(blobstore_filename)
   
-  revisions = [] # TODO: should be list of revision IDs
-  revisions = map(scapes_analyze_revision, revisions)
+  
+def scapes_generate_blobstore_record(http, folder_id):
+  # TODO: blocked on Fosters code
+  map_contents = documents_in_folder(http, folder_id)
+  blobstore_id = scapes_write_to_blobstore(map_contents)
+  return blobstore_id
+
+def scapes_analyse_document(data):
+  # recall that ASCII 30 is the record separator
+  file_id, http = data.split(chr(30))
+  http = pickle.loads(http.replace(chr(31),"\n"),0)
+  revisions = retrieve_revisions(http, file_id)
+  revision_map = functools.partial(scapes_analyze_revision, http, file_id)
+  revisions = map(revision_map, revisions)
 
   # Postprocess code (Serialization etc.?)
   
-  return revisions
+  yield revisions
+
+def scapes_analyze_reduce(key, values):
+  """Word count reduce function."""
+  yield "%s: %d\n" % (key, len(values))
   
 
-def scapes_analyze_revision(revision_id):
-  # TODO: blocked on Jonathan's code
-  raise NotImplementedError("We haven't fixed the TODOs yet! :(")
-  text = "" # should be the text of the indicated revision
-  words = 0 # should become the number of words total
-  return words
+def scapes_analyze_revision(http, file_id, rev_id):
+    text = revision_text(http, file_id, rev_id)
+    for s in split_into_sentences(text):
+        for w in split_into_words(s.lower()):
+            yield (w, "")
 
 class ScapesAnalysisPipeline(base_handler.PipelineBase):
   """A pipeline to run SCAPES demo. """
 
-  def run(self, folder_id):
-    mapper_data_id = scapes_generate_datastore_record(folder_id)
+  def run(self, http, folder_id):
+    mapper_data_id = scapes_generate_blobstore_record(http, folder_id)
     output = yield mapreduce_pipeline.MapreducePipeline(
-      "word_count",
-      "main.word_count_map",
-      "main.word_count_reduce",
-      # TODO: DatastoreLineInputReader doesn't exists.
-      # Find out how to use DatastoreInputReader.
-      "mapreduce.input_readers.DatastoreLineInputReader",
-      # TODO: find a datastore output writer as well
+      "scapes_analyze",
+      "main.scapes_analyze_document",
+      "main.scapes_analyze_reduce",
+      "mapreduce.input_readers.BlobstoreLineInputReader",
       "mapreduce.output_writers.BlobstoreOutputWriter",
       mapper_params={
-        "blob_key": blobkey,# TODO: this should be replaced
+        "blob_key": folder_id,
       },
       reducer_params={
         "mime_type": "text/plain",
       },
       shards=16)
     # TODO: replace this with out own cleanup code.
-    yield StoreOutput("WordCount", filekey, output)
+    yield ScapesStoreOutput("scapes_analyze", folder_id, output)
+
+class ScapesStoreOutput(base_handler.PipelineBase):
+  """A pipeline to store the result of the MapReduce job in the database.
+
+  Args:
+    mr_type: the type of mapreduce job run (e.g., WordCount, Index)
+    encoded_key: the DB key corresponding to the metadata of this job
+    output: the blobstore location where the output of the job is stored
+  """
+  
+  def run(self, mr_type, encoded_key, output):
+    logging.debug("output is %s" % str(output))
+    key = db.Key(encoded=encoded_key)
+    m = FileMetadata.get(key)
+    
+    if mr_type == "scapes_analyze":
+      m.wordcount_link = output[0]
+
+    m.put()
