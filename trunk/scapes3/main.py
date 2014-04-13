@@ -360,6 +360,7 @@ app = webapp2.WSGIApplication(
         ('/', IndexHandler),
         ('/upload', UploadHandler),
         (r'/blobstore/(.*)', DownloadHandler),
+        (config.decorator.callback_path, config.decorator.callback_handler()),
     ],
     debug=True)
 
