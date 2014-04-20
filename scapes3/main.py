@@ -62,6 +62,9 @@ from service import config
 from handler.revision_core          import retrieve_revisions
 from handler.revision_analyzer_core import revision_text
 from handler.file_id_handler        import documents_in_folder
+
+from model.file_model import File
+
 class FileMetadata(db.Model):
   """A helper class that will hold metadata for the user's blobs.
 
@@ -150,13 +153,6 @@ DEFAULT_FOLDER_NAME = 'default_folder'
 def folder_key(folder_name=DEFAULT_FOLDER_NAME):
     """Constructs a Datastore key for a folder entity with folder_name."""
     return ndb.Key('Folder', folder_name)
-
-
-class File(ndb.Model):
-    """Models an individual File entry with author, content and date."""
-    author = ndb.UserProperty()
-    list_of_id = ndb.StringProperty(indexed=False)
-    date = ndb.DateTimeProperty(auto_now_add=True)
 
 class Folder(webapp2.RequestHandler):
   def post(self, file_content):
