@@ -2,7 +2,7 @@
 import unittest
 
 from datetime import datetime
-from file_model import File
+from model.file_model import File
 from google.appengine.ext import testbed
 from google.appengine.api import users
 
@@ -61,3 +61,4 @@ class FileModelTest(unittest.TestCase):
 
 if __name__ == '__main__':
   unittest.main()
+
