@@ -1,12 +1,10 @@
 #!/usr/bin/python
 import unittest
 
-from datetime import datetime
 from google.appengine.ext import testbed
-from google.appengine.api import users
 from model.file_metadata import FileMetadata
 
-class FileModelTest(unittest.TestCase):
+class FileMetadetaTest(unittest.TestCase):
 
   def setUp(self):
     self.testbed = testbed.Testbed()
