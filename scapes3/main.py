@@ -204,6 +204,7 @@ class IndexHandler(webapp2.RequestHandler):
     http = config.decorator.authorize_url()
     folder_id = self.request.get("scapes_folder_id")
     if self.request.get("scapes_folder"):
+      print "\n"+"="*100, http, "\n", folder_id, "=" * 100
       pipeline = ScapesAnalysisPipeline(http, folder_id)
 
     pipeline.start()
@@ -413,6 +414,7 @@ class ScapesAnalysisPipeline(base_handler.PipelineBase):
   """A pipeline to run SCAPES demo. """
 
   def run(self, http, folder_id):
+    print "\n"+"="*100, http, "\n", folder_id, "=" * 100
     mapper_data_id = scapes_generate_blobstore_record(http, folder_id)
     output = yield mapreduce_pipeline.MapreducePipeline(
       "scapes_analyze",
