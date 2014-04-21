@@ -2,9 +2,9 @@
 import unittest
 
 from datetime import datetime
-from model.file_model import File
 from google.appengine.ext import testbed
 from google.appengine.api import users
+from model.file_model import File
 
 class FileModelTest(unittest.TestCase):
 
