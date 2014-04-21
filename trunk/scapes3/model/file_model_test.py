@@ -1,10 +1,10 @@
 #!/usr/bin/python
 import unittest
 
+from datetime import datetime
+from file_model import File
 from google.appengine.ext import testbed
 from google.appengine.api import users
-
-from file_model import File
 
 class FileModelTest(unittest.TestCase):
 
@@ -13,20 +13,51 @@ class FileModelTest(unittest.TestCase):
     self.testbed.activate()
     self.testbed.init_datastore_v3_stub()
     self.testbed.init_memcache_stub()
+    self.testbed.setup_env(
+        USER_EMAIL = 'test@example.com',
+        USER_ID = '123',
+        USER_IS_ADMIN = '0',
+        overwrite = True)
 
   def tearDown(self):
     self.testbed.deactivate()
 
-  def testSomething(self):
-    self.assertEqual(1, 1 + 0)
+  def testQueryLength(self):
+    testFile = File()
+    testFile.put()
 
-  def testPut(self):
+    queryResults = File.query().fetch(2)
+    self.assertEqual(1, len(queryResults))
+  
+  def testAuthor(self):
     testFile = File()
     testFile.author = users.get_current_user()
     testFile.put()
-    # TODO(michaelcupino): Assert that the author that was stored is the same
-    # as the current user.
-    self.assertEqual(2, 1 + 1)
+
+    queryResults = File.query().fetch(2)
+    actualFile = queryResults[0]
+
+    self.assertEqual('test@example.com', actualFile.author.email())
+
+  def testListOfId(self):
+    testFile = File()
+    testFile.list_of_id = 'id1, id2, id3, id4, id5'
+    testFile.put()
+
+    queryResults = File.query().fetch(2)
+    actualFile = queryResults[0]
+
+    self.assertEqual('id1, id2, id3, id4, id5', actualFile.list_of_id)
+
+  def testDate(self):
+    testFile = File()
+    testFile.date = datetime(2014, 4, 20)
+    testFile.put()
+
+    queryResults = File.query().fetch(2)
+    actualFile = queryResults[0]
+
+    self.assertEqual(datetime(2014, 4, 20), actualFile.date)
 
 if __name__ == '__main__':
   unittest.main()
