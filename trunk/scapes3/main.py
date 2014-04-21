@@ -27,88 +27,37 @@ zip file to attain higher accuracies)."""
 __author__ = """aizatsky@google.com (Mike Aizatsky), cbunch@google.com (Chris
 Bunch)"""
 
+import csv
 import datetime
+import functools
 import jinja2
 import logging
+import pickle
 import re
+import tempfile
 import urllib
 import webapp2
-import csv
-import tempfile
-import functools
-import pickle
-
 import google.appengine.ext.cloudstorage as gcs
 
-from google.appengine.api import mail
-from google.appengine.ext import blobstore
-from google.appengine.ext import db
-
-from google.appengine.ext.webapp import blobstore_handlers
-from google.appengine.ext.webapp.util import login_required
-
 from google.appengine.api import files
+from google.appengine.api import mail
 from google.appengine.api import taskqueue
 from google.appengine.api import users
-
+from google.appengine.ext import blobstore
+from google.appengine.ext import db
+from google.appengine.ext.webapp import blobstore_handlers
+from google.appengine.ext.webapp.util import login_required
+from handler.file_id_handler import documents_in_folder
+from handler.index_handler import IndexHandler
+from handler.revision_analyzer_core import revision_text
+from handler.revision_core import retrieve_revisions
 from mapreduce import base_handler
 from mapreduce import mapreduce_pipeline
 from mapreduce import operation as op
 from mapreduce import shuffler
-
-from service import config
-
-from handler.revision_core          import retrieve_revisions
-from handler.revision_analyzer_core import revision_text
-from handler.file_id_handler        import documents_in_folder
-
 from model.file_metadata import FileMetadata
 from model.file_model import File
-
-class IndexHandler(webapp2.RequestHandler):
-  """The main page that users will interact with, which presents users with
-  the ability to upload new data or run MapReduce jobs on their existing data.
-  """
-
-  template_env = jinja2.Environment(loader=jinja2.FileSystemLoader("templates"),
-                                    autoescape=True)
-  
-  @login_required
-  def get(self):
-    user = users.get_current_user()
-    username = user.nickname()
-
-    first = FileMetadata.getFirstKeyForUser(username)
-    last = FileMetadata.getLastKeyForUser(username)
-
-    q = FileMetadata.all()
-    q.filter("__key__ >", first)
-    q.filter("__key__ < ", last)
-    results = q.fetch(10)
-
-    items = [result for result in results]
-    length = len(items)
-
-    upload_url = blobstore.create_upload_url("/upload")
-
-    self.response.out.write(self.template_env.get_template("index.html").render(
-        {"username": username,
-         "items": items,
-         "length": length,
-         "upload_url": upload_url}))
-    
-  @config.decorator.oauth_required
-  def post(self):
-    http = config.decorator.http()
-    folder_id = self.request.get("scapes_folder_id")
-    if self.request.get("scapes_folder"):
-      print "\n"+"*"*100, type(http), "\n", folder_id, "*" * 100
-      pipeline = ScapesAnalysisPipeline(http, folder_id)
-
-    pipeline.start()
-    self.redirect(pipeline.base_path + "/status?root=" + pipeline.pipeline_id)
-    
-
+from service import config
 
 def split_into_sentences(s):
   """Split text into list of sentences."""
@@ -279,12 +228,6 @@ def scapes_write_to_blobstore(filename, contents):
   return blobstore.create_gs_key(blobstore_filename)
   
   
-def scapes_generate_blobstore_record(http, folder_id):
-  # TODO: blocked on Fosters code
-  map_contents = documents_in_folder(http, folder_id)
-  blobstore_id = scapes_write_to_blobstore(map_contents)
-  return blobstore_id
-
 def scapes_analyse_document(data):
   # recall that ASCII 30 is the record separator
   file_id, http = data.split(chr(30))
@@ -307,28 +250,6 @@ def scapes_analyze_revision(http, file_id, rev_id):
     for s in split_into_sentences(text):
         for w in split_into_words(s.lower()):
             yield (w, "")
-
-class ScapesAnalysisPipeline(base_handler.PipelineBase):
-  """A pipeline to run SCAPES demo. """
-
-  def run(self, http, folder_id):
-    print "\n"+"="*100, type(http), "\n", folder_id, "=" * 100
-    mapper_data_id = scapes_generate_blobstore_record(http, folder_id)
-    output = yield mapreduce_pipeline.MapreducePipeline(
-      "scapes_analyze",
-      "main.scapes_analyze_document",
-      "main.scapes_analyze_reduce",
-      "mapreduce.input_readers.BlobstoreLineInputReader",
-      "mapreduce.output_writers.BlobstoreOutputWriter",
-      mapper_params={
-        "blob_key": folder_id,
-      },
-      reducer_params={
-        "mime_type": "text/plain",
-      },
-      shards=16)
-    # TODO: replace this with out own cleanup code.
-    yield ScapesStoreOutput("scapes_analyze", folder_id, output)
 
 class ScapesStoreOutput(base_handler.PipelineBase):
   """A pipeline to store the result of the MapReduce job in the database.
