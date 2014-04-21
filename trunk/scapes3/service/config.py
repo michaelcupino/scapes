@@ -49,4 +49,12 @@ decorator = appengine.oauth2decorator_from_clientsecrets(
     message=MISSING_CLIENT_SECRETS_MESSAGE)
 
 http_cache = httplib2.Http(memcache)
-service = discovery.build('drive', 'v2', http=http_cache)
+
+
+service = None
+def getService():
+  global service
+  if not service:
+    service = discovery.build('drive', 'v2', http=http_cache)
+  return service
+    
