@@ -1,5 +1,6 @@
 from mapreduce import base_handler
 from mapreduce import mapreduce_pipeline
+from pipeline.scapes_store_output import ScapesStoreOutput
 
 class ScapesAnalysisPipeline(base_handler.PipelineBase):
   """A pipeline to run SCAPES demo. """
