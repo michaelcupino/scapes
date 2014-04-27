@@ -6,7 +6,7 @@ import webtest
 from handler.folder_handler import Folder
 from google.appengine.ext import testbed
 from google.appengine.api import users
-from model.file_model import File
+from model.file_model import ScapesFile
 
 class FolderHandlerTest(unittest.TestCase):
 
@@ -42,10 +42,10 @@ class FolderHandlerTest(unittest.TestCase):
     }
     response = self.testapp.post('/folder', params)
 
-    queryResults = File.query().fetch(2)
-    actualFile = queryResults[0]
+    queryResults = ScapesFile.query().fetch(2)
+    actualScapesFile = queryResults[0]
 
-    self.assertEqual('test@example.com', actualFile.author.email())
+    self.assertEqual('test@example.com', actualScapesFile.author.email())
 
 if __name__ == '__main__':
   unittest.main()

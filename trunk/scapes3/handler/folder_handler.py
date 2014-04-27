@@ -2,7 +2,7 @@ import webapp2
 
 from google.appengine.api import users
 from google.appengine.ext import ndb
-from model.file_model import File
+from model.file_model import ScapesFile
 
 class Folder(webapp2.RequestHandler):
   def get(self):
@@ -10,7 +10,7 @@ class Folder(webapp2.RequestHandler):
 
   def post(self):
     folder_name = self.request.get('folder_name', DEFAULT_FOLDER_NAME)
-    file = File(parent=folder_key(folder_name))
+    file = ScapesFile(parent=folder_key(folder_name))
     
     if users.get_current_user():
       file.author = users.get_current_user()
