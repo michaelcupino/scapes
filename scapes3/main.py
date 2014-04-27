@@ -116,33 +116,6 @@ def word_count_reduce(key, values):
   """Word count reduce function."""
   yield "%s: %d\n" % (key, len(values))
 
-
-
-class WordCountPipeline(base_handler.PipelineBase):
-  """A pipeline to run Word count demo.
-
-  Args:
-    blobkey: blobkey to process as string. Should be a zip archive with
-      text files inside.
-  """
-
-  def run(self, filekey, blobkey):
-    logging.debug("filename is %s" % filekey)
-    output = yield mapreduce_pipeline.MapreducePipeline(
-      "word_count",
-      "main.word_count_map",
-      "main.word_count_reduce",
-      "mapreduce.input_readers.BlobstoreZipInputReader",
-      "mapreduce.output_writers.BlobstoreOutputWriter",
-      mapper_params={
-        "blob_key": blobkey,
-      },
-        reducer_params={
-          "mime_type": "text/plain",
-        },
-        shards=16)
-    yield StoreOutput("WordCount", filekey, output)
-
 class StoreOutput(base_handler.PipelineBase):
   """A pipeline to store the result of the MapReduce job in the database.
 
@@ -162,20 +135,10 @@ class StoreOutput(base_handler.PipelineBase):
 
     m.put()
 
-class DownloadHandler(blobstore_handlers.BlobstoreDownloadHandler):
-  """Handler to download blob by blobkey."""
-
-  def get(self, key):
-    key = str(urllib.unquote(key)).strip()
-    logging.debug("key is %s" % key)
-    blob_info = blobstore.BlobInfo.get(key)
-    self.send_blob(blob_info)
-
 
 app = webapp2.WSGIApplication(
     [
         ('/', IndexHandler),
-        (r'/blobstore/(.*)', DownloadHandler),
         (config.decorator.callback_path, config.decorator.callback_handler()),
     ],
     debug=True)
