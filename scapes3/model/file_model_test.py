@@ -4,9 +4,9 @@ import unittest
 from datetime import datetime
 from google.appengine.ext import testbed
 from google.appengine.api import users
-from model.file_model import File
+from model.file_model import ScapesFile
 
-class FileModelTest(unittest.TestCase):
+class ScapesFileModelTest(unittest.TestCase):
 
   def setUp(self):
     self.testbed = testbed.Testbed()
@@ -23,41 +23,41 @@ class FileModelTest(unittest.TestCase):
     self.testbed.deactivate()
 
   def testQueryLength(self):
-    testFile = File()
-    testFile.put()
+    testScapesFile = ScapesFile()
+    testScapesFile.put()
 
-    queryResults = File.query().fetch(2)
+    queryResults = ScapesFile.query().fetch(2)
     self.assertEqual(1, len(queryResults))
   
   def testAuthor(self):
-    testFile = File()
-    testFile.author = users.get_current_user()
-    testFile.put()
+    testScapesFile = ScapesFile()
+    testScapesFile.author = users.get_current_user()
+    testScapesFile.put()
 
-    queryResults = File.query().fetch(2)
-    actualFile = queryResults[0]
+    queryResults = ScapesFile.query().fetch(2)
+    actualScapesFile = queryResults[0]
 
-    self.assertEqual('test@example.com', actualFile.author.email())
+    self.assertEqual('test@example.com', actualScapesFile.author.email())
 
   def testListOfId(self):
-    testFile = File()
-    testFile.list_of_id = 'id1, id2, id3, id4, id5'
-    testFile.put()
+    testScapesFile = ScapesFile()
+    testScapesFile.list_of_id = 'id1, id2, id3, id4, id5'
+    testScapesFile.put()
 
-    queryResults = File.query().fetch(2)
-    actualFile = queryResults[0]
+    queryResults = ScapesFile.query().fetch(2)
+    actualScapesFile = queryResults[0]
 
-    self.assertEqual('id1, id2, id3, id4, id5', actualFile.list_of_id)
+    self.assertEqual('id1, id2, id3, id4, id5', actualScapesFile.list_of_id)
 
   def testDate(self):
-    testFile = File()
-    testFile.date = datetime(2014, 4, 20)
-    testFile.put()
+    testScapesFile = ScapesFile()
+    testScapesFile.date = datetime(2014, 4, 20)
+    testScapesFile.put()
 
-    queryResults = File.query().fetch(2)
-    actualFile = queryResults[0]
+    queryResults = ScapesFile.query().fetch(2)
+    actualScapesFile = queryResults[0]
 
-    self.assertEqual(datetime(2014, 4, 20), actualFile.date)
+    self.assertEqual(datetime(2014, 4, 20), actualScapesFile.date)
 
 if __name__ == '__main__':
   unittest.main()
