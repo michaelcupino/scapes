@@ -1,31 +1,9 @@
 #!/usr/bin/env python
-#
-# Copyright 2011 Google Inc.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
 
-""" This is a sample application that tests the MapReduce API.
+""" SCAPES app. Analyzes a list of google documents.
 
-It does so by allowing users to upload a zip file containing plaintext files
-and perform some kind of analysis upon it. Currently three types of MapReduce
-jobs can be run over user-supplied input data: a WordCount MR that reports the
-number of occurrences of each word, an Index MR that reports which file(s) each
-word in the input corpus comes from, and a Phrase MR that finds statistically
-improbably phrases for a given input file (this requires many input files in the
-zip file to attain higher accuracies)."""
-
-__author__ = """aizatsky@google.com (Mike Aizatsky), cbunch@google.com (Chris
-Bunch)"""
+bit.ly/scapescode
+bit.ly/scapeseng"""
 
 import csv
 import datetime
