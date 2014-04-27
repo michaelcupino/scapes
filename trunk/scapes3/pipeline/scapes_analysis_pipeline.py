@@ -4,9 +4,8 @@ from mapreduce import mapreduce_pipeline
 class ScapesAnalysisPipeline(base_handler.PipelineBase):
   """A pipeline to run SCAPES demo. """
 
-  def run(self, http, folder_id):
+  def run(self, mapper_data_id):
     print "\n"+"="*100, type(http), "\n", folder_id, "=" * 100
-    mapper_data_id = scapes_generate_blobstore_record(http, folder_id)
     output = yield mapreduce_pipeline.MapreducePipeline(
       "scapes_analyze",
       "main.scapes_analyze_document",
@@ -14,7 +13,7 @@ class ScapesAnalysisPipeline(base_handler.PipelineBase):
       "mapreduce.input_readers.BlobstoreLineInputReader",
       "mapreduce.output_writers.BlobstoreOutputWriter",
       mapper_params={
-        "blob_key": folder_id,
+        "blob_key": mapper_data_id,
       },
       reducer_params={
         "mime_type": "text/plain",
