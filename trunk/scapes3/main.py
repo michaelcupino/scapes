@@ -51,33 +51,6 @@ def split_into_words(s):
   return s.split()
 
 
-def send_email():
-    """Sends an email."""
-    
-    # TODO(tbawaz): Send a hardcoded email.
-    
-    # makes a temp file for csv writer
-    csvFile = tempfile.TemporaryFile()
-    writer = csv.writer(csvFile)
-    
-    values = [['Date', 'Time']]
-    writer.writerows(values)
-    csvFile.seek(0)
-    csvFileBytes = csvFile.read()
-    
-    # ensure it is a plain byte string
-    csvFileBytes = bytes(csvFileBytes)
-    csvFile.close()
-    
-    mail.send_mail(sender = "Scapes Robot <robot@scapes-uci.appspotmail.com>",
-              to = "Tristan Biles <tbawaz@gmail.com>",
-              subject = "Getting through the first sprint",
-              body = """
-              Testing the mail.send_mail() function over the mail.EmailMessage()
-                                """, 
-                          attachments = [("csvTempFile.csv",csvFileBytes)])
-    logging.info("value of my csv is %s", csvFileBytes)
-
 def word_count_map(data):
   """Word count map function."""
   (entry, text_fn) = data
@@ -87,12 +60,6 @@ def word_count_map(data):
   for s in split_into_sentences(text):
     for w in split_into_words(s.lower()):
       yield (w, "")
-
-
-def word_count_reduce(key, values):
-  send_email()
-  """Word count reduce function."""
-  yield "%s: %d\n" % (key, len(values))
 
 
 app = webapp2.WSGIApplication(
