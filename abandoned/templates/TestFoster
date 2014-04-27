@@ -1,4 +1,0 @@
-{% extends "templates/defaultLayout.html" %}
-{% block content %}
-  <a href="{{ approvalPageUrl }}">Authorize the SCAPES app to Google Docs access</a>
-{% endblock %}
