@@ -161,33 +161,6 @@ class StoreOutput(base_handler.PipelineBase):
       m.wordcount_link = output[0]
 
     m.put()
-    
-class UploadHandler(blobstore_handlers.BlobstoreUploadHandler):
-  """Handler to upload data to blobstore."""
-
-  def post(self):
-    source = "uploaded by user"
-    upload_files = self.get_uploads("file")
-    blob_key = upload_files[0].key()
-    name = self.request.get("name")
-
-    user = users.get_current_user()
-
-    username = user.nickname()
-    date = datetime.datetime.now()
-    str_blob_key = str(blob_key)
-    key = FileMetadata.getKeyName(username, date, str_blob_key)
-
-    m = FileMetadata(key_name = key)
-    m.owner = user
-    m.filename = name
-    m.uploadedOn = date
-    m.source = source
-    m.blobkey = str_blob_key
-    m.put()
-
-    self.redirect("/")
-
 
 class DownloadHandler(blobstore_handlers.BlobstoreDownloadHandler):
   """Handler to download blob by blobkey."""
@@ -202,7 +175,6 @@ class DownloadHandler(blobstore_handlers.BlobstoreDownloadHandler):
 app = webapp2.WSGIApplication(
     [
         ('/', IndexHandler),
-        ('/upload', UploadHandler),
         (r'/blobstore/(.*)', DownloadHandler),
         (config.decorator.callback_path, config.decorator.callback_handler()),
     ],
