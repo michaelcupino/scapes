@@ -1,7 +1,7 @@
 from apiclient import errors, discovery
 from google.appengine.ext.webapp.util import login_required
 from oauth2client import appengine, client
-import os, jinja2, webapp2, httplib2
+import os, jinja2, webapp2
 
 from service import config
 
