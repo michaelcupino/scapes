@@ -11,20 +11,6 @@ from google.appengine.ext import ndb,db
 
 import webapp2
 
-DEFAULT_FOLDER_NAME = 'default_folder'
-
-
-# We set a parent key on the 'Greetings' to ensure that they are all in the same
-# entity group. Queries across the single entity group will be consistent.
-# However, the write rate should be limited to ~1/second.
-
-def folder_key(title,folder_name=DEFAULT_FOLDER_NAME):
-    """Constructs a Datastore key for a folder entity with folder_name."""
-    #parameter order is reversed because of kwargs necessities :(
-    #i dont use this atm
-    return ndb.Key('Folder', folder_name,'File',title)
-
-
 class File(ndb.Model):
     """Models an individual File entry with author, content and date."""
     author = ndb.UserProperty()
