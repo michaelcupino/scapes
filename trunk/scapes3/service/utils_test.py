@@ -17,12 +17,44 @@ class UtilsTest(unittest.TestCase):
     self.testbed.deactivate()
 
   def testSplitIntoSentences(self):
-    # TODO(michaelcupino): Actuall test this
-    self.assertEqual(1, 1 + 0)
+    sample_battery = {
+      "hahahahahaha" : [
+        'hahahahahaha'
+      ],
+      "!!!a.// }{  //.b??" : [
+        '', '', '', 'a', '// }{ //', 'b', '', ''
+      ],
+      "Well... I'd say!" : [
+        'Well', '', '', " I'd say", ''
+      ],
+      "Hamster Huey, and the Gooey Kablooey" : [
+        'Hamster Huey, and the Gooey Kablooey'
+      ]
+    }
+    for key in sample_battery:
+      result = utils.split_into_sentences(key)
+      expected = sample_battery[key]
+      self.assertEqual(result, expected)
 
   def testSplitIntoWords(self):
-    # TODO(michaelcupino): Actuall test this
-    self.assertEqual(1, 1 + 0)
+    sample_battery = {
+      "hahahahahaha" : [
+        'hahahahahaha'
+      ],
+      "Oh, look! A test!" : [
+        'Oh', 'look', 'A', 'test'
+      ],
+      " a  b     c d \t \n r \r d" : [
+        'a', 'b', 'c', 'd', 'r', 'd'
+      ],
+      "a.,b}{c\"dd*d+" : [
+        'a', 'b', 'c', 'dd', 'd'
+      ]
+    }
+    for key in sample_battery:
+      result = utils.split_into_words(key)
+      expected = sample_battery[key]
+      self.assertEqual(result, expected)
 
   def testscapesWriteToBlobstore(self):
     # TODO(michaelcupino): Actuall test this

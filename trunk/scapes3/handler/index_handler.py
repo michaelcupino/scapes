@@ -6,6 +6,7 @@ from google.appengine.ext import blobstore
 from google.appengine.ext.webapp.util import login_required
 from model.file_metadata import FileMetadata
 from pipeline.scapes_analysis_pipeline import ScapesAnalysisPipeline
+from 
 from service import config
 
 class IndexHandler(webapp2.RequestHandler):
@@ -46,7 +47,8 @@ class IndexHandler(webapp2.RequestHandler):
     folder_id = self.request.get("scapes_folder_id")
     if self.request.get("scapes_folder"):
       print "\n"+"*"*100, type(http), "\n", folder_id, "*" * 100
-      pipeline = ScapesAnalysisPipeline(http, folder_id)
+      mapper_data_id = scapes_generate_blobstore_record(http, folder_id)
+      pipeline = ScapesAnalysisPipeline(mapper_data_id)
 
     pipeline.start()
     self.redirect(pipeline.base_path + "/status?root=" + pipeline.pipeline_id)

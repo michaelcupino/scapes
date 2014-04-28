@@ -9,7 +9,7 @@ class ScapesAnalysisPipeline(base_handler.PipelineBase):
   """A pipeline to run SCAPES demo. """
 
   def run(self, mapper_data_id):
-    print "\n"+"="*100, type(http), "\n", folder_id, "=" * 100
+    # print "\n"+"="*100, type(http), "\n", folder_id, "=" * 100
     output = yield mapreduce_pipeline.MapreducePipeline(
       "scapes_analyze",
       "service.utils.scapes_analyze_document",
