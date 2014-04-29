@@ -6,7 +6,6 @@ from google.appengine.ext import blobstore
 from google.appengine.ext.webapp.util import login_required
 from model.file_metadata import FileMetadata
 from pipeline.scapes_analysis_pipeline import ScapesAnalysisPipeline
-from 
 from service import config
 
 class IndexHandler(webapp2.RequestHandler):
