@@ -35,10 +35,12 @@ class MailMapReduceHandlerTest(unittest.TestCase):
 
     response = self.testapp.get('/emailmr')
 
-    mockEmailPipelineConstructor.assert_called_with('test@example.com')
+    mockEmailPipelineConstructor.assert_called_with('test@example.com',
+        'Hello from SCAPES', ('This message was sent from the EmailPipeline '
+        'map reduce job.'))
     mockEmailPipelineStartMethod.assert_called_with()
-    self.assertEqual(('Map reduce job has been started. Email will be sent '
-        'soon.'), response.body)
+    self.assertEqual(('Map reduce job has been started. An email will be '
+        'sent to test@example.com.'), response.body)
 
 if __name__ == '__main__':
   unittest.main()

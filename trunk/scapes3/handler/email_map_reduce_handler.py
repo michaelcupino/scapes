@@ -11,8 +11,10 @@ class EmailMapReduceHandler(webapp2.RequestHandler):
   @login_required
   def get(self):
     toEmail = users.get_current_user().email()
-    pipeline = EmailPipeline(toEmail)
+    subject = 'Hello from SCAPES'
+    body = 'This message was sent from the EmailPipeline map reduce job.'
+    pipeline = EmailPipeline(toEmail, subject, body)
     pipeline.start()
-    self.response.write(('Map reduce job has been started. Email will be sent '
-        'soon.'))
+    self.response.write(('Map reduce job has been started. An email will be '
+        'sent to %s.' % toEmail))
 

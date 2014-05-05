@@ -1,0 +1,314 @@
+{
+ "kind": "drive#revisionList",
+ "etag": "\"CVruBPpttIFUljWWlrzTkP_WMTQ/Lggf7539_iCNR1hpoApLYuGXANs\"",
+ "selfLink": "https://content.googleapis.com/drive/v2/files/1Duz2yYSTSgdWQhTgEJ3zPELKTHS3WGhPVLQk1PDJm3Q/revisions",
+ "items": [
+  {
+   "kind": "drive#revision",
+   "etag": "\"CVruBPpttIFUljWWlrzTkP_WMTQ/SNX2Y4w6YdDM6BzkAwCk327fvlo\"",
+   "id": "697",
+   "selfLink": "https://content.googleapis.com/drive/v2/files/1Duz2yYSTSgdWQhTgEJ3zPELKTHS3WGhPVLQk1PDJm3Q/revisions/697",
+   "mimeType": "application/vnd.google-apps.document",
+   "modifiedDate": "2014-03-15T17:49:32.768Z",
+   "published": false,
+   "exportLinks": {
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document": "https://docs.google.com/feeds/download/documents/export/Export?id=1Duz2yYSTSgdWQhTgEJ3zPELKTHS3WGhPVLQk1PDJm3Q&revision=697&exportFormat=docx",
+    "application/vnd.oasis.opendocument.text": "https://docs.google.com/feeds/download/documents/export/Export?id=1Duz2yYSTSgdWQhTgEJ3zPELKTHS3WGhPVLQk1PDJm3Q&revision=697&exportFormat=odt",
+    "text/html": "https://docs.google.com/feeds/download/documents/export/Export?id=1Duz2yYSTSgdWQhTgEJ3zPELKTHS3WGhPVLQk1PDJm3Q&revision=697&exportFormat=html",
+    "application/rtf": "https://docs.google.com/feeds/download/documents/export/Export?id=1Duz2yYSTSgdWQhTgEJ3zPELKTHS3WGhPVLQk1PDJm3Q&revision=697&exportFormat=rtf",
+    "text/plain": "https://docs.google.com/feeds/download/documents/export/Export?id=1Duz2yYSTSgdWQhTgEJ3zPELKTHS3WGhPVLQk1PDJm3Q&revision=697&exportFormat=txt",
+    "application/pdf": "https://docs.google.com/feeds/download/documents/export/Export?id=1Duz2yYSTSgdWQhTgEJ3zPELKTHS3WGhPVLQk1PDJm3Q&revision=697&exportFormat=pdf"
+   },
+   "lastModifyingUserName": "Jonathan H",
+   "lastModifyingUser": {
+    "kind": "drive#user",
+    "displayName": "Jonathan H",
+    "picture": {
+     "url": "https://lh6.googleusercontent.com/-1J9VIvYmPHs/AAAAAAAAAAI/AAAAAAAAAn0/cKlcBroiZko/s64/photo.jpg"
+    },
+    "isAuthenticatedUser": false,
+    "permissionId": "12397605487334956914",
+    "emailAddress": "pythonnut@gmail.com"
+   }
+  },
+  {
+   "kind": "drive#revision",
+   "etag": "\"CVruBPpttIFUljWWlrzTkP_WMTQ/VStOJOkLoDW6q-UndGP-LFWf_o8\"",
+   "id": "698",
+   "selfLink": "https://content.googleapis.com/drive/v2/files/1Duz2yYSTSgdWQhTgEJ3zPELKTHS3WGhPVLQk1PDJm3Q/revisions/698",
+   "mimeType": "application/vnd.google-apps.document",
+   "modifiedDate": "2014-03-15T17:49:35.114Z",
+   "published": false,
+   "exportLinks": {
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document": "https://docs.google.com/feeds/download/documents/export/Export?id=1Duz2yYSTSgdWQhTgEJ3zPELKTHS3WGhPVLQk1PDJm3Q&revision=698&exportFormat=docx",
+    "application/vnd.oasis.opendocument.text": "https://docs.google.com/feeds/download/documents/export/Export?id=1Duz2yYSTSgdWQhTgEJ3zPELKTHS3WGhPVLQk1PDJm3Q&revision=698&exportFormat=odt",
+    "text/html": "https://docs.google.com/feeds/download/documents/export/Export?id=1Duz2yYSTSgdWQhTgEJ3zPELKTHS3WGhPVLQk1PDJm3Q&revision=698&exportFormat=html",
+    "application/rtf": "https://docs.google.com/feeds/download/documents/export/Export?id=1Duz2yYSTSgdWQhTgEJ3zPELKTHS3WGhPVLQk1PDJm3Q&revision=698&exportFormat=rtf",
+    "text/plain": "https://docs.google.com/feeds/download/documents/export/Export?id=1Duz2yYSTSgdWQhTgEJ3zPELKTHS3WGhPVLQk1PDJm3Q&revision=698&exportFormat=txt",
+    "application/pdf": "https://docs.google.com/feeds/download/documents/export/Export?id=1Duz2yYSTSgdWQhTgEJ3zPELKTHS3WGhPVLQk1PDJm3Q&revision=698&exportFormat=pdf"
+   },
+   "lastModifyingUserName": "Jonathan H",
+   "lastModifyingUser": {
+    "kind": "drive#user",
+    "displayName": "Jonathan H",
+    "picture": {
+     "url": "https://lh6.googleusercontent.com/-1J9VIvYmPHs/AAAAAAAAAAI/AAAAAAAAAn0/cKlcBroiZko/s64/photo.jpg"
+    },
+    "isAuthenticatedUser": false,
+    "permissionId": "12397605487334956914",
+    "emailAddress": "pythonnut@gmail.com"
+   }
+  },
+  {
+   "kind": "drive#revision",
+   "etag": "\"CVruBPpttIFUljWWlrzTkP_WMTQ/eDPuWX7JZJhC4waVn5BaHtajNY8\"",
+   "id": "868",
+   "selfLink": "https://content.googleapis.com/drive/v2/files/1Duz2yYSTSgdWQhTgEJ3zPELKTHS3WGhPVLQk1PDJm3Q/revisions/868",
+   "mimeType": "application/vnd.google-apps.document",
+   "modifiedDate": "2014-03-15T17:51:22.771Z",
+   "published": false,
+   "exportLinks": {
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document": "https://docs.google.com/feeds/download/documents/export/Export?id=1Duz2yYSTSgdWQhTgEJ3zPELKTHS3WGhPVLQk1PDJm3Q&revision=868&exportFormat=docx",
+    "application/vnd.oasis.opendocument.text": "https://docs.google.com/feeds/download/documents/export/Export?id=1Duz2yYSTSgdWQhTgEJ3zPELKTHS3WGhPVLQk1PDJm3Q&revision=868&exportFormat=odt",
+    "text/html": "https://docs.google.com/feeds/download/documents/export/Export?id=1Duz2yYSTSgdWQhTgEJ3zPELKTHS3WGhPVLQk1PDJm3Q&revision=868&exportFormat=html",
+    "application/rtf": "https://docs.google.com/feeds/download/documents/export/Export?id=1Duz2yYSTSgdWQhTgEJ3zPELKTHS3WGhPVLQk1PDJm3Q&revision=868&exportFormat=rtf",
+    "text/plain": "https://docs.google.com/feeds/download/documents/export/Export?id=1Duz2yYSTSgdWQhTgEJ3zPELKTHS3WGhPVLQk1PDJm3Q&revision=868&exportFormat=txt",
+    "application/pdf": "https://docs.google.com/feeds/download/documents/export/Export?id=1Duz2yYSTSgdWQhTgEJ3zPELKTHS3WGhPVLQk1PDJm3Q&revision=868&exportFormat=pdf"
+   },
+   "lastModifyingUserName": "Jonathan H",
+   "lastModifyingUser": {
+    "kind": "drive#user",
+    "displayName": "Jonathan H",
+    "picture": {
+     "url": "https://lh6.googleusercontent.com/-1J9VIvYmPHs/AAAAAAAAAAI/AAAAAAAAAn0/cKlcBroiZko/s64/photo.jpg"
+    },
+    "isAuthenticatedUser": false,
+    "permissionId": "12397605487334956914",
+    "emailAddress": "pythonnut@gmail.com"
+   }
+  },
+  {
+   "kind": "drive#revision",
+   "etag": "\"CVruBPpttIFUljWWlrzTkP_WMTQ/yuLL07ZdngT0X34v1set992GG0M\"",
+   "id": "869",
+   "selfLink": "https://content.googleapis.com/drive/v2/files/1Duz2yYSTSgdWQhTgEJ3zPELKTHS3WGhPVLQk1PDJm3Q/revisions/869",
+   "mimeType": "application/vnd.google-apps.document",
+   "modifiedDate": "2014-03-15T17:51:22.897Z",
+   "published": false,
+   "exportLinks": {
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document": "https://docs.google.com/feeds/download/documents/export/Export?id=1Duz2yYSTSgdWQhTgEJ3zPELKTHS3WGhPVLQk1PDJm3Q&revision=869&exportFormat=docx",
+    "application/vnd.oasis.opendocument.text": "https://docs.google.com/feeds/download/documents/export/Export?id=1Duz2yYSTSgdWQhTgEJ3zPELKTHS3WGhPVLQk1PDJm3Q&revision=869&exportFormat=odt",
+    "text/html": "https://docs.google.com/feeds/download/documents/export/Export?id=1Duz2yYSTSgdWQhTgEJ3zPELKTHS3WGhPVLQk1PDJm3Q&revision=869&exportFormat=html",
+    "application/rtf": "https://docs.google.com/feeds/download/documents/export/Export?id=1Duz2yYSTSgdWQhTgEJ3zPELKTHS3WGhPVLQk1PDJm3Q&revision=869&exportFormat=rtf",
+    "text/plain": "https://docs.google.com/feeds/download/documents/export/Export?id=1Duz2yYSTSgdWQhTgEJ3zPELKTHS3WGhPVLQk1PDJm3Q&revision=869&exportFormat=txt",
+    "application/pdf": "https://docs.google.com/feeds/download/documents/export/Export?id=1Duz2yYSTSgdWQhTgEJ3zPELKTHS3WGhPVLQk1PDJm3Q&revision=869&exportFormat=pdf"
+   },
+   "lastModifyingUserName": "Jonathan H",
+   "lastModifyingUser": {
+    "kind": "drive#user",
+    "displayName": "Jonathan H",
+    "picture": {
+     "url": "https://lh6.googleusercontent.com/-1J9VIvYmPHs/AAAAAAAAAAI/AAAAAAAAAn0/cKlcBroiZko/s64/photo.jpg"
+    },
+    "isAuthenticatedUser": false,
+    "permissionId": "12397605487334956914",
+    "emailAddress": "pythonnut@gmail.com"
+   }
+  },
+  {
+   "kind": "drive#revision",
+   "etag": "\"CVruBPpttIFUljWWlrzTkP_WMTQ/TcfNloIVIeMyJSPwu2u-hNMz5E0\"",
+   "id": "937",
+   "selfLink": "https://content.googleapis.com/drive/v2/files/1Duz2yYSTSgdWQhTgEJ3zPELKTHS3WGhPVLQk1PDJm3Q/revisions/937",
+   "mimeType": "application/vnd.google-apps.document",
+   "modifiedDate": "2014-03-15T17:53:52.351Z",
+   "published": false,
+   "exportLinks": {
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document": "https://docs.google.com/feeds/download/documents/export/Export?id=1Duz2yYSTSgdWQhTgEJ3zPELKTHS3WGhPVLQk1PDJm3Q&revision=937&exportFormat=docx",
+    "application/vnd.oasis.opendocument.text": "https://docs.google.com/feeds/download/documents/export/Export?id=1Duz2yYSTSgdWQhTgEJ3zPELKTHS3WGhPVLQk1PDJm3Q&revision=937&exportFormat=odt",
+    "text/html": "https://docs.google.com/feeds/download/documents/export/Export?id=1Duz2yYSTSgdWQhTgEJ3zPELKTHS3WGhPVLQk1PDJm3Q&revision=937&exportFormat=html",
+    "application/rtf": "https://docs.google.com/feeds/download/documents/export/Export?id=1Duz2yYSTSgdWQhTgEJ3zPELKTHS3WGhPVLQk1PDJm3Q&revision=937&exportFormat=rtf",
+    "text/plain": "https://docs.google.com/feeds/download/documents/export/Export?id=1Duz2yYSTSgdWQhTgEJ3zPELKTHS3WGhPVLQk1PDJm3Q&revision=937&exportFormat=txt",
+    "application/pdf": "https://docs.google.com/feeds/download/documents/export/Export?id=1Duz2yYSTSgdWQhTgEJ3zPELKTHS3WGhPVLQk1PDJm3Q&revision=937&exportFormat=pdf"
+   },
+   "lastModifyingUserName": "Jonathan H",
+   "lastModifyingUser": {
+    "kind": "drive#user",
+    "displayName": "Jonathan H",
+    "picture": {
+     "url": "https://lh6.googleusercontent.com/-1J9VIvYmPHs/AAAAAAAAAAI/AAAAAAAAAn0/cKlcBroiZko/s64/photo.jpg"
+    },
+    "isAuthenticatedUser": false,
+    "permissionId": "12397605487334956914",
+    "emailAddress": "pythonnut@gmail.com"
+   }
+  },
+  {
+   "kind": "drive#revision",
+   "etag": "\"CVruBPpttIFUljWWlrzTkP_WMTQ/f9u3kDPqgMosfuhL97itQKLBaww\"",
+   "id": "939",
+   "selfLink": "https://content.googleapis.com/drive/v2/files/1Duz2yYSTSgdWQhTgEJ3zPELKTHS3WGhPVLQk1PDJm3Q/revisions/939",
+   "mimeType": "application/vnd.google-apps.document",
+   "modifiedDate": "2014-03-15T17:54:40.777Z",
+   "published": false,
+   "exportLinks": {
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document": "https://docs.google.com/feeds/download/documents/export/Export?id=1Duz2yYSTSgdWQhTgEJ3zPELKTHS3WGhPVLQk1PDJm3Q&revision=939&exportFormat=docx",
+    "application/vnd.oasis.opendocument.text": "https://docs.google.com/feeds/download/documents/export/Export?id=1Duz2yYSTSgdWQhTgEJ3zPELKTHS3WGhPVLQk1PDJm3Q&revision=939&exportFormat=odt",
+    "text/html": "https://docs.google.com/feeds/download/documents/export/Export?id=1Duz2yYSTSgdWQhTgEJ3zPELKTHS3WGhPVLQk1PDJm3Q&revision=939&exportFormat=html",
+    "application/rtf": "https://docs.google.com/feeds/download/documents/export/Export?id=1Duz2yYSTSgdWQhTgEJ3zPELKTHS3WGhPVLQk1PDJm3Q&revision=939&exportFormat=rtf",
+    "text/plain": "https://docs.google.com/feeds/download/documents/export/Export?id=1Duz2yYSTSgdWQhTgEJ3zPELKTHS3WGhPVLQk1PDJm3Q&revision=939&exportFormat=txt",
+    "application/pdf": "https://docs.google.com/feeds/download/documents/export/Export?id=1Duz2yYSTSgdWQhTgEJ3zPELKTHS3WGhPVLQk1PDJm3Q&revision=939&exportFormat=pdf"
+   },
+   "lastModifyingUserName": "Jonathan H",
+   "lastModifyingUser": {
+    "kind": "drive#user",
+    "displayName": "Jonathan H",
+    "picture": {
+     "url": "https://lh6.googleusercontent.com/-1J9VIvYmPHs/AAAAAAAAAAI/AAAAAAAAAn0/cKlcBroiZko/s64/photo.jpg"
+    },
+    "isAuthenticatedUser": false,
+    "permissionId": "12397605487334956914",
+    "emailAddress": "pythonnut@gmail.com"
+   }
+  },
+  {
+   "kind": "drive#revision",
+   "etag": "\"CVruBPpttIFUljWWlrzTkP_WMTQ/PSMRp-J10sBskX0onIRjemyvy0I\"",
+   "id": "1035",
+   "selfLink": "https://content.googleapis.com/drive/v2/files/1Duz2yYSTSgdWQhTgEJ3zPELKTHS3WGhPVLQk1PDJm3Q/revisions/1035",
+   "mimeType": "application/vnd.google-apps.document",
+   "modifiedDate": "2014-03-15T18:01:00.673Z",
+   "published": false,
+   "exportLinks": {
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document": "https://docs.google.com/feeds/download/documents/export/Export?id=1Duz2yYSTSgdWQhTgEJ3zPELKTHS3WGhPVLQk1PDJm3Q&revision=1035&exportFormat=docx",
+    "application/vnd.oasis.opendocument.text": "https://docs.google.com/feeds/download/documents/export/Export?id=1Duz2yYSTSgdWQhTgEJ3zPELKTHS3WGhPVLQk1PDJm3Q&revision=1035&exportFormat=odt",
+    "text/html": "https://docs.google.com/feeds/download/documents/export/Export?id=1Duz2yYSTSgdWQhTgEJ3zPELKTHS3WGhPVLQk1PDJm3Q&revision=1035&exportFormat=html",
+    "application/rtf": "https://docs.google.com/feeds/download/documents/export/Export?id=1Duz2yYSTSgdWQhTgEJ3zPELKTHS3WGhPVLQk1PDJm3Q&revision=1035&exportFormat=rtf",
+    "text/plain": "https://docs.google.com/feeds/download/documents/export/Export?id=1Duz2yYSTSgdWQhTgEJ3zPELKTHS3WGhPVLQk1PDJm3Q&revision=1035&exportFormat=txt",
+    "application/pdf": "https://docs.google.com/feeds/download/documents/export/Export?id=1Duz2yYSTSgdWQhTgEJ3zPELKTHS3WGhPVLQk1PDJm3Q&revision=1035&exportFormat=pdf"
+   },
+   "lastModifyingUserName": "Jonathan H",
+   "lastModifyingUser": {
+    "kind": "drive#user",
+    "displayName": "Jonathan H",
+    "picture": {
+     "url": "https://lh6.googleusercontent.com/-1J9VIvYmPHs/AAAAAAAAAAI/AAAAAAAAAn0/cKlcBroiZko/s64/photo.jpg"
+    },
+    "isAuthenticatedUser": false,
+    "permissionId": "12397605487334956914",
+    "emailAddress": "pythonnut@gmail.com"
+   }
+  },
+  {
+   "kind": "drive#revision",
+   "etag": "\"CVruBPpttIFUljWWlrzTkP_WMTQ/RUWUdMLhlWeQuulSRfJlFymw69M\"",
+   "id": "1036",
+   "selfLink": "https://content.googleapis.com/drive/v2/files/1Duz2yYSTSgdWQhTgEJ3zPELKTHS3WGhPVLQk1PDJm3Q/revisions/1036",
+   "mimeType": "application/vnd.google-apps.document",
+   "modifiedDate": "2014-03-15T18:03:15.820Z",
+   "published": false,
+   "exportLinks": {
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document": "https://docs.google.com/feeds/download/documents/export/Export?id=1Duz2yYSTSgdWQhTgEJ3zPELKTHS3WGhPVLQk1PDJm3Q&revision=1036&exportFormat=docx",
+    "application/vnd.oasis.opendocument.text": "https://docs.google.com/feeds/download/documents/export/Export?id=1Duz2yYSTSgdWQhTgEJ3zPELKTHS3WGhPVLQk1PDJm3Q&revision=1036&exportFormat=odt",
+    "text/html": "https://docs.google.com/feeds/download/documents/export/Export?id=1Duz2yYSTSgdWQhTgEJ3zPELKTHS3WGhPVLQk1PDJm3Q&revision=1036&exportFormat=html",
+    "application/rtf": "https://docs.google.com/feeds/download/documents/export/Export?id=1Duz2yYSTSgdWQhTgEJ3zPELKTHS3WGhPVLQk1PDJm3Q&revision=1036&exportFormat=rtf",
+    "text/plain": "https://docs.google.com/feeds/download/documents/export/Export?id=1Duz2yYSTSgdWQhTgEJ3zPELKTHS3WGhPVLQk1PDJm3Q&revision=1036&exportFormat=txt",
+    "application/pdf": "https://docs.google.com/feeds/download/documents/export/Export?id=1Duz2yYSTSgdWQhTgEJ3zPELKTHS3WGhPVLQk1PDJm3Q&revision=1036&exportFormat=pdf"
+   },
+   "lastModifyingUserName": "Jonathan H",
+   "lastModifyingUser": {
+    "kind": "drive#user",
+    "displayName": "Jonathan H",
+    "picture": {
+     "url": "https://lh6.googleusercontent.com/-1J9VIvYmPHs/AAAAAAAAAAI/AAAAAAAAAn0/cKlcBroiZko/s64/photo.jpg"
+    },
+    "isAuthenticatedUser": false,
+    "permissionId": "12397605487334956914",
+    "emailAddress": "pythonnut@gmail.com"
+   }
+  },
+  {
+   "kind": "drive#revision",
+   "etag": "\"CVruBPpttIFUljWWlrzTkP_WMTQ/aTpYN8a1PU_ev7ldveP8QWKBofs\"",
+   "id": "1048",
+   "selfLink": "https://content.googleapis.com/drive/v2/files/1Duz2yYSTSgdWQhTgEJ3zPELKTHS3WGhPVLQk1PDJm3Q/revisions/1048",
+   "mimeType": "application/vnd.google-apps.document",
+   "modifiedDate": "2014-03-15T18:48:54.294Z",
+   "published": false,
+   "exportLinks": {
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document": "https://docs.google.com/feeds/download/documents/export/Export?id=1Duz2yYSTSgdWQhTgEJ3zPELKTHS3WGhPVLQk1PDJm3Q&revision=1048&exportFormat=docx",
+    "application/vnd.oasis.opendocument.text": "https://docs.google.com/feeds/download/documents/export/Export?id=1Duz2yYSTSgdWQhTgEJ3zPELKTHS3WGhPVLQk1PDJm3Q&revision=1048&exportFormat=odt",
+    "text/html": "https://docs.google.com/feeds/download/documents/export/Export?id=1Duz2yYSTSgdWQhTgEJ3zPELKTHS3WGhPVLQk1PDJm3Q&revision=1048&exportFormat=html",
+    "application/rtf": "https://docs.google.com/feeds/download/documents/export/Export?id=1Duz2yYSTSgdWQhTgEJ3zPELKTHS3WGhPVLQk1PDJm3Q&revision=1048&exportFormat=rtf",
+    "text/plain": "https://docs.google.com/feeds/download/documents/export/Export?id=1Duz2yYSTSgdWQhTgEJ3zPELKTHS3WGhPVLQk1PDJm3Q&revision=1048&exportFormat=txt",
+    "application/pdf": "https://docs.google.com/feeds/download/documents/export/Export?id=1Duz2yYSTSgdWQhTgEJ3zPELKTHS3WGhPVLQk1PDJm3Q&revision=1048&exportFormat=pdf"
+   },
+   "lastModifyingUserName": "Jonathan H",
+   "lastModifyingUser": {
+    "kind": "drive#user",
+    "displayName": "Jonathan H",
+    "picture": {
+     "url": "https://lh6.googleusercontent.com/-1J9VIvYmPHs/AAAAAAAAAAI/AAAAAAAAAn0/cKlcBroiZko/s64/photo.jpg"
+    },
+    "isAuthenticatedUser": false,
+    "permissionId": "12397605487334956914",
+    "emailAddress": "pythonnut@gmail.com"
+   }
+  },
+  {
+   "kind": "drive#revision",
+   "etag": "\"CVruBPpttIFUljWWlrzTkP_WMTQ/sYEE_uwhOnuGz4eXP8gKVPZ7fO8\"",
+   "id": "1049",
+   "selfLink": "https://content.googleapis.com/drive/v2/files/1Duz2yYSTSgdWQhTgEJ3zPELKTHS3WGhPVLQk1PDJm3Q/revisions/1049",
+   "mimeType": "application/vnd.google-apps.document",
+   "modifiedDate": "2014-03-15T18:54:31.197Z",
+   "published": false,
+   "exportLinks": {
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document": "https://docs.google.com/feeds/download/documents/export/Export?id=1Duz2yYSTSgdWQhTgEJ3zPELKTHS3WGhPVLQk1PDJm3Q&revision=1049&exportFormat=docx",
+    "application/vnd.oasis.opendocument.text": "https://docs.google.com/feeds/download/documents/export/Export?id=1Duz2yYSTSgdWQhTgEJ3zPELKTHS3WGhPVLQk1PDJm3Q&revision=1049&exportFormat=odt",
+    "text/html": "https://docs.google.com/feeds/download/documents/export/Export?id=1Duz2yYSTSgdWQhTgEJ3zPELKTHS3WGhPVLQk1PDJm3Q&revision=1049&exportFormat=html",
+    "application/rtf": "https://docs.google.com/feeds/download/documents/export/Export?id=1Duz2yYSTSgdWQhTgEJ3zPELKTHS3WGhPVLQk1PDJm3Q&revision=1049&exportFormat=rtf",
+    "text/plain": "https://docs.google.com/feeds/download/documents/export/Export?id=1Duz2yYSTSgdWQhTgEJ3zPELKTHS3WGhPVLQk1PDJm3Q&revision=1049&exportFormat=txt",
+    "application/pdf": "https://docs.google.com/feeds/download/documents/export/Export?id=1Duz2yYSTSgdWQhTgEJ3zPELKTHS3WGhPVLQk1PDJm3Q&revision=1049&exportFormat=pdf"
+   },
+   "lastModifyingUserName": "tbawaz",
+   "lastModifyingUser": {
+    "kind": "drive#user",
+    "displayName": "tbawaz",
+    "picture": {
+     "url": "https://lh3.googleusercontent.com/-gIH9Qpcn6qQ/AAAAAAAAAAI/AAAAAAAAAGs/sThJGq_iNpg/s64/photo.jpg"
+    },
+    "isAuthenticatedUser": false,
+    "permissionId": "12792405828965268933"
+   }
+  },
+  {
+   "kind": "drive#revision",
+   "etag": "\"CVruBPpttIFUljWWlrzTkP_WMTQ/Fr7_XEOS17pyhJ1C22iuRvCNYzs\"",
+   "id": "1057",
+   "selfLink": "https://content.googleapis.com/drive/v2/files/1Duz2yYSTSgdWQhTgEJ3zPELKTHS3WGhPVLQk1PDJm3Q/revisions/1057",
+   "mimeType": "application/vnd.google-apps.document",
+   "modifiedDate": "2014-03-15T21:04:33.362Z",
+   "published": false,
+   "exportLinks": {
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document": "https://docs.google.com/feeds/download/documents/export/Export?id=1Duz2yYSTSgdWQhTgEJ3zPELKTHS3WGhPVLQk1PDJm3Q&revision=1057&exportFormat=docx",
+    "application/vnd.oasis.opendocument.text": "https://docs.google.com/feeds/download/documents/export/Export?id=1Duz2yYSTSgdWQhTgEJ3zPELKTHS3WGhPVLQk1PDJm3Q&revision=1057&exportFormat=odt",
+    "text/html": "https://docs.google.com/feeds/download/documents/export/Export?id=1Duz2yYSTSgdWQhTgEJ3zPELKTHS3WGhPVLQk1PDJm3Q&revision=1057&exportFormat=html",
+    "application/rtf": "https://docs.google.com/feeds/download/documents/export/Export?id=1Duz2yYSTSgdWQhTgEJ3zPELKTHS3WGhPVLQk1PDJm3Q&revision=1057&exportFormat=rtf",
+    "text/plain": "https://docs.google.com/feeds/download/documents/export/Export?id=1Duz2yYSTSgdWQhTgEJ3zPELKTHS3WGhPVLQk1PDJm3Q&revision=1057&exportFormat=txt",
+    "application/pdf": "https://docs.google.com/feeds/download/documents/export/Export?id=1Duz2yYSTSgdWQhTgEJ3zPELKTHS3WGhPVLQk1PDJm3Q&revision=1057&exportFormat=pdf"
+   },
+   "lastModifyingUserName": "tbawaz",
+   "lastModifyingUser": {
+    "kind": "drive#user",
+    "displayName": "tbawaz",
+    "picture": {
+     "url": "https://lh3.googleusercontent.com/-gIH9Qpcn6qQ/AAAAAAAAAAI/AAAAAAAAAGs/sThJGq_iNpg/s64/photo.jpg"
+    },
+    "isAuthenticatedUser": false,
+    "permissionId": "12792405828965268933"
+   }
+  }
+ ]
+}
+

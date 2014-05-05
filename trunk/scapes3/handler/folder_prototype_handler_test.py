@@ -12,6 +12,7 @@ from model.file_model import ScapesFile
 from mock import MagicMock
 from mock import patch
 
+# TODO(michaelcupino): Move this to a test_utils package.
 def datafile(filename):
   return os.path.join(os.path.dirname(__file__), filename)
 
@@ -44,9 +45,10 @@ class FolderPrototypeHandlerTest(unittest.TestCase):
 
   @patch('service.config.decorator')
   def testGet_noNextPageToken(self, MockOauth2Decorator):
-    books_discovery = {}
+    # TODO(michaelcupino): Move test json files into a test_utils package.
     http = HttpMockSequence([
-      ({'status': '200'}, open(datafile('test-drive-children-list-4.json'), 'rb').read()),
+      ({'status': '200'}, open(datafile('test-drive-children-list-4.json'),
+          'rb').read()),
     ])
     MockOauth2Decorator.has_credentials = MagicMock(return_value=True)
     MockOauth2Decorator.http = MagicMock(return_value=http)
@@ -57,12 +59,16 @@ class FolderPrototypeHandlerTest(unittest.TestCase):
 
   @patch('service.config.decorator')
   def testGet_withNextPageToken(self, MockOauth2Decorator):
-    books_discovery = {}
+    # TODO(michaelcupino): Move test json files into a test_utils package.
     http = HttpMockSequence([
-      ({'status': '200'}, open(datafile('test-drive-children-list-0.json'), 'rb').read()),
-      ({'status': '200'}, open(datafile('test-drive-children-list-1.json'), 'rb').read()),
-      ({'status': '200'}, open(datafile('test-drive-children-list-2.json'), 'rb').read()),
-      ({'status': '200'}, open(datafile('test-drive-children-list-3.json'), 'rb').read()),
+      ({'status': '200'}, open(datafile('test-drive-children-list-0.json'),
+          'rb').read()),
+      ({'status': '200'}, open(datafile('test-drive-children-list-1.json'),
+          'rb').read()),
+      ({'status': '200'}, open(datafile('test-drive-children-list-2.json'),
+          'rb').read()),
+      ({'status': '200'}, open(datafile('test-drive-children-list-3.json'),
+          'rb').read()),
     ])
     MockOauth2Decorator.has_credentials = MagicMock(return_value=True)
     MockOauth2Decorator.http = MagicMock(return_value=http)
