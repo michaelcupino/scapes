@@ -2,7 +2,6 @@ import httplib2
 import json
 
 from mapreduce import base_handler
-from mock import patch
 from oauth2client.client import OAuth2Credentials
 from pipeline.email_pipeline import EmailPipeline
 from service import config
