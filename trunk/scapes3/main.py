@@ -14,15 +14,17 @@ from handler.folder_analysis_handler import FolderAnalysisHandler
 from handler.folder_fetcher_handler import FolderFetcherHandler
 from handler.folder_prototype_handler import FolderPrototypeHandler
 from handler.index_handler import IndexHandler
+from handler.layout_handler import LayoutHandler
 from handler.revisions_analysis_handler import RevisionsAnalysisHandler
 from service import config
 
 app = webapp2.WSGIApplication([
-    ('/', IndexHandler),
+    ('/', LayoutHandler),
     ('/document-analysis', DocumentAnalysisHandler),
     ('/emailmr', EmailMapReduceHandler),
     ('/folder-analysis', FolderAnalysisHandler),
     ('/folder-fetcher', FolderFetcherHandler),
+    ('/index', IndexHandler),
     ('/revisions-analysis', RevisionsAnalysisHandler),
     (r'/documentmr/(.*)/revisions', DocumentRevisionsMRHandler),
     (r'/folder/(.*)', FolderPrototypeHandler),
