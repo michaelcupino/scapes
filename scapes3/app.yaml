@@ -15,6 +15,10 @@ handlers:
   static_files: static/js/custom.js
   upload: static/js/custom.js
 
+- url: /js/scapes-compiled.js
+  static_files: js/scapes-compiled.js
+  upload: js/start-compiled.js
+
 - url: /mapreduce(/.*)?
   script: mapreduce.main.APP
 
