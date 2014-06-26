@@ -8,7 +8,6 @@ bit.ly/scapeseng"""
 import webapp2
 
 from handler.document_analysis_handler import DocumentAnalysisHandler
-from handler.document_revisions_mr_handler import DocumentRevisionsMRHandler
 from handler.email_map_reduce_handler import EmailMapReduceHandler
 from handler.folder_analysis_handler import FolderAnalysisHandler
 from handler.folder_fetcher_handler import FolderFetcherHandler
@@ -20,13 +19,12 @@ from service import config
 
 app = webapp2.WSGIApplication([
     ('/', LayoutHandler),
-    ('/document-analysis', DocumentAnalysisHandler),
     ('/emailmr', EmailMapReduceHandler),
     ('/folder-analysis', FolderAnalysisHandler),
     ('/folder-fetcher', FolderFetcherHandler),
     ('/index', IndexHandler),
     ('/revisions-analysis', RevisionsAnalysisHandler),
-    (r'/documentmr/(.*)/revisions', DocumentRevisionsMRHandler),
+    (r'/document-analysis/(.*)', DocumentAnalysisHandler),
     (r'/folder/(.*)', FolderPrototypeHandler),
     (config.decorator.callback_path, config.decorator.callback_handler()),
 ], debug=True)
