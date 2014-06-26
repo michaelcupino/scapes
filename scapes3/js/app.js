@@ -14,7 +14,7 @@ goog.require('scapes.hello');
  * @export
  */
 scapes.app = function() {
-  var newDiv = goog.dom.createDom('h1', null, 'Hello world!');
+  var newDiv = goog.dom.createDom('h1', null, 'Hello {{yourName}}!');
   goog.dom.appendChild(document.body, newDiv);
 
   var helloObject = new scapes.hello.HelloClass();
