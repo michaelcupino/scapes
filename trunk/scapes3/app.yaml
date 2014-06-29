@@ -23,6 +23,9 @@ handlers:
   static_files: styles/scapes.css
   upload: styles/scapes.css
 
+- url: /partials
+  static_dir: partials
+
 - url: /mapreduce(/.*)?
   script: mapreduce.main.APP
 
