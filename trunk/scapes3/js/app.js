@@ -7,6 +7,7 @@
 goog.provide('scapes.app');
 
 goog.require('goog.dom');
+goog.require('scapes.config');
 goog.require('scapes.hello');
 
 /**
@@ -25,6 +26,7 @@ scapes.app = function() {
  * Angular module for scapes.
  */
 scapes.app.module = angular.module('scapes', [
+  scapes.config.module.name,
   'ngResource'
 ]);
 
@@ -33,10 +35,11 @@ scapes.app.module = angular.module('scapes', [
 /**
  * @param {!angular.Scope} $scope
  * @param {!Function} $resource
+ * @param {!scapesexterns.ScapesConfig} scapesConfig
  * @constructor
  * @ngInject
  */
-scapes.app.HomeCtrl = function($scope, $resource) {
+scapes.app.HomeCtrl = function($scope, $resource, scapesConfig) {
   // TODO(michaelcupino): Use @export annotation when closure compiler has these
   // flags: --remove_unused_prototype_props_in_externs=false and
   // --export_local_property_definitions.
@@ -51,6 +54,16 @@ scapes.app.HomeCtrl = function($scope, $resource) {
   this.statusMessage = '';
   goog.exportProperty(this, 'statusMessage', this.statusMessage);
 
+  /** @type {boolean} */
+  this.isUserLoggedIn = scapesConfig.isUserLoggedIn;
+  goog.exportProperty(this, 'isUserLoggedIn', this.isUserLoggedIn);
+
+  /** @type {string} */
+  this.loginUrl = scapesConfig.loginUrl;
+  goog.exportProperty(this, 'loginUrl', this.loginUrl);
+
+  // TODO(michaelcupino): Figure out how to declare that there is a static
+  // method on this class named 'post'.
   /**
    * @constructor
    * @private
@@ -65,6 +78,7 @@ scapes.app.module.controller('HomeCtrl', scapes.app.HomeCtrl);
 
 /**
  * @param {string} docId
+ * @suppress {missingProperties}
  */
 scapes.app.HomeCtrl.prototype.analyzeDoc = function(docId) {
   this.ServerService_.post({},
