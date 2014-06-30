@@ -18,6 +18,7 @@
         src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.18/angular-resource.min.js">
     </script>
     <link href="/styles/scapes.css" rel="stylesheet">
+    <script>var scapesConfig = {{ scapesConfig|safe }}</script>
     <script src="/js/scapes-compiled.js"></script>
   </head>
   <body ng-controller="HomeCtrl" ng-include="'/partials/home.html'"></body>
