@@ -36,9 +36,16 @@
           ng-click="ctrl.analyzeDoc(ctrl.docId)">
         Analyze
       </button>
-      <h1 class="analyze-input" ng-show="ctrl.statusMessage">
+      <a ng-href="{{ctrl.authUrl}}" class="btn btn-default btn-lg btn-block
+          analyze-input" role="button" ng-show="ctrl.authUrl">
+        Allow SCAPES to access Google Docs.
+      </a>
+      <div class="analyze-text lead" ng-show="ctrl.statusMessage">
         {{ctrl.statusMessage}}
-      </h1>
+      </div>
+      <a ng-href="{{ctrl.pipelineUrl}}" ng-show="ctrl.pipelineUrl" class="lead">
+        See the pipeline in action.
+      </a>
     </div>
     <div ng-hide="ctrl.isUserLoggedIn">
       <h1>SCAPES</h1>

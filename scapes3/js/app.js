@@ -54,6 +54,14 @@ scapes.app.HomeCtrl = function($scope, $resource, scapesConfig) {
   this.statusMessage = '';
   goog.exportProperty(this, 'statusMessage', this.statusMessage);
 
+  /** @type {string} */
+  this.pipelineUrl = '';
+  goog.exportProperty(this, 'pipelineUrl', this.pipelineUrl);
+
+  /** @type {string} */
+  this.authUrl = '';
+  goog.exportProperty(this, 'authUrl', this.authUrl);
+
   /** @type {boolean} */
   this.isUserLoggedIn = scapesConfig.isUserLoggedIn;
   goog.exportProperty(this, 'isUserLoggedIn', this.isUserLoggedIn);
@@ -68,7 +76,7 @@ scapes.app.HomeCtrl = function($scope, $resource, scapesConfig) {
    * @constructor
    * @private
    */
-  this.ServerService_ = $resource('/angular', {}, {
+  this.ServerService_ = $resource('/document-analysis', {}, {
     post: {
       method: 'POST'
     }
@@ -81,7 +89,7 @@ scapes.app.module.controller('HomeCtrl', scapes.app.HomeCtrl);
  * @suppress {missingProperties}
  */
 scapes.app.HomeCtrl.prototype.analyzeDoc = function(docId) {
-  this.ServerService_.post({},
+  this.ServerService_.post({'docId': docId},
       goog.bind(scapes.app.HomeCtrl.prototype.analyzeOnSuccess_, this));
 };
 goog.exportProperty(scapes.app.HomeCtrl.prototype, 'analyzeDoc',
@@ -90,7 +98,9 @@ goog.exportProperty(scapes.app.HomeCtrl.prototype, 'analyzeDoc',
 /**
  * @typedef {{
  *   statusMessage: string,
- *   numberOfDocs: number
+ *   numberOfDocs: number,
+ *   pipelineUrl: string,
+ *   authUrl: string
  * }}
  */
 scapes.app.ServerResponse;
@@ -101,5 +111,8 @@ scapes.app.ServerResponse;
  */
 scapes.app.HomeCtrl.prototype.analyzeOnSuccess_ = function(response) {
   this.statusMessage = response.statusMessage;
+  // TODO(michaelcupino): Figure out why closure compiler renames pipelineUrl.
+  this['pipelineUrl'] = response['pipelineUrl'];
+  this['authUrl'] = response['authUrl'];
 };
 

@@ -6,6 +6,7 @@ import urllib2
 
 from StringIO import StringIO
 from apiclient.http import HttpMockSequence
+from google.appengine.api.mail import EmailMessage
 from google.appengine.ext import testbed
 from mock import MagicMock
 from mock import patch
@@ -24,13 +25,18 @@ class DocumentAnalysisPipelineTest(unittest.TestCase):
     self.testbed = testbed.Testbed()
     self.testbed.activate()
     self.testbed.init_datastore_v3_stub()
+    self.testbed.init_mail_stub()
 
   def tearDown(self):
     self.testbed.deactivate()
 
+  # TODO(michaelcupino): Mocking EmailMessage.send beacuse the mail stub is
+  # trying to call .decode on the list we pass it. Fix this.
+  @patch.object(EmailMessage, 'send')
   @patch.object(urllib2, 'urlopen')
   @patch.object(OAuth2Credentials, 'from_json')
-  def testRun(self, mockOAuth2CredentialsFromJsonMethod, mockUrlOpenMethod):
+  def testRun(self, mockOAuth2CredentialsFromJsonMethod, mockUrlOpenMethod,
+      mockEmailMessageSendMethod):
     http = HttpMockSequence([
       ({'status': '200'}, open(datafile('test-drive-revisions-list-0.json'),
           'rb').read()),
