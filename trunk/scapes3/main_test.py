@@ -26,9 +26,10 @@ class MainTest(unittest.TestCase):
     self.testbed.deactivate()
   
   def testDocumentAnalysis(self):  
-    # TODO(michaelcupino): Figure out why webtest doesn't like it when a get
-    # method is mocked.
-    response = self.testapp.get('/document-analysis/abc123')
+    # TODO(michaelcupino): Figure out why webtest doesn't like it when a post
+    # method is mocked. I think the key is to get something like Jasmine's spy
+    # "andCallThrough" method.
+    response = self.testapp.post('/document-analysis')
 
 if __name__ == '__main__':
   unittest.main()

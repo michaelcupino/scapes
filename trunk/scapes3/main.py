@@ -7,7 +7,7 @@ bit.ly/scapeseng"""
 
 import webapp2
 
-from handler.angular_handler import AngularHandler
+from handler.auth_redirect_handler import AuthRedirectHandler
 from handler.document_analysis_handler import DocumentAnalysisHandler
 from handler.email_map_reduce_handler import EmailMapReduceHandler
 from handler.folder_analysis_handler import FolderAnalysisHandler
@@ -20,13 +20,13 @@ from service import config
 
 app = webapp2.WSGIApplication([
     ('/', LayoutHandler),
-    ('/angular', AngularHandler),
+    ('/authredirect', AuthRedirectHandler),
+    ('/document-analysis', DocumentAnalysisHandler),
     ('/emailmr', EmailMapReduceHandler),
     ('/folder-analysis', FolderAnalysisHandler),
     ('/folder-fetcher', FolderFetcherHandler),
     ('/index', IndexHandler),
     ('/revisions-analysis', RevisionsAnalysisHandler),
-    (r'/document-analysis/(.*)', DocumentAnalysisHandler),
     (r'/folder/(.*)', FolderPrototypeHandler),
     (config.decorator.callback_path, config.decorator.callback_handler()),
 ], debug=True)
