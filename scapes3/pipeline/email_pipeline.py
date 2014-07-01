@@ -15,6 +15,6 @@ class EmailPipeline(base_handler.PipelineBase):
     message.sender = 'robot@scapes-uci.appspotmail.com'
     message.to = toEmail
     message.subject = subject
-    message.body = body
+    message.body = str(body)
     message.send()
 

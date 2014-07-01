@@ -26,17 +26,14 @@ class DocumentAnalysisPipelineTest(unittest.TestCase):
     self.testbed.activate()
     self.testbed.init_datastore_v3_stub()
     self.testbed.init_mail_stub()
+    self.mailStub = self.testbed.get_stub(testbed.MAIL_SERVICE_NAME)
 
   def tearDown(self):
     self.testbed.deactivate()
 
-  # TODO(michaelcupino): Mocking EmailMessage.send beacuse the mail stub is
-  # trying to call .decode on the list we pass it. Fix this.
-  @patch.object(EmailMessage, 'send')
   @patch.object(urllib2, 'urlopen')
   @patch.object(OAuth2Credentials, 'from_json')
-  def testRun(self, mockOAuth2CredentialsFromJsonMethod, mockUrlOpenMethod,
-      mockEmailMessageSendMethod):
+  def testRun(self, mockOAuth2CredentialsFromJsonMethod, mockUrlOpenMethod):
     http = HttpMockSequence([
       ({'status': '200'}, open(datafile('test-drive-revisions-list-0.json'),
           'rb').read()),
@@ -104,6 +101,12 @@ class DocumentAnalysisPipelineTest(unittest.TestCase):
     pipeline.start_test()
     result = pipeline.outputs.default.value
     self.assertEqual([5, 7, -7, -5, 38, 18, 26, 18, 0, -17, 9], result)
+    messages = self.mailStub.get_sent_messages(to='test@example.com')
+    self.assertEqual(1, len(messages))
+    self.assertEqual('robot@scapes-uci.appspotmail.com', messages[0].sender)
+    self.assertEqual('Document Analysis', messages[0].subject)
+    self.assertEqual('[5, 7, -7, -5, 38, 18, 26, 18, 0, -17, 9]',
+        messages[0].body.decode())
 
 if __name__ == '__main__':
   unittest.main()
