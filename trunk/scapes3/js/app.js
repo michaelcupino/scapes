@@ -81,6 +81,16 @@ scapes.app.HomeCtrl = function($scope, $resource, scapesConfig) {
       method: 'POST'
     }
   });
+
+  /**
+   * @constructor
+   * @private
+   */
+  this.FolderService_ = $resource('/folder-analysis', {}, {
+    post: {
+      method: 'POST'
+    }
+  });
 };
 scapes.app.module.controller('HomeCtrl', scapes.app.HomeCtrl);
 
@@ -94,6 +104,17 @@ scapes.app.HomeCtrl.prototype.analyzeDoc = function(docId) {
 };
 goog.exportProperty(scapes.app.HomeCtrl.prototype, 'analyzeDoc',
     scapes.app.HomeCtrl.prototype.analyzeDoc);
+
+/**
+ * @param {string} folderId
+ * @suppress {missingProperties}
+ */
+scapes.app.HomeCtrl.prototype.analyzeFolder = function(folderId) {
+  this.FolderService_.post({'folderId': folderId},
+      goog.bind(scapes.app.HomeCtrl.prototype.analyzeOnSuccess_, this));
+};
+goog.exportProperty(scapes.app.HomeCtrl.prototype, 'analyzeFolder',
+    scapes.app.HomeCtrl.prototype.analyzeFolder);
 
 /**
  * @typedef {{

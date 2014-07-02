@@ -47,6 +47,22 @@ describe('scapes.app', function() {
       expect(scope.ctrl.authUrl).toBe('http://example.com/auth');
       expect(scope.ctrl.pipelineUrl).toBe('http://example.com/pipeline');
     });
+
+    it('should set the statusMessage on scope on success (folder)', function() {
+      var response = {
+        statusMessage: 'Hello hello',
+        authUrl: 'http://example.com/auth',
+        pipelineUrl: 'http://example.com/pipeline'
+      };
+      $httpBackend.expectPOST('/folder-analysis').respond(response);
+      instance.analyzeFolder('abc123');
+
+      expect(scope.ctrl.statusMessage).toBe('');
+      $httpBackend.flush();
+      expect(scope.ctrl.statusMessage).toBe('Hello hello');
+      expect(scope.ctrl.authUrl).toBe('http://example.com/auth');
+      expect(scope.ctrl.pipelineUrl).toBe('http://example.com/pipeline');
+    });
   });
 });
 

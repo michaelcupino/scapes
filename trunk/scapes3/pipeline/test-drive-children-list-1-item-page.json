@@ -1,0 +1,16 @@
+{
+ "kind": "drive#childList",
+ "etag": "\"rUX02FC6EFkeJGMohzpKwDHIcAg/x2KMsu8KNM7aSHYm5LeBg1LZk4A\"",
+ "selfLink": "https://content.googleapis.com/drive/v2/files/0BzgGloh-1l4LWW82TVNyc25uSVU/children?q=mimeType+%3D+%22application/vnd.google-apps.document%22+and+trashed+%3D+false",
+ "nextPageToken": "@!|~EAIaowELEgBSmgEKkAEKafjzZf3_____wxLI9FB3QUAA_wH__kNvc21vLnVzZXIoMDAwMDAwYTBlNTI1OTBiOVUpLmRpcl9lbnRyeSg2OTEwMzkyMTE3MDVcLjE0XC5zNGRZdnk0d3haQ1lqbEhCV1NMREFqZykAARBkIVhEP6c59Z9dOQAAAAACmgwASAFQAFoLCbJJmE7LDCRxEAEgAfCElXwBDEAAIgsJuZAl5aAAAAAgBg",
+ "nextLink": "https://content.googleapis.com/drive/v2/files/0BzgGloh-1l4LWW82TVNyc25uSVU/children?pageToken=@!%7C~EAIaowELEgBSmgEKkAEKafjzZf3_____wxLI9FB3QUAA_wH__kNvc21vLnVzZXIoMDAwMDAwYTBlNTI1OTBiOVUpLmRpcl9lbnRyeSg2OTEwMzkyMTE3MDVcLjE0XC5zNGRZdnk0d3haQ1lqbEhCV1NMREFqZykAARBkIVhEP6c59Z9dOQAAAAACmgwASAFQAFoLCbJJmE7LDCRxEAEgAfCElXwBDEAAIgsJuZAl5aAAAAAgBg&q=mimeType+%3D+%22application/vnd.google-apps.document%22+and+trashed+%3D+false",
+ "items": [
+  {
+   "kind": "drive#childReference",
+   "id": "1o0L3UOiubzeBZNFEyKzZrUfVdWZ4K4-WeINn83VkwAI",
+   "selfLink": "https://content.googleapis.com/drive/v2/files/0BzgGloh-1l4LWW82TVNyc25uSVU/children/1o0L3UOiubzeBZNFEyKzZrUfVdWZ4K4-WeINn83VkwAI",
+   "childLink": "https://content.googleapis.com/drive/v2/files/1o0L3UOiubzeBZNFEyKzZrUfVdWZ4K4-WeINn83VkwAI"
+  }
+ ]
+}
+
