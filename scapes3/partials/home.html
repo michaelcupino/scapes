@@ -34,7 +34,12 @@
       <button type="button" class="btn btn-primary btn-lg btn-block analyze-input"
           ng-disabled="!ctrl.docId" id="doc-analyze-button"
           ng-click="ctrl.analyzeDoc(ctrl.docId)">
-        Analyze
+        Analyze doc
+      </button>
+      <button type="button" class="btn btn-primary btn-lg btn-block
+          analyze-input" ng-disabled="!ctrl.docId" id="doc-analyze-folder"
+          ng-click="ctrl.analyzeFolder(ctrl.docId)">
+        Analyze folder
       </button>
       <a ng-href="{{ctrl.authUrl}}" class="btn btn-default btn-lg btn-block
           analyze-input" role="button" ng-show="ctrl.authUrl">
