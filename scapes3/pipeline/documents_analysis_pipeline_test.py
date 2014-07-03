@@ -3,9 +3,9 @@
 import unittest
 
 from google.appengine.ext import testbed
-from pipeline.folder_analysis_pipeline import FolderAnalysisPipeline
+from pipeline.documents_analysis_pipeline import DocumentsAnalysisPipeline
 
-class FolderAnalysisPipelineTest(unittest.TestCase):
+class DocumentsAnalysisPipelineTest(unittest.TestCase):
 
   def setUp(self):
     self.testbed = testbed.Testbed()
@@ -14,7 +14,8 @@ class FolderAnalysisPipelineTest(unittest.TestCase):
   def tearDown(self):
     self.testbed.deactivate()
 
-  # TODO(michaelcupino): Test that an email is sent after there is an analyses.
+  # TODO(michaelcupino): Test that the DocumentAnalysisPipeline gets called for
+  # each document.
   def testRun(self):
     self.assertEqual(1, 0 + 1)
 

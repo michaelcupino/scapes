@@ -20,10 +20,5 @@ class DocumentAnalysisPipeline(base_handler.PipelineBase):
     exportLinks = yield DocumentRevisionsPipeline(toEmail,
         documentId, credentialsAsJson)
     revisionsAnalysis = yield RevisionsAnalysisPipeline(exportLinks)
-    # TODO(michaelcupino): Call the mail pipeline only when this is the root
-    # pipeline.
-    yield common.Log.info('Sending email to %s with body %s', toEmail,
-        revisionsAnalysis)
-    yield EmailPipeline(toEmail, 'Document Analysis', revisionsAnalysis)
     yield common.Return(revisionsAnalysis)
 
