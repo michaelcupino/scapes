@@ -22,9 +22,11 @@ class RevisionsDiffPipelineTest(unittest.TestCase):
     result = pipeline.outputs.default.value
 
     expected = Revision()
-    expected.wordsAdded = 25
-    expected.wordsDeleted = 6
+    expected.wordsAdded = 1
+    expected.wordsDeleted = 0
     self.assertEqual(result, expected.to_dict())
+
+  # TODO(michaelcupino): Test isRemove, isAdd, etc.
 
 if __name__ == '__main__':
   unittest.main()

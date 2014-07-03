@@ -105,38 +105,40 @@ class DocumentAnalysisPipelineTest(unittest.TestCase):
 
     expectedResult = []
     expectedResult.append(Revision(
-        wordsAdded=25,
-        wordsDeleted=5).to_dict())
-    expectedResult.append(Revision(
-        wordsAdded=25,
-        wordsDeleted=7).to_dict())
-    expectedResult.append(Revision(
-        wordsAdded=25,
-        wordsDeleted=-7).to_dict())
-    expectedResult.append(Revision(
-        wordsAdded=25,
-        wordsDeleted=-5).to_dict())
-    expectedResult.append(Revision(
-        wordsAdded=25,
-        wordsDeleted=38).to_dict())
-    expectedResult.append(Revision(
-        wordsAdded=25,
-        wordsDeleted=18).to_dict())
-    expectedResult.append(Revision(
-        wordsAdded=25,
-        wordsDeleted=26).to_dict())
-    expectedResult.append(Revision(
-        wordsAdded=25,
-        wordsDeleted=18).to_dict())
-    expectedResult.append(Revision(
-        wordsAdded=25,
+        wordsAdded=1,
         wordsDeleted=0).to_dict())
     expectedResult.append(Revision(
-        wordsAdded=25,
-        wordsDeleted=-17).to_dict())
+        wordsAdded=1,
+        wordsDeleted=0).to_dict())
     expectedResult.append(Revision(
-        wordsAdded=25,
-        wordsDeleted=9).to_dict())
+        wordsAdded=0,
+        wordsDeleted=1).to_dict())
+    expectedResult.append(Revision(
+        wordsAdded=0,
+        wordsDeleted=1).to_dict())
+    expectedResult.append(Revision(
+        wordsAdded=7,
+        wordsDeleted=0).to_dict())
+    expectedResult.append(Revision(
+        wordsAdded=3,
+        wordsDeleted=0).to_dict())
+    expectedResult.append(Revision(
+        wordsAdded=5,
+        wordsDeleted=0).to_dict())
+    expectedResult.append(Revision(
+        wordsAdded=3,
+        wordsDeleted=0).to_dict())
+    expectedResult.append(Revision(
+        wordsAdded=0,
+        wordsDeleted=0).to_dict())
+    # TODO(michaelcupino): I would have expected there to be no words added.
+    # Figure out why this behavior occurrs.
+    expectedResult.append(Revision(
+        wordsAdded=1,
+        wordsDeleted=3).to_dict())
+    expectedResult.append(Revision(
+        wordsAdded=2,
+        wordsDeleted=0).to_dict())
     self.assertEqual(expectedResult, result)
 
 if __name__ == '__main__':
