@@ -20,7 +20,7 @@ class EmailPipelineTest(unittest.TestCase):
   def testRun(self):
     pipeline = EmailPipeline('test@example.com')
     pipeline.run('test@example.com', 'Hello from SCAPES', ('This message was '
-        'sent from the EmailPipeline map reduce job.'))
+        'sent from the EmailPipeline map reduce job.'), {})
 
     messages = self.mailStub.get_sent_messages(to='test@example.com')
     self.assertEqual(1, len(messages))

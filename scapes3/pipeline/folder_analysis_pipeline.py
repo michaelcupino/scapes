@@ -24,5 +24,6 @@ class FolderAnalysisPipeline(base_handler.PipelineBase):
     yield common.Log.info(('An email would be sent to %s. These are the '
         'document diffs inside folder %s: %s'), toEmail, folderId,
         documentsAnalysis)
-    yield EmailPipeline(toEmail, 'Folder Analysis', documentsAnalysis)
+    yield EmailPipeline(toEmail, 'Folder Analysis', 'Attached is the csv file.',
+        documentsAnalysis)
 
