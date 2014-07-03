@@ -3,6 +3,7 @@ from mapreduce.lib.pipeline import common
 from oauth2client.client import OAuth2Credentials
 from pipeline.folder_fetcher_pipeline import FolderFetcherPipeline
 from pipeline.documents_analysis_pipeline import DocumentsAnalysisPipeline
+from pipeline.email_pipeline import EmailPipeline
 
 class FolderAnalysisPipeline(base_handler.PipelineBase):
   """A pipeline that analyzes a folder and emails its analysis to the requester.
