@@ -8,6 +8,7 @@ from google.appengine.ext import testbed
 from mock import MagicMock
 from mock import patch
 from pipeline.revisions_analysis_pipeline import RevisionsAnalysisPipeline
+from model.revision import Revision
 
 class RevisionsAnalysisPipelineTest(unittest.TestCase):
 
@@ -36,7 +37,18 @@ class RevisionsAnalysisPipelineTest(unittest.TestCase):
     pipeline = RevisionsAnalysisPipeline(exportLinks)
     pipeline.start_test()
     result = pipeline.outputs.default.value
-    self.assertEqual([5, 7, -6], result)
+
+    revision1 = Revision()
+    revision1.wordsAdded = 25
+    revision1.wordsDeleted = 5
+    revision2 = Revision()
+    revision2.wordsAdded = 25
+    revision2.wordsDeleted = 7
+    revision3 = Revision()
+    revision3.wordsAdded = 25
+    revision3.wordsDeleted = -6
+    self.assertEqual([revision1.to_dict(), revision2.to_dict(),
+        revision3.to_dict()], result)
 
 if __name__ == '__main__':
   unittest.main()
