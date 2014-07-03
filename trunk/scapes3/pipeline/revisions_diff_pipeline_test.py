@@ -4,6 +4,7 @@ import unittest
 
 from google.appengine.ext import testbed
 from pipeline.revisions_diff_pipeline import RevisionsDiffPipeline
+from model.revision import Revision
 
 class RevisionsDiffPipelineTest(unittest.TestCase):
 
@@ -20,7 +21,10 @@ class RevisionsDiffPipelineTest(unittest.TestCase):
     pipeline.start_test()
     result = pipeline.outputs.default.value
 
-    self.assertEqual(result, 6)
+    expected = Revision()
+    expected.wordsAdded = 25
+    expected.wordsDeleted = 6
+    self.assertEqual(result, expected.to_dict())
 
 if __name__ == '__main__':
   unittest.main()

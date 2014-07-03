@@ -4,6 +4,7 @@ import os
 import unittest
 import urllib2
 
+from model.revision import Revision
 from StringIO import StringIO
 from apiclient.http import HttpMockSequence
 from google.appengine.api.mail import EmailMessage
@@ -101,7 +102,42 @@ class DocumentAnalysisPipelineTest(unittest.TestCase):
     pipeline = DocumentAnalysisPipeline('test@example.com', 'abc123', None)
     pipeline.start_test()
     result = pipeline.outputs.default.value
-    self.assertEqual([5, 7, -7, -5, 38, 18, 26, 18, 0, -17, 9], result)
+
+    expectedResult = []
+    expectedResult.append(Revision(
+        wordsAdded=25,
+        wordsDeleted=5).to_dict())
+    expectedResult.append(Revision(
+        wordsAdded=25,
+        wordsDeleted=7).to_dict())
+    expectedResult.append(Revision(
+        wordsAdded=25,
+        wordsDeleted=-7).to_dict())
+    expectedResult.append(Revision(
+        wordsAdded=25,
+        wordsDeleted=-5).to_dict())
+    expectedResult.append(Revision(
+        wordsAdded=25,
+        wordsDeleted=38).to_dict())
+    expectedResult.append(Revision(
+        wordsAdded=25,
+        wordsDeleted=18).to_dict())
+    expectedResult.append(Revision(
+        wordsAdded=25,
+        wordsDeleted=26).to_dict())
+    expectedResult.append(Revision(
+        wordsAdded=25,
+        wordsDeleted=18).to_dict())
+    expectedResult.append(Revision(
+        wordsAdded=25,
+        wordsDeleted=0).to_dict())
+    expectedResult.append(Revision(
+        wordsAdded=25,
+        wordsDeleted=-17).to_dict())
+    expectedResult.append(Revision(
+        wordsAdded=25,
+        wordsDeleted=9).to_dict())
+    self.assertEqual(expectedResult, result)
 
 if __name__ == '__main__':
   unittest.main()
