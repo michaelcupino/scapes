@@ -3,6 +3,7 @@ import tempfile
 
 from google.appengine.api import mail
 from mapreduce import base_handler
+from model.revision import Revision
 
 class EmailPipeline(base_handler.PipelineBase):
   """A pipeline that sends an email.
@@ -11,9 +12,10 @@ class EmailPipeline(base_handler.PipelineBase):
     toEmail: The email address reciever of this message.
     subject: The subject of this message.
     body: The body of this message.
+    documentAnalysis: Analysis.
   """
   
-  def run(self, toEmail, subject, body):
+  def run(self, toEmail, subject, body, documentsAnalyses):
     # TODO(michaelcupino): Move csv transforms into a service.
     csvFile = tempfile.TemporaryFile()
     writer = csv.writer(csvFile)
@@ -21,6 +23,23 @@ class EmailPipeline(base_handler.PipelineBase):
         'Words deleted', 'Punct. cap', 'Words moved', 'Document ID',
         'Document Name']]
     writer.writerows(values)
+
+    for documentAnalyses in documentsAnalyses:
+      for documentAnalysis in documentAnalyses:
+        revision = Revision(**documentAnalysis)
+        values = [[
+          revision.dateTime, # Date
+          '', # Time
+          revision.author,
+          revision.wordCount,
+          revision.wordsAdded,
+          revision.wordsDeleted,
+          '', # Punct. cap
+          '', # Words moved
+          revision.documentId, # Document ID
+          '', # Document Name
+        ]]
+        writer.writerows(values)
 
     csvFile.seek(0)
     csvFileBytes = csvFile.read()
