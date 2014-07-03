@@ -110,6 +110,8 @@ goog.exportProperty(scapes.app.HomeCtrl.prototype, 'analyzeDoc',
  * @suppress {missingProperties}
  */
 scapes.app.HomeCtrl.prototype.analyzeFolder = function(folderId) {
+  this.statusMessage = 'Loading...';
+  this['pipelineUrl'] = '';
   this.FolderService_.post({'folderId': folderId},
       goog.bind(scapes.app.HomeCtrl.prototype.analyzeOnSuccess_, this));
 };

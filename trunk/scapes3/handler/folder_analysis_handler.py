@@ -26,8 +26,8 @@ class FolderAnalysisHandler(webapp2.RequestHandler):
         config.decorator.get_credentials().to_json())
     pipeline.start()
     responseJson = {
-      'statusMessage': ('Folder analysis has started. List of character '
-        'diffs will be sent to %s.' % toEmail),
+      'statusMessage': ('Folder analysis has started. The csv file with '
+        'analysis will be sent to %s.' % toEmail),
       'pipelineUrl': pipeline.base_path + '/status?root=' + pipeline.pipeline_id
     }
     self.response.headers['Content-Type'] = 'application/json'

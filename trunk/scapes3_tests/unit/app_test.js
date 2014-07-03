@@ -57,7 +57,7 @@ describe('scapes.app', function() {
       $httpBackend.expectPOST('/folder-analysis').respond(response);
       instance.analyzeFolder('abc123');
 
-      expect(scope.ctrl.statusMessage).toBe('');
+      expect(scope.ctrl.statusMessage).toBe('Loading...');
       $httpBackend.flush();
       expect(scope.ctrl.statusMessage).toBe('Hello hello');
       expect(scope.ctrl.authUrl).toBe('http://example.com/auth');

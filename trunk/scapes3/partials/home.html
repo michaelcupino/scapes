@@ -26,16 +26,12 @@
     <div ng-show="ctrl.isUserLoggedIn">
       <h1>SCAPES</h1>
       <p class="lead">
-        Input in the document id and click the analyze button.
+        Input in the folder id and click the analyze button.
       </p>
+      <!-- TODO(michaelcupino): Rename docId to just inputId or something. -->
       <input type="text" ng-model="ctrl.docId"
-          placeholder="Enter the document id"
+          placeholder="Enter the folder id"
           class="form-control input-lg analyze-input" id="doc-id-input">
-      <button type="button" class="btn btn-primary btn-lg btn-block analyze-input"
-          ng-disabled="!ctrl.docId" id="doc-analyze-button"
-          ng-click="ctrl.analyzeDoc(ctrl.docId)">
-        Analyze doc
-      </button>
       <button type="button" class="btn btn-primary btn-lg btn-block
           analyze-input" ng-disabled="!ctrl.docId" id="doc-analyze-folder"
           ng-click="ctrl.analyzeFolder(ctrl.docId)">
