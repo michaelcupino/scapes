@@ -16,6 +16,7 @@ class EmailPipelineTest(unittest.TestCase):
   def tearDown(self):
     self.testbed.deactivate()
 
+  # TODO(michaelcupino): Find out how to test for attachments?
   def testRun(self):
     pipeline = EmailPipeline('test@example.com')
     pipeline.run('test@example.com', 'Hello from SCAPES', ('This message was '
