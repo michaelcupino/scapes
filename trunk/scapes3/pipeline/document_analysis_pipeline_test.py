@@ -26,6 +26,7 @@ class DocumentAnalysisPipelineTest(unittest.TestCase):
     self.testbed.activate()
     self.testbed.init_datastore_v3_stub()
     self.testbed.init_mail_stub()
+    # TODO(michaelcupino): Remove unused variables.
     self.mailStub = self.testbed.get_stub(testbed.MAIL_SERVICE_NAME)
 
   def tearDown(self):
@@ -101,12 +102,6 @@ class DocumentAnalysisPipelineTest(unittest.TestCase):
     pipeline.start_test()
     result = pipeline.outputs.default.value
     self.assertEqual([5, 7, -7, -5, 38, 18, 26, 18, 0, -17, 9], result)
-    messages = self.mailStub.get_sent_messages(to='test@example.com')
-    self.assertEqual(1, len(messages))
-    self.assertEqual('robot@scapes-uci.appspotmail.com', messages[0].sender)
-    self.assertEqual('Document Analysis', messages[0].subject)
-    self.assertEqual('[5, 7, -7, -5, 38, 18, 26, 18, 0, -17, 9]',
-        messages[0].body.decode())
 
 if __name__ == '__main__':
   unittest.main()
