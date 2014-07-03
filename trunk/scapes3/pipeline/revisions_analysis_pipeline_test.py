@@ -39,14 +39,14 @@ class RevisionsAnalysisPipelineTest(unittest.TestCase):
     result = pipeline.outputs.default.value
 
     revision1 = Revision()
-    revision1.wordsAdded = 25
-    revision1.wordsDeleted = 5
+    revision1.wordsAdded = 1
+    revision1.wordsDeleted = 0
     revision2 = Revision()
-    revision2.wordsAdded = 25
-    revision2.wordsDeleted = 7
+    revision2.wordsAdded = 1
+    revision2.wordsDeleted = 0
     revision3 = Revision()
-    revision3.wordsAdded = 25
-    revision3.wordsDeleted = -6
+    revision3.wordsAdded = 0
+    revision3.wordsDeleted = 1
     self.assertEqual([revision1.to_dict(), revision2.to_dict(),
         revision3.to_dict()], result)
 
