@@ -103,10 +103,19 @@ class DocumentAnalysisPipelineTest(unittest.TestCase):
     pipeline.start_test()
     result = pipeline.outputs.default.value
 
+    # TODO(michaelcupino): Updated expected data to match actual result.
     expectedResult = []
     expectedResult.append(Revision(
         wordsAdded=1,
-        wordsDeleted=0).to_dict())
+        wordsDeleted=0,
+        wordCount=1,
+        author='Jonathan H',
+        dateTime='2014-03-15T17:49:32.768Z',
+        exportLink=('https://docs.google.com/feeds/download/documents/export/Ex'
+            'port?id=1Duz2yYSTSgdWQhTgEJ3zPELKTHS3WGhPVLQk1PDJm3Q&revision=697&'
+            'exportFormat=txt'),
+        revisionNumber='697',
+        documentId='abc123').to_dict())
     expectedResult.append(Revision(
         wordsAdded=1,
         wordsDeleted=0).to_dict())

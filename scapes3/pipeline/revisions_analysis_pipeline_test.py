@@ -27,6 +27,11 @@ class RevisionsAnalysisPipelineTest(unittest.TestCase):
       'docs.google.com/456',
       'docs.google.com/789'
     ]
+    mockRevisions = [
+      Revision(exportLink=exportLinks[0]).to_dict(),
+      Revision(exportLink=exportLinks[1]).to_dict(),
+      Revision(exportLink=exportLinks[2]).to_dict()
+    ]
     exportedText = {
       exportLinks[0]: StringIO('Hello'),
       exportLinks[1]: StringIO('Hello world.'),
@@ -34,19 +39,25 @@ class RevisionsAnalysisPipelineTest(unittest.TestCase):
     }
     mockUrlOpenMethod.side_effect = lambda url: exportedText[url]
 
-    pipeline = RevisionsAnalysisPipeline(exportLinks)
+    pipeline = RevisionsAnalysisPipeline(mockRevisions)
     pipeline.start_test()
     result = pipeline.outputs.default.value
 
     revision1 = Revision()
     revision1.wordsAdded = 1
     revision1.wordsDeleted = 0
+    revision1.wordCount = 1
+    revision1.exportLink = 'docs.google.com/123'
     revision2 = Revision()
     revision2.wordsAdded = 1
     revision2.wordsDeleted = 0
+    revision2.wordCount = 2
+    revision2.exportLink = 'docs.google.com/456'
     revision3 = Revision()
     revision3.wordsAdded = 0
     revision3.wordsDeleted = 1
+    revision3.wordCount = 1
+    revision3.exportLink = 'docs.google.com/789'
     self.assertEqual([revision1.to_dict(), revision2.to_dict(),
         revision3.to_dict()], result)
 

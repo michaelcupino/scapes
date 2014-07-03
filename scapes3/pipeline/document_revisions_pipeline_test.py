@@ -67,10 +67,10 @@ class DocumentRevisionsPipelineTest(unittest.TestCase):
 
     self.assertIn(('https://docs.google.com/feeds/download/documents/export/Exp'
         'ort?id=1Duz2yYSTSgdWQhTgEJ3zPELKTHS3WGhPVLQk1PDJm3Q&revision=697&expor'
-        'tFormat=txt'), result)
+        'tFormat=txt'), result[0]['exportLink'])
     self.assertIn(('https://docs.google.com/feeds/download/documents/export/Exp'
         'ort?id=1Duz2yYSTSgdWQhTgEJ3zPELKTHS3WGhPVLQk1PDJm3Q&revision=698&expor'
-        'tFormat=txt'), result)
+        'tFormat=txt'), result[1]['exportLink'])
 
 
 if __name__ == '__main__':

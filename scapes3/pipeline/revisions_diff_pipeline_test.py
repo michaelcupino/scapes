@@ -17,13 +17,14 @@ class RevisionsDiffPipelineTest(unittest.TestCase):
     self.testbed.deactivate()
 
   def testRun(self):
-    pipeline = RevisionsDiffPipeline('Hello', 'Hello there')
+    pipeline = RevisionsDiffPipeline('Hello', 'Hello there', {})
     pipeline.start_test()
     result = pipeline.outputs.default.value
 
     expected = Revision()
     expected.wordsAdded = 1
     expected.wordsDeleted = 0
+    expected.wordCount= 2
     self.assertEqual(result, expected.to_dict())
 
   # TODO(michaelcupino): Test isRemove, isAdd, etc.
