@@ -17,8 +17,8 @@ class DocumentAnalysisPipeline(base_handler.PipelineBase):
   """
   
   def run(self, toEmail, documentId, credentialsAsJson):
-    exportLinks = yield DocumentRevisionsPipeline(toEmail,
+    revisions = yield DocumentRevisionsPipeline(toEmail,
         documentId, credentialsAsJson)
-    revisionsAnalysis = yield RevisionsAnalysisPipeline(exportLinks)
+    revisionsAnalysis = yield RevisionsAnalysisPipeline(revisions)
     yield common.Return(revisionsAnalysis)
 

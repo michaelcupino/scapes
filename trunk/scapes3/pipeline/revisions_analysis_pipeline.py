@@ -8,7 +8,7 @@ class RevisionsAnalysisPipeline(base_handler.PipelineBase):
   added and number of words deleted.
 
   Args:
-    exportLinks: The export links of a resources that contains the actual text
+    revisions: The export links of a resources that contains the actual text
         in a revision.
 
   Returns:
@@ -17,10 +17,10 @@ class RevisionsAnalysisPipeline(base_handler.PipelineBase):
     revision id as the key and a ScapesRevisionAnalysis object as the value.
   """
   
-  def run(self, exportLinks):
+  def run(self, revisions):
     revisionTexts = []
-    for exportLink in exportLinks:
-      revisionText = yield RevisionFetcherPipeline(exportLink)
+    for revision in revisions:
+      revisionText = yield RevisionFetcherPipeline(revision['exportLink'])
       revisionTexts.append(revisionText)
 
     scapesDiffs = []
@@ -28,10 +28,8 @@ class RevisionsAnalysisPipeline(base_handler.PipelineBase):
       previousRevisionText = '' if i == 0 else revisionTexts[i - 1]
       currentRevisionText = revisionTexts[i]
       scapesDiff = yield RevisionsDiffPipeline(previousRevisionText,
-          currentRevisionText)
+          currentRevisionText, revisions[i])
       scapesDiffs.append(scapesDiff)
 
-    # TODO(michaelcupino): Return a dictionary with ScapesRevisionAnalysis
-    # objects.
     yield pipeline_common.List(*scapesDiffs)
 

@@ -4,6 +4,7 @@ import json
 from mapreduce import base_handler
 from oauth2client.client import OAuth2Credentials
 from service import config
+from model.revision import Revision
 
 class DocumentRevisionsPipeline(base_handler.PipelineBase):
   """A pipeline that returns a list of revision export links of a document.
@@ -15,7 +16,7 @@ class DocumentRevisionsPipeline(base_handler.PipelineBase):
     credentialsAsJson: A json representation of user's oauth2 credentials.
 
   Returns:
-    List of revision export links of a document.
+    List of Revisions of a document.
   """
   
   # TODO(michaelcupino): Remove unused toEmail paramater.
@@ -24,11 +25,16 @@ class DocumentRevisionsPipeline(base_handler.PipelineBase):
     http = credentials.authorize(httplib2.Http())
 
     request = config.getService().revisions().list(fileId=documentId)
-    revisions = request.execute(http=http)
+    response = request.execute(http=http)
 
-    exportLinks = []
-    for item in revisions.get('items'):
-      textExportLink = item.get('exportLinks').get('text/plain')
-      exportLinks.append(textExportLink)
-    return exportLinks
+    revisions = []
+    for item in response.get('items'):
+      revision = Revision()
+      revision.documentId = documentId
+      revision.revisionNumber = item.get('id')
+      revision.author = item.get('lastModifyingUserName')
+      revision.exportLink = item.get('exportLinks').get('text/plain')
+      revision.dateTime = item.get('modifiedDate')
+      revisions.append(revision.to_dict())
+    return revisions
 

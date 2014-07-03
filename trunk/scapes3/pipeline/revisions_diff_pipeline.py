@@ -1,3 +1,5 @@
+import string
+
 from gdiff import diff_match_patch
 from mapreduce import base_handler
 from model.revision import Revision
@@ -16,7 +18,7 @@ class RevisionsDiffPipeline(base_handler.PipelineBase):
     contains how many words were added and removed.
   """
   
-  def run(self, revisionTextA, revisionTextB):
+  def run(self, revisionTextA, revisionTextB, revisionDict):
     gdiff = diff_match_patch()
     revisionDiffs = gdiff.diff_main(revisionTextA,
         revisionTextB, False)
@@ -26,10 +28,28 @@ class RevisionsDiffPipeline(base_handler.PipelineBase):
     addedWordCount = self.getAddWordCount(diffWordCount)
     deletedWordCount = self.getDeletedWordCount(diffWordCount)
 
-    revision = Revision()
+    revision = Revision(**revisionDict)
     revision.wordsAdded = addedWordCount
     revision.wordsDeleted = deletedWordCount
+    revision.wordCount = self.getWordCount(revisionTextB)
     return revision.to_dict()
+
+  def getWordCount(self, revisionText):
+    """Counts the number of words in a String
+
+    Args:
+     revisionText: String. Text of the revision.
+
+    Returns:
+      Int. Number of words in revisionText.
+    """
+
+    revisionText = string.split(revisionText, '\n')
+    wordCount = 0;
+    for line in revisionText:
+      line = line.split()
+      wordCount = wordCount + len(line)
+    return wordCount
 
   def isRemove(self, x):
     """Determines whether a gdiff tuple signifies a removal. Helps with
