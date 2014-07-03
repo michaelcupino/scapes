@@ -65,8 +65,7 @@ class FolderAnalysisHandlerTest(unittest.TestCase):
 
     mockFolderAnalysisPipeline.assert_called_with('test@example.com',
         'folder123abc', AnyMatcher())
-    self.assertIn(('"statusMessage": "Folder analysis has started. List '
-        'of character diffs will'), response.body)
+    self.assertIn('"statusMessage": "Folder analysis has started.', response.body)
     self.assertIn('"pipelineUrl": "test-base/status?root=pipeline123"',
         response.body)
 

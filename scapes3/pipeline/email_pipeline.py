@@ -50,6 +50,6 @@ class EmailPipeline(base_handler.PipelineBase):
     message.to = toEmail
     message.subject = subject
     message.body = str(body)
-    message.attachments = [('hello.csv', csvFileBytes)]
+    message.attachments = [('export.csv', csvFileBytes)]
     message.send()
 
