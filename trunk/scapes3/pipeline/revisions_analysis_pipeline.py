@@ -17,10 +17,11 @@ class RevisionsAnalysisPipeline(base_handler.PipelineBase):
     revision id as the key and a ScapesRevisionAnalysis object as the value.
   """
   
-  def run(self, revisions):
+  def run(self, revisions, credentialsAsJson):
     revisionTexts = []
     for revision in revisions:
-      revisionText = yield RevisionFetcherPipeline(revision['exportLink'])
+      revisionText = yield RevisionFetcherPipeline(revision['exportLink'],
+          credentialsAsJson)
       revisionTexts.append(revisionText)
 
     scapesDiffs = []
