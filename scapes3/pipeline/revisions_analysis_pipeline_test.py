@@ -39,7 +39,8 @@ class RevisionsAnalysisPipelineTest(unittest.TestCase):
     }
     mockUrlOpenMethod.side_effect = lambda url: exportedText[url]
 
-    pipeline = RevisionsAnalysisPipeline(mockRevisions)
+    # TODO(michaelcupino): Fix tests
+    pipeline = RevisionsAnalysisPipeline(mockRevisions, None)
     pipeline.start_test()
     result = pipeline.outputs.default.value
 
